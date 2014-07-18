@@ -32,7 +32,7 @@ DwarfException::DwarfException() throw() {}
 DwarfException::DwarfException(const char* reason) throw() : reason(reason){}
 DwarfException::~DwarfException() throw() {}
 const char* DwarfException::what() const throw(){
-    std::string result = std::string("DwarfException: ");
+	std::string result = std::string("DwarfException: ");
 	return result.append(this->reason).c_str();
 }
 
@@ -61,6 +61,8 @@ public:
 	uint64_t getDieBitOffset(Dwarf_Die die);
 	uint64_t getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr);
 	std::string getDieAttributeString(Dwarf_Die die, Dwarf_Half attr);
+	uint64_t getDieAttributeAddress(Dwarf_Die die, Dwarf_Half attr);
+	bool getDieAttributeFlag(Dwarf_Die die, Dwarf_Half attr);
 
 	Dwarf_Debug dbg;
 
@@ -390,7 +392,11 @@ main(int argc, char **argv)
 		return 0;
     } else {
         printf("Using %s as file\n", argv[1]);
-		DwarfParser::parseDwarf(std::string(argv[1]));
+		try{
+			DwarfParser::parseDwarf(std::string(argv[1]));
+		}catch(DwarfException &e){
+			std::cout << e.what() << std::endl;
+		}
     }
 
     return 0;
@@ -689,22 +695,70 @@ void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
 	Dwarf_Signed attrcount = 0;
 	char *filename = 0;
 	res = dwarf_attrlist(print_me,&attrbuf,&attrcount,&error);
-	if(res != DW_DLV_OK) {
+	if(res == DW_DLV_ERROR) {
 		throw DwarfException("Unable to get attribute list");
-	}
-	for(Dwarf_Signed i = 0; i < attrcount ; ++i) {
-		Dwarf_Half aform;
-		res = dwarf_whatattr(attrbuf[i],&aform,&error);
-		if(res == DW_DLV_OK) {
-			const char * atname;
-			dwarf_get_AT_name(aform, &atname);
+	}else if(res != DW_DLV_NO_ENTRY){
+		for(Dwarf_Signed i = 0; i < attrcount ; ++i) {
+			Dwarf_Half aform;
+			res = dwarf_whatattr(attrbuf[i],&aform,&error);
+			if(res == DW_DLV_OK) {
+				const char * atname;
+				dwarf_get_AT_name(aform, &atname);
+				
+				Dwarf_Attribute myattr;
+				res = dwarf_attr(print_me, aform, &myattr, &error);
+				if(res == DW_DLV_ERROR) {
+					throw DwarfException("Error in dwarf_attr\n");
+				}
+				uint16_t formid = ((uint16_t*)myattr)[1];
 
-			std::cout << atname << ": " << getDieAttributeNumber(print_me, aform) << std::endl;
+				std::cout << atname << ": ";
+				uint64_t number;
+				std::string name;
+				const char* formname;
 
+
+				switch(formid){
+					case DW_FORM_addr:
+						number = getDieAttributeAddress(print_me, aform);
+						std::cout << number;
+						break;
+					case DW_FORM_data1:
+					case DW_FORM_data2:
+					case DW_FORM_data4:
+					case DW_FORM_data8:
+						number = getDieAttributeNumber(print_me, aform);
+						std::cout << number;
+						break;
+					case DW_FORM_ref4:
+					case DW_FORM_sdata:
+						number = getDieAttributeNumber(print_me, aform);
+						std::cout << (int64_t) number;
+						break;
+					case DW_FORM_exprloc:
+						std::cout << "<unavailable> - ";
+						break;
+					case DW_FORM_flag_present:
+						number = getDieAttributeFlag(print_me, aform);
+						std::cout << ((number) ? "True" : "False");
+						break;
+					case DW_FORM_strp:
+						name = getDieAttributeString(print_me, aform);
+						std::cout << name;
+						break;
+					default:
+						dwarf_get_FORM_name(formid, &formname);
+						std::cout << "<unavailable> - " << formname;
+						break;
+				}
+
+				std::cout << std::endl;
+
+			}
+			dwarf_dealloc(dbg,attrbuf[i],DW_DLA_ATTR);
 		}
-		dwarf_dealloc(dbg,attrbuf[i],DW_DLA_ATTR);
+		dwarf_dealloc(dbg,attrbuf,DW_DLA_LIST);
 	}
-	dwarf_dealloc(dbg,attrbuf,DW_DLA_LIST);
 //    if(namesoptionon ||checkoptionon) {
 //        if( tag == DW_TAG_subprogram) {
 //            if(namesoptionon) {
@@ -771,6 +825,9 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			break;
 		case DW_TAG_base_type:
 			cursym = new BaseType(cur_die);
+			break;
+		case DW_TAG_pointer_type:
+			cursym = new Pointer(cur_die);
 			break;
 		//case:
 		//	break;
@@ -871,18 +928,13 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 		return result;
 	}
 
-	std::cout << "Dwarf error message: " << dwarf_errmsg(error) << std::endl;
-	uint16_t * debug = (uint16_t*) myattr;
-	const char *atname, *formname;
-	dwarf_get_AT_name(debug[0], &atname);
-	dwarf_get_FORM_name(debug[1], &formname);
-	std::cout << "Attr form = " << atname << " with type: " << formname << std::endl;
 	throw DwarfException("Error in getDieAttributeNumber\n");
-
 	return 0;
 }
 
 std::string DwarfParser::getDieAttributeString(Dwarf_Die die, Dwarf_Half attr){
+	char* str;
+	std::string result;
 	Dwarf_Attribute myattr;
 	Dwarf_Bool hasattr;
 
@@ -895,5 +947,61 @@ std::string DwarfParser::getDieAttributeString(Dwarf_Die die, Dwarf_Half attr){
 	if(res == DW_DLV_ERROR) {
 		throw DwarfException("Error in dwarf_attr\n");
 	}
+    res = dwarf_formstring(myattr, &str,&error);
+	if(res == DW_DLV_OK){
+    	result = std::string(str);
+        dwarf_dealloc(dbg,str,DW_DLA_STRING);
+		return result;
+	}
+	
+	throw DwarfException("Error in getDieAttributeString\n");
+	return NULL;
+}
 
+uint64_t DwarfParser::getDieAttributeAddress(Dwarf_Die die, Dwarf_Half attr){
+	uint64_t result;
+	Dwarf_Attribute myattr;
+	Dwarf_Bool hasattr;
+
+	int res = dwarf_hasattr(die, attr, &hasattr, &error);
+    if(hasattr == 0) {
+    	throw DwarfException("Attr not in Die\n");
+    }
+	
+	res = dwarf_attr(die, attr, &myattr, &error);
+    if(res == DW_DLV_ERROR) {
+    	throw DwarfException("Error in dwarf_attr\n");
+    }
+	
+    res = dwarf_formaddr(myattr, (Dwarf_Addr*) &result, &error);
+    if(res == DW_DLV_OK) {
+    	return result;
+    }
+
+	throw DwarfException("Error in getDieAttributeAddress\n");
+	return 0;
+}
+
+bool DwarfParser::getDieAttributeFlag(Dwarf_Die die, Dwarf_Half attr){
+	bool result;
+	Dwarf_Attribute myattr;
+	Dwarf_Bool hasattr;
+
+	int res = dwarf_hasattr(die, attr, &hasattr, &error);
+    if(hasattr == 0) {
+    	throw DwarfException("Attr not in Die\n");
+    }
+	
+	res = dwarf_attr(die, attr, &myattr, &error);
+    if(res == DW_DLV_ERROR) {
+    	throw DwarfException("Error in dwarf_attr\n");
+    }
+	
+    res = dwarf_formflag(myattr, &hasattr, &error);
+    if(res == DW_DLV_OK) {
+    	return hasattr;
+    }
+
+	throw DwarfException("Error in getDieAttributeAddress\n");
+	return 0;
 }
