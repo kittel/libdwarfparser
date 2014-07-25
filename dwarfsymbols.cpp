@@ -12,7 +12,10 @@
 #include "dwarf.h"
 #include "libdwarf.h"
 
+#include <cassert>
+
 #include <vector>
+#include <map>
 
 #include <exception>
 
@@ -55,6 +58,7 @@ class DwarfParser {
 public:
 	static void parseDwarf(std::string filename);
 	static DwarfParser* getInstance();
+	bool dieHasAttr(Dwarf_Die die, Dwarf_Half attr);
 	std::string getDieName(Dwarf_Die die);
 	uint64_t getDieOffset(Dwarf_Die die);
 	uint64_t getDieByteSize(Dwarf_Die die);
@@ -94,22 +98,35 @@ public:
 	uint32_t getByteSize();
 	std::string getName();
 
+	static Symbol* findSymbolByName(std::string name);
+
 protected:
 	uint64_t offset;
 	uint32_t byteSize;
 	std::string name;
-
+	
+	typedef std::map<std::string, Symbol*> SymbolMap;
+	static SymbolMap symbolMap;
 };
+
+Symbol::SymbolMap Symbol::symbolMap;
 
 Symbol::Symbol(Dwarf_Die object){
 	DwarfParser* instance = DwarfParser::getInstance();
 	this->byteSize = instance->getDieByteSize(object);
 	this->offset = instance->getDieOffset(object);
 	this->name = instance->getDieName(object);
+
+	if(this->name.size() != 0){
+		symbolMap[this->name] = this;
+	}
+	
 }
 
-Symbol::~Symbol(){
+Symbol::~Symbol(){}
 
+Symbol* Symbol::findSymbolByName(std::string name){
+	return symbolMap.find(name)->second;
 }
 
 uint32_t Symbol::getByteSize(){
@@ -120,30 +137,34 @@ std::string Symbol::getName(){
 	return this->name;
 }
 
-class ReferencingType {
-public:
-	ReferencingType(Dwarf_Die object);
-	virtual ~ReferencingType();
-};
-
-ReferencingType::ReferencingType(Dwarf_Die object){
-
-}
-
-ReferencingType::~ReferencingType(){
-
-}
-
 class BaseType: public Symbol {
 public:
 	BaseType(Dwarf_Die object);
 	virtual ~BaseType();
 
 	static BaseType* findBaseTypeById(uint64_t id);
+	static BaseType* findSymbolByName(std::string name);
+	uint64_t getEncoding();
+
+private:
+	uint64_t encoding;
+	
+	typedef std::map<std::string, BaseType*> BaseTypeNameMap;
+	static BaseTypeNameMap baseTypeNameMap;
+	
 };
+
+BaseType::BaseTypeNameMap BaseType::baseTypeNameMap;
 
 BaseType::BaseType(Dwarf_Die object):
 	Symbol(object){
+	DwarfParser *parser = DwarfParser::getInstance();
+	if(parser->dieHasAttr(object, DW_AT_encoding)){
+		this->encoding = parser->getDieAttributeNumber(object, DW_AT_encoding);
+	}
+	if(this->name.size() != 0){
+		baseTypeNameMap[this->name] = this;
+	}
 
 }
 
@@ -154,6 +175,34 @@ BaseType::~BaseType(){
 BaseType* BaseType::findBaseTypeById(uint64_t id){
 	return 0;
 }
+
+BaseType* BaseType::findSymbolByName(std::string name){
+	return baseTypeNameMap.find(name)->second;
+}
+
+
+uint64_t BaseType::getEncoding(){
+	return this->encoding;
+}
+
+class ReferencingType {
+public:
+	ReferencingType(Dwarf_Die object);
+	virtual ~ReferencingType();
+
+private:
+	uint64_t type;
+	BaseType* base;
+};
+
+ReferencingType::ReferencingType(Dwarf_Die object){
+	DwarfParser *parser = DwarfParser::getInstance();
+	if(parser->dieHasAttr(object, DW_AT_type)){
+		this->type = parser->getDieAttributeNumber(object, DW_AT_type);
+	}
+}
+
+ReferencingType::~ReferencingType(){}
 
 
 class RefBaseType: public BaseType {
@@ -171,10 +220,9 @@ protected:
 
 RefBaseType::RefBaseType(Dwarf_Die object):
 	BaseType(object){
-	try {
-		this->type = DwarfParser::getInstance()->getDieAttributeNumber(object, DW_AT_type);
-	}catch (DwarfException &e){
-		std::cout << "DwarfException: " << e.what() << std::endl;
+	DwarfParser* parser = DwarfParser::getInstance();
+	if(parser->dieHasAttr(object, DW_AT_type)){
+		this->type = parser->getDieAttributeNumber(object, DW_AT_type);
 	}
 	this->base = NULL;
 }
@@ -185,6 +233,21 @@ RefBaseType::~RefBaseType(){
 
 void RefBaseType::resolveBaseType(){
 	this->base = BaseType::findBaseTypeById(this->type);
+}
+
+class ConstType: public RefBaseType {
+public:
+	ConstType(Dwarf_Die object);
+	virtual ~ConstType();
+};
+
+ConstType::ConstType(Dwarf_Die object):
+	RefBaseType(object){
+
+}
+
+ConstType::~ConstType(){
+
 }
 
 class Typedef: public RefBaseType {
@@ -275,10 +338,9 @@ StructuredMember::StructuredMember(Dwarf_Die object, Structured *parent):
 		throw DwarfException("Parent not set");
 	}
 	parent->addMember(this);
-	try {
-		this->bitoffset = DwarfParser::getInstance()->getDieAttributeNumber(object, DW_AT_data_member_location);
-	}catch(DwarfException &e){
-		//Union does not contain DW_AT_data_member_location
+	DwarfParser *parser = DwarfParser::getInstance();
+	if(parser->dieHasAttr(object, DW_AT_data_member_location)){
+		this->bitoffset = parser->getDieAttributeNumber(object, DW_AT_data_member_location);
 	}
 }
 
@@ -290,6 +352,10 @@ class Enum: public BaseType {
 public:
 	Enum(Dwarf_Die object);
 	virtual ~Enum();
+
+	void addEnum(Dwarf_Die object);
+	std::string enumValue(uint32_t value);
+	uint32_t enumName(std::string name);
 };
 
 Enum::Enum(Dwarf_Die object):
@@ -297,7 +363,26 @@ Enum::Enum(Dwarf_Die object):
 
 }
 
-Enum::~Enum(){
+Enum::~Enum(){}
+
+void Enum::addEnum(Dwarf_Die object){}
+
+std::string Enum::enumValue(uint32_t value){}
+
+uint32_t enumName(std::string name){}
+
+class Pointer: public RefBaseType {
+public:
+	Pointer(Dwarf_Die object);
+	virtual ~Pointer();
+};
+
+Pointer::Pointer(Dwarf_Die object):
+	RefBaseType(object){
+
+}
+
+Pointer::~Pointer(){
 
 }
 
@@ -329,6 +414,38 @@ Function::Function(Dwarf_Die object):
 
 Function::~Function(){
 
+}
+
+class Variable : public Symbol, public ReferencingType {
+public:
+	Variable(Dwarf_Die object);
+	virtual ~Variable();
+
+	uint64_t getLocation();
+	void setLocation(uint64_t location);
+
+private:
+	uint64_t location;
+};
+
+Variable::Variable(Dwarf_Die object):
+	Symbol(object), ReferencingType(object){
+	
+	DwarfParser *parser = DwarfParser::getInstance();
+	
+	//Get location from elf
+	this->location = 0;
+	
+}
+
+Variable::~Variable(){}
+
+uint64_t Variable::getLocation(){
+	return this->location;
+}
+
+void Variable::setLocation(uint64_t location){
+	this->location = location;
 }
 
 DwarfParser *DwarfParser::instance = NULL;
@@ -451,9 +568,9 @@ void DwarfParser::get_die_and_siblings(Dwarf_Die in_die, Symbol *parent, int in_
     Dwarf_Die child = 0;
     Dwarf_Error error;
 
-    Symbol *cursym;
+    Symbol *cursym = 0;
 
-    cursym = initSymbolFromDie(in_die, parent, in_level,sf);
+	cursym = initSymbolFromDie(in_die, parent, in_level,sf);
 
     for(;;) {
         Dwarf_Die sib_die = 0;
@@ -480,7 +597,7 @@ void DwarfParser::get_die_and_siblings(Dwarf_Die in_die, Symbol *parent, int in_
             dwarf_dealloc(dbg,cur_die,DW_DLA_DIE);
         }
         cur_die = sib_die;
-        initSymbolFromDie(cur_die, parent, in_level,sf);
+        cursym = initSymbolFromDie(cur_die, parent, in_level,sf);
     }
     return;
 }
@@ -691,6 +808,8 @@ void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
         printf("Error in dwarf_get_TAG_name , level %d \n",level);
         exit(1);
     }
+	printf("--\nDescription of tag: %s\n", tagname);
+	
     Dwarf_Attribute *attrbuf = 0;
 	Dwarf_Signed attrcount = 0;
 	char *filename = 0;
@@ -795,7 +914,8 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 
 	Symbol *cursym = 0;
 
-	Structured* structured;
+	Structured* structured = 0;
+	Enum* enumType = 0;
 
 	switch(tag){
 
@@ -810,7 +930,8 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			break;
 		case DW_TAG_member:
 			if(!parent){
-				std::cout << "Parent not set" << std::endl;
+				//std::cout << "Parent not set" << std::endl;
+				//print_die_data(cur_die,level,sf);
 				break;
 			}
 			structured = dynamic_cast<Structured*>(parent);
@@ -818,7 +939,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 				cursym = new StructuredMember(cur_die, structured);
 				break;
 			}else{
-				print_die_data(cur_die,level,sf);
+				//print_die_data(cur_die,level,sf);
 				//class also contains members
 				//throw DwarfException("Parent structured not set");
 			}
@@ -829,11 +950,37 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 		case DW_TAG_pointer_type:
 			cursym = new Pointer(cur_die);
 			break;
+		case DW_TAG_const_type:
+			cursym = new ConstType(cur_die);
+		case DW_TAG_enumeration_type:
+			cursym = new Enum(cur_die);
+			break;
+		case DW_TAG_enumerator:
+			assert(parent);
+			enumType = dynamic_cast<Enum*>(parent);
+			if(enumType){
+				enumType->addEnum(cur_die);
+			}else{
+				print_die_data(cur_die, level, sf);
+			}
+			break;
+		case DW_TAG_variable:
+			if(this->dieHasAttr(cur_die, DW_AT_specification)){
+				//This is an initializer for another object
+				break;
+			}
+			cursym = new Variable(cur_die);
+			break;
 		//case:
 		//	break;
 
 		case DW_TAG_compile_unit:
 		case DW_TAG_namespace:
+		case DW_TAG_imported_declaration:
+		case DW_TAG_class_type:
+		case DW_TAG_lexical_block:
+		case DW_TAG_formal_parameter:
+		case DW_TAG_subprogram:
 			/* This tag is currently not supported */
 			break;
 
@@ -843,10 +990,9 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 				throw DwarfException("Error in dwarf_get_TAG_name");
 			}
 			printf("We are currently not interested in the tag: %s\n", tagname);
-			print_die_data(cur_die,level,sf);
+			//print_die_data(cur_die,level,sf);
 
 	}
-
 	return cursym;
 }
 
@@ -900,6 +1046,15 @@ uint64_t DwarfParser::getDieBitOffset(Dwarf_Die die){
 	return (uint64_t) size;
 }
 
+bool DwarfParser::dieHasAttr(Dwarf_Die die, Dwarf_Half attr){
+	Dwarf_Bool hasattr;
+	int res = dwarf_hasattr(die, attr, &hasattr, &error);
+    if(hasattr == 0) {
+    	return false;
+    }
+	return true;
+}
+
 uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 	uint64_t result;
 	Dwarf_Attribute myattr;
@@ -927,7 +1082,6 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 	if(res == DW_DLV_OK){
 		return result;
 	}
-
 	throw DwarfException("Error in getDieAttributeNumber\n");
 	return 0;
 }
