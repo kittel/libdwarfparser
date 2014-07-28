@@ -8,7 +8,7 @@ public:
 	BaseType(Dwarf_Die object);
 	virtual ~BaseType();
 
-	static BaseType* findBaseTypeById(uint64_t id);
+	static BaseType* findBaseTypeByID(uint64_t id);
 	static BaseType* findBaseTypeByName(std::string name);
 	uint64_t getEncoding();
 

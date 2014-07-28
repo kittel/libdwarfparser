@@ -1,5 +1,7 @@
 #include "referencingtype.h"
 
+#include <cassert>
+
 ReferencingType::ReferencingType(Dwarf_Die object){
 	DwarfParser *parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_type)){
@@ -9,3 +11,8 @@ ReferencingType::ReferencingType(Dwarf_Die object){
 
 ReferencingType::~ReferencingType(){}
 
+BaseType *ReferencingType::getBaseType(){
+	this->base = BaseType::findBaseTypeByID(this->type);
+	assert(this->base);
+	return this->base;
+}

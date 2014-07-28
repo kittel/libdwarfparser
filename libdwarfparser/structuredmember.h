@@ -11,8 +11,15 @@ public:
 	StructuredMember(Dwarf_Die object, Structured *parent);
 	virtual ~StructuredMember();
 
+	uint32_t getByteSize();
+	uint32_t getBitSize();
+	uint32_t getBitOffset();
+	uint32_t getMemberLocation();
+
 protected:
-	uint32_t bitoffset;
+	uint32_t bitSize;
+	uint32_t bitOffset;
+	uint32_t memberLocation;
 
 };
 

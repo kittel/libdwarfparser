@@ -23,7 +23,8 @@ class DwarfParser {
 
 public:
 
-	static void parseDwarf(std::string filename);
+	static void parseDwarfFromFilename(std::string filename);
+	static void parseDwarfFromFD(int fd);
 	static DwarfParser* getInstance();
 
 	bool dieHasAttr(Dwarf_Die die, Dwarf_Half attr);
@@ -39,7 +40,7 @@ public:
 
 
 private:
-	DwarfParser(std::string filename);
+	DwarfParser(int fd);
 	virtual ~DwarfParser();
 
 	Dwarf_Debug dbg;

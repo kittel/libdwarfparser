@@ -2,6 +2,8 @@
 
 #include "dwarfparser.h"
 
+#include <cassert>
+
 BaseType::BaseTypeNameMap BaseType::baseTypeNameMap;
 
 BaseType::BaseType(Dwarf_Die object):
@@ -20,10 +22,13 @@ BaseType::~BaseType(){
 
 }
 
-BaseType* BaseType::findBaseTypeById(uint64_t id){
-	//TODO Implement function
-	id = id;
-	return 0;
+BaseType* BaseType::findBaseTypeByID(uint64_t id){
+	BaseType* base;
+	Symbol *symbol = Symbol::findSymbolByID(id);
+	assert(symbol);
+	base = dynamic_cast<BaseType*>(symbol);
+	assert(base);
+	return base;
 }
 
 BaseType* BaseType::findBaseTypeByName(std::string name){

@@ -16,15 +16,14 @@
 
 DwarfParser *DwarfParser::instance = NULL;
 
-DwarfParser::DwarfParser(std::string filename) :
-		dbg(), fd(0), res(DW_DLV_ERROR), error(), errhand(), errarg()
-	{
-		fd = open(filename.c_str(),O_RDONLY);
-		res = dwarf_init(fd,DW_DLC_READ,errhand,errarg, &dbg,&error);
-		if(res != DW_DLV_OK) {
-		    throw DwarfException("Giving up, cannot do DWARF processing\n");
-		}
+DwarfParser::DwarfParser(int fd) :
+	dbg(), fd(fd), res(DW_DLV_ERROR), error(), errhand(), errarg()
+{
+	res = dwarf_init(this->fd,DW_DLC_READ,errhand,errarg, &dbg,&error);
+	if(res != DW_DLV_OK) {
+	    throw DwarfException("Giving up, cannot do DWARF processing\n");
 	}
+}
 
 DwarfParser::~DwarfParser(){
 
@@ -55,8 +54,15 @@ DwarfParser::Srcfilesdata::~Srcfilesdata()
     this->srcfilescount = 0;
 }
 
-void DwarfParser::parseDwarf(std::string filename){
-	DwarfParser::instance = new DwarfParser(filename);
+void DwarfParser::parseDwarfFromFilename(std::string filename){
+	int fd = open(filename.c_str(),O_RDONLY);
+	DwarfParser::instance = new DwarfParser(fd);
+
+	instance->read_cu_list();
+}
+
+void DwarfParser::parseDwarfFromFD(int fd){
+	DwarfParser::instance = new DwarfParser(fd);
 
 	instance->read_cu_list();
 }
@@ -341,7 +347,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			if(res != DW_DLV_OK) {
 				throw DwarfException("Error in dwarf_get_TAG_name");
 			}
-			printf("We are currently not interested in the tag: %s\n", tagname);
+			//printf("We are currently not interested in the tag: %s\n", tagname);
 			//print_die_data(cur_die,level,sf);
 
 	}

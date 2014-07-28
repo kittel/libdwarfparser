@@ -13,7 +13,9 @@ public:
 	ReferencingType(Dwarf_Die object);
 	virtual ~ReferencingType();
 
-private:
+	BaseType *getBaseType();
+
+protected:
 	uint64_t type;
 	BaseType* base;
 };

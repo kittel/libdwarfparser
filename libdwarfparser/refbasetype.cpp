@@ -16,5 +16,5 @@ RefBaseType::~RefBaseType(){
 }
 
 void RefBaseType::resolveBaseType(){
-	this->base = BaseType::findBaseTypeById(this->type);
+	this->base = BaseType::findBaseTypeByID(this->type);
 }

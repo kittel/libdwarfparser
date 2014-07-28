@@ -13,6 +13,7 @@ public:
 	virtual ~Structured();
 
 	virtual void addMember(StructuredMember *member);
+	StructuredMember* getMemberByName(std::string name);
 
 private:
 	std::vector<StructuredMember*> members;
