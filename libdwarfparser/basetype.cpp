@@ -26,7 +26,7 @@ BaseType* BaseType::findBaseTypeById(uint64_t id){
 	return 0;
 }
 
-BaseType* BaseType::findSymbolByName(std::string name){
+BaseType* BaseType::findBaseTypeByName(std::string name){
 	return baseTypeNameMap.find(name)->second;
 }
 

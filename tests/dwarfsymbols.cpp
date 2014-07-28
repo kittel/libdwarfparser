@@ -1,7 +1,20 @@
 #include "libdwarfparser/libdwarfparser.h"
 
 #include <iostream>
+#include <cassert>
 
+
+void checkEnum(){
+	BaseType* bt;
+	bt = BaseType::findBaseTypeByName("testenum");
+	assert(bt);
+	assert(bt->getName() == std::string("testenum"));
+
+	Enum *enumPtr = dynamic_cast<Enum*>(bt);
+	assert(enumPtr);
+	assert(enumPtr->enumValue(std::string("testenumzero")) == 0);
+	assert(enumPtr->enumName(0) == std::string("testenumzero"));
+}
 	
 int main(int argc, char **argv){
     if(argc < 2) {
@@ -15,5 +28,7 @@ int main(int argc, char **argv){
 			std::cout << e.what() << std::endl;
 		}
     }
+	checkEnum();
+
     return 0;
 }

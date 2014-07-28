@@ -13,8 +13,9 @@ public:
 	virtual ~Enum();
 
 	void addEnum(Dwarf_Die object);
-	std::string enumValue(uint32_t value);
-	uint32_t enumName(std::string name);
+	std::string enumName(uint32_t value);
+	uint32_t enumValue(std::string name);
+	void printEnumMembers(std::ostream &stream);
 
 private:
 

@@ -9,7 +9,7 @@ public:
 	virtual ~BaseType();
 
 	static BaseType* findBaseTypeById(uint64_t id);
-	static BaseType* findSymbolByName(std::string name);
+	static BaseType* findBaseTypeByName(std::string name);
 	uint64_t getEncoding();
 
 private:
