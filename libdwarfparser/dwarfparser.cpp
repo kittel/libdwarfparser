@@ -14,8 +14,7 @@
 
 #include "helpers.h"
 
-#include <dwarf.h>
-#include <libdwarf.h>
+#include "dwarfparser.h"
 
 #include <typeinfo>
 

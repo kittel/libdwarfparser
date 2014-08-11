@@ -2,9 +2,6 @@
 
 #include "dwarfparser.h"
 
-#include <dwarf.h>
-#include <libdwarf.h>
-
 #include <iostream>
 
 Symbol::SymbolNameMap Symbol::symbolNameMap;

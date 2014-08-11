@@ -2,9 +2,6 @@
 
 #include "dwarfparser.h"
 
-#include <dwarf.h>
-#include <libdwarf.h>
-
 #include <cassert>
 
 RefBaseType::RefBaseTypeNameMap RefBaseType::refBaseTypeNameMap;

@@ -2,8 +2,6 @@
 
 #include <cassert>
 
-#include <dwarf.h>
-#include <libdwarf.h>
 #include <iostream>
 
 ReferencingType::ReferencingType(Dwarf_Die object){

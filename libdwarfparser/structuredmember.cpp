@@ -3,9 +3,6 @@
 #include <iostream>
 #include "dwarfexception.h"
 
-#include <dwarf.h>
-#include <libdwarf.h>
-
 
 StructuredMember::StructuredMember(Dwarf_Die object, Structured *parent):
 	Symbol(object), ReferencingType(object),

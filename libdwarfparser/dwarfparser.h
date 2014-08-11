@@ -1,8 +1,8 @@
 #ifndef _DWARFPARSER_H_
 #define _DWARFPARSER_H_
 
-#include "dwarf.h"
-#include "libdwarf.h"
+#include "libdwarf/dwarf.h"
+#include "libdwarf/libdwarf.h"
 
 
 #include <string>

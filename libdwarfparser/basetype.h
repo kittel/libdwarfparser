@@ -2,7 +2,7 @@
 #define _BASETYPE_H_
 
 #include "symbol.h"
-#include "dwarf.h"
+#include "libdwarf/dwarf.h"
 
 #include <cassert>
 #include <typeinfo>

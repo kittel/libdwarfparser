@@ -24,8 +24,8 @@ libvmiwrapper_la_SOURCES =	libvmiwrapper.cpp \
 #							vmiinstance.h \
 #							vmiexception.h
 
-libvmiwrapper_la_CPPFLAGS = -I /home/kittel/projekte/code/libvmi/libvmi/ \
-							-I /home/kittel/projekte/code/libdwarf/libdwarf/ \
+libvmiwrapper_la_CPPFLAGS = -I /home/kittel/projekte/code/libvmi/ \
+							-I /home/kittel/projekte/code/libdwarf/ \
 							-ggdb \
 							$(GLIB_CFLAGS) 
 #libvmiwapper_la_LDFLAGS  = -ldwarf -lelf  -L/home/kittel/projekte/libvmi/libdwarf/libdwarf/

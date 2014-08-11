@@ -2,8 +2,6 @@
 #define LIBDWARFPARSER_H_
 
 
-#include "dwarf.h"
-#include "libdwarf.h"
 #include "basetype.h"
 #include "consttype.h"
 #include "dwarfexception.h"

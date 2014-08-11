@@ -2,8 +2,7 @@
 
 #include <cassert>
 
-#include <dwarf.h>
-#include <libdwarf.h>
+#include <libdwarf/libdwarf.h>
 
 #include "dwarfparser.h"
 #include "instance.h"

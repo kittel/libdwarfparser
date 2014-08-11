@@ -5,9 +5,6 @@
 #include "helpers.h"
 #include <iostream>
 
-#include <dwarf.h>
-#include <libdwarf.h>
-
 #include "libvmiwrapper/vmiinstance.h"
 
 #include "instance.h"

@@ -58,7 +58,7 @@ libdwarfparser_la_SOURCES =	basetype.cpp \
 #							helpers.h \
 #							instance.h
 
-libdwarfparser_la_CPPFLAGS = -I /home/kittel/projekte/code/libdwarf/libdwarf/ \
+libdwarfparser_la_CPPFLAGS = -I /home/kittel/projekte/code/libdwarf/ \
 							 -ggdb \
 							$(GLIB_CFLAGS) 
 #libdwarfparser_la_LDFLAGS  = -ldwarf -lelf  -L/home/kittel/projekte/libvmi/libdwarf/libdwarf/

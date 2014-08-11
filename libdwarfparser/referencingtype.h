@@ -1,8 +1,8 @@
 #ifndef _REFERENCINGTYPE_H_
 #define _REFERENCINGTYPE_H_
 
-#include "dwarf.h"
-#include "libdwarf.h"
+#include "libdwarf/dwarf.h"
+#include "libdwarf/libdwarf.h"
 
 #include "basetype.h"
 

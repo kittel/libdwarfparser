@@ -2,9 +2,6 @@
 
 #include "structuredmember.h"
 
-#include <dwarf.h>
-#include <libdwarf.h>
-
 #include <iostream>
 
 Structured::Structured(Dwarf_Die object):

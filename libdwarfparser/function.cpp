@@ -1,8 +1,5 @@
 #include "function.h"
 
-#include <dwarf.h>
-#include <libdwarf.h>
-
 #include "dwarfparser.h"
 
 #include <algorithm>

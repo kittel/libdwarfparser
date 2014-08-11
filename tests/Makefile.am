@@ -8,9 +8,9 @@ bin_PROGRAMS = test \
 test_SOURCES = test.c
 
 dwarfsymbols_SOURCES = dwarfsymbols.cpp
-dwarfsymbols_CXXFLAGS = -I /home/kittel/projekte/code/libdwarf/libdwarf/ \
+dwarfsymbols_CXXFLAGS = -I /home/kittel/projekte/code/libdwarf/ \
 						$(AM_CXXFLAGS) \
 						$(GLIB_CFLAGS) 
 dwarfsymbols_LDFLAGS = -L../libdwarfparser/ \
 					   -ldwarfparser -ldwarf -lelf \
-					   -L/home/kittel/projekte/code/libdwarf/libdwarf/ 
+					   -L/home/kittel/projekte/code/libdwarf/libdwarf
