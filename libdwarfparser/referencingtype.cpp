@@ -2,6 +2,10 @@
 
 #include <cassert>
 
+#include <dwarf.h>
+#include <libdwarf.h>
+#include <iostream>
+
 ReferencingType::ReferencingType(Dwarf_Die object){
 	DwarfParser *parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_type)){
@@ -16,3 +20,4 @@ BaseType *ReferencingType::getBaseType(){
 	assert(this->base);
 	return this->base;
 }
+

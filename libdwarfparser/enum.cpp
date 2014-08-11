@@ -7,6 +7,9 @@
 
 #include "helpers.h"
 
+#include <dwarf.h>
+#include <libdwarf.h>
+
 Enum::Enum(Dwarf_Die object):
 	BaseType(object), enumValues(){
 }

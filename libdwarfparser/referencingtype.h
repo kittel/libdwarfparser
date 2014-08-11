@@ -16,8 +16,10 @@ public:
 	BaseType *getBaseType();
 
 protected:
+
 	uint64_t type;
 	BaseType* base;
+	
 };
 
 #endif  /* _REFERENCINGTYPE_H_ */

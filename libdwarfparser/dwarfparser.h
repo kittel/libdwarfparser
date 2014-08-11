@@ -4,7 +4,11 @@
 #include "dwarf.h"
 #include "libdwarf.h"
 
+
 #include <string>
+
+struct Dwarf_Die_s;
+typedef struct Dwarf_Die_s* Dwarf_Die; 
 
 class Symbol;
 
@@ -35,8 +39,14 @@ public:
 	uint64_t getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr);
 	std::string getDieAttributeString(Dwarf_Die die, Dwarf_Half attr);
 	uint64_t getDieAttributeAddress(Dwarf_Die die, Dwarf_Half attr);
+	bool isDieExternal(Dwarf_Die die);
+	bool isDieDeclaration(Dwarf_Die die);
 	bool getDieAttributeFlag(Dwarf_Die die, Dwarf_Half attr);
-
+	
+	template<class T>
+	T* getTypeInstance(Dwarf_Die object);
+	template<class T>
+	T* getRefTypeInstance(Dwarf_Die object);
 
 
 private:
@@ -49,6 +59,9 @@ private:
 	Dwarf_Error error;
 	Dwarf_Handler errhand;
 	Dwarf_Ptr errarg;
+
+	uint64_t curCUOffset;
+	uint64_t nextCUOffset;
 
 	static DwarfParser *instance;
 

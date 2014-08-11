@@ -17,5 +17,17 @@ class DwarfException : std::exception {
 		std::string reason;
 };
 
+class DwarfTypeException : DwarfException {
+	public:
+		DwarfTypeException() throw();
+		DwarfTypeException(const char* reason) throw();
+		virtual ~DwarfTypeException() throw();
+		virtual const char* what() const throw();
+
+
+	private:
+		std::string reason;
+};
+
 #endif  /* _DWARFEXCEPTION_H_ */
 

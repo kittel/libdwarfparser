@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <inttypes.h>
 
-#include "libdwarfparser/helpers.h"
+#include "helpers.h"
 
 
 struct teststruct1{

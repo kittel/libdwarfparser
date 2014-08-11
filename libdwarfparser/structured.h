@@ -3,7 +3,7 @@
 
 #include "basetype.h"
 
-#include <vector>
+#include <map>
 
 class StructuredMember;
 
@@ -12,11 +12,17 @@ public:
 	Structured(Dwarf_Die object);
 	virtual ~Structured();
 
-	virtual void addMember(StructuredMember *member);
+	virtual StructuredMember *addMember(Dwarf_Die object);
 	StructuredMember* getMemberByName(std::string name);
 
+	void listMembers();
+	StructuredMember *memberByOffset(uint32_t offset);
+	uint32_t memberOffset(std::string member) const;
+
 private:
-	std::vector<StructuredMember*> members;
+	
+	typedef std::map<std::string, StructuredMember*> MemberNameMap;
+	MemberNameMap memberNameMap;
 };
 
 #endif  /* _STRUCTURED_H_ */

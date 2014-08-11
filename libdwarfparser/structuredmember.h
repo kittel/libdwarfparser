@@ -16,11 +16,13 @@ public:
 	uint32_t getBitOffset();
 	uint32_t getMemberLocation();
 
+
 protected:
 	uint32_t bitSize;
 	uint32_t bitOffset;
 	uint32_t memberLocation;
 
+	Structured* parent;
 };
 
 #endif  /* _STRUCTUREDMEMBER_H_ */

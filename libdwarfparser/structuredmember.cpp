@@ -3,15 +3,18 @@
 #include <iostream>
 #include "dwarfexception.h"
 
+#include <dwarf.h>
+#include <libdwarf.h>
+
 
 StructuredMember::StructuredMember(Dwarf_Die object, Structured *parent):
 	Symbol(object), ReferencingType(object),
-	bitSize(0), bitOffset(0), memberLocation(0){
+	bitSize(0), bitOffset(0), memberLocation(0),
+	parent(parent){
 	if(parent == NULL){
 		std::cout << "parent not set" << std::endl;
 		throw DwarfException("Parent not set");
 	}
-	parent->addMember(this);
 	DwarfParser *parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_bit_size)){
 		this->bitSize = parser->getDieAttributeNumber(object, DW_AT_bit_size);

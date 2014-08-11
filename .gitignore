@@ -33,3 +33,10 @@ missing
 
 
 depcomp
+
+.project
+.cproject
+
+tags
+
+*objdump

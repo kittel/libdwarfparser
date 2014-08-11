@@ -14,10 +14,17 @@
 
 #include "helpers.h"
 
+#include <dwarf.h>
+#include <libdwarf.h>
+
+#include <typeinfo>
+
 DwarfParser *DwarfParser::instance = NULL;
 
 DwarfParser::DwarfParser(int fd) :
-	dbg(), fd(fd), res(DW_DLV_ERROR), error(), errhand(), errarg()
+	dbg(), fd(fd), res(DW_DLV_ERROR), 
+	error(), errhand(), errarg(),
+	curCUOffset(0), nextCUOffset(0)
 {
 	res = dwarf_init(this->fd,DW_DLC_READ,errhand,errarg, &dbg,&error);
 	if(res != DW_DLV_OK) {
@@ -82,6 +89,7 @@ void DwarfParser::read_cu_list()
     int cu_number = 0;
 
     for(;;++cu_number) {
+		this->curCUOffset = this->nextCUOffset;
     	Srcfilesdata sf;
         Dwarf_Die no_die = 0;
         Dwarf_Die cu_die = 0;
@@ -95,8 +103,17 @@ void DwarfParser::read_cu_list()
         }
         if(res == DW_DLV_NO_ENTRY) {
             /* Done. */
-            return;
+            break;
         }
+		this->nextCUOffset = next_cu_header;
+	//	std::cout << std::hex << 
+	//		"cu_header_length " <<  cu_header_length <<
+	//		"\n version_stamp " << version_stamp << 
+	//		"\n abbrev_offset " << abbrev_offset <<
+	//		"\n address_size " << address_size <<
+	//		"\n next_cu_header " << next_cu_header << 
+	//		std::dec << std::endl;
+
         /* The CU will have a single sibling, a cu_die. */
         res = dwarf_siblingof(dbg,no_die,&cu_die,&error);
         if(res == DW_DLV_ERROR) {
@@ -111,6 +128,8 @@ void DwarfParser::read_cu_list()
         get_die_and_siblings(cu_die, 0, 0, sf);
         dwarf_dealloc(dbg, cu_die,DW_DLA_DIE);
     }
+	Array::cleanArrays();
+	Function::cleanFunctions();
 }
 
 void DwarfParser::get_die_and_siblings(Dwarf_Die in_die, Symbol *parent, int in_level, Srcfilesdata sf)
@@ -164,6 +183,9 @@ void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
 
     int res = dwarf_diename(print_me,&name,&error);
 
+	std::cout << getDieName(print_me) << " @ " << std::hex <<
+		getDieOffset(print_me) << std::dec << std::endl;
+
     if(res == DW_DLV_ERROR) {
         printf("Error in dwarf_diename , level %d \n",level);
         exit(1);
@@ -204,10 +226,11 @@ void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
 				}
 				uint16_t formid = ((uint16_t*)myattr)[1];
 
-				std::cout << atname << ": ";
 				uint64_t number;
 				std::string name;
 				const char* formname;
+				dwarf_get_FORM_name(formid, &formname);
+				std::cout << atname << " with type: " << formname << ": ";
 
 
 				switch(formid){
@@ -225,7 +248,7 @@ void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
 					case DW_FORM_ref4:
 					case DW_FORM_sdata:
 						number = getDieAttributeNumber(print_me, aform);
-						std::cout << (int64_t) number;
+						std::cout << std::hex << (int64_t) number << std::dec;
 						break;
 					case DW_FORM_exprloc:
 						std::cout << "<unavailable> - ";
@@ -259,6 +282,50 @@ void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
     }
 }
 
+template<class T>
+T* DwarfParser::getRefTypeInstance(Dwarf_Die object){
+	T* cursym;
+
+	RefBaseType* rbt = RefBaseType::findRefBaseTypeByName(getDieName(object));
+	cursym = dynamic_cast<T*>(rbt);
+	if(!rbt){
+		return new T(object);
+	}else if (!cursym){
+		std::cout << "RefBaseType with same name but different type!" << 
+			typeid(T).name() << " vs " << typeid(rbt).name() <<
+			" " << rbt->getName() << std::endl;
+		std::cout << "Previous id: " << std::hex << rbt->getID() <<  
+			" current ID: " << getDieOffset(object) << std::dec << std::endl;
+		return NULL;
+	}
+	cursym->addAlternativeID(getDieOffset(object));
+	return cursym;
+}
+
+template<>
+Variable* DwarfParser::getTypeInstance(Dwarf_Die object){
+	Variable* cursym;
+
+	cursym = Variable::findVariableByName(getDieName(object));
+	if(!cursym){
+		return new Variable(object);
+	}
+	cursym->update(object);
+	cursym->addAlternativeID(getDieOffset(object));
+	return cursym;
+
+}
+
+template<class T>
+T* DwarfParser::getTypeInstance(Dwarf_Die object){
+	T* cursym = BaseType::findBaseTypeByName<T>(getDieName(object));
+	if(!cursym){
+		return new T(object);
+	}
+	cursym->addAlternativeID(getDieOffset(object));
+	return cursym;
+}
+
 Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int level, Srcfilesdata sf){
 
 	Dwarf_Half tag = 0;
@@ -274,17 +341,19 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 
 	Structured* structured = 0;
 	Enum* enumType = 0;
+	Array* array = 0;
+	Function * function = 0;
 
 	switch(tag){
 
 		case DW_TAG_typedef:
-			cursym = new Typedef(cur_die);
+			cursym = getRefTypeInstance<Typedef>(cur_die);
 			break;
 		case DW_TAG_structure_type:
-			cursym = new Struct(cur_die);
+			cursym = getTypeInstance<Struct>(cur_die);
 			break;
 		case DW_TAG_union_type:
-			cursym = new Union(cur_die);
+			cursym = getTypeInstance<Union>(cur_die);
 			break;
 		case DW_TAG_member:
 			if(!parent){
@@ -294,7 +363,8 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			}
 			structured = dynamic_cast<Structured*>(parent);
 			if (structured){
-				cursym = new StructuredMember(cur_die, structured);
+				cursym = structured->addMember(cur_die);
+				//cursym = getTypeInstance<Variable>(cur_die);
 				break;
 			}else{
 				//print_die_data(cur_die,level,sf);
@@ -303,15 +373,15 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			}
 			break;
 		case DW_TAG_base_type:
-			cursym = new BaseType(cur_die);
+			cursym = getTypeInstance<BaseType>(cur_die);
 			break;
 		case DW_TAG_pointer_type:
-			cursym = new Pointer(cur_die);
+			cursym = getRefTypeInstance<Pointer>(cur_die);
 			break;
 		case DW_TAG_const_type:
-			cursym = new ConstType(cur_die);
+			cursym = getTypeInstance<ConstType>(cur_die);
 		case DW_TAG_enumeration_type:
-			cursym = new Enum(cur_die);
+			cursym = getTypeInstance<Enum>(cur_die);
 			break;
 		case DW_TAG_enumerator:
 			assert(parent);
@@ -327,17 +397,34 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 				//This is an initializer for another object
 				break;
 			}
-			cursym = new Variable(cur_die);
+			cursym = getTypeInstance<Variable>(cur_die);
 			break;
-		//case:
-		//	break;
-
+		case DW_TAG_array_type: 
+			cursym = new Array(cur_die);
+			break;
+		case DW_TAG_subrange_type:
+			assert(parent);
+			array = dynamic_cast<Array*>(parent);
+			if(array){
+				array->update(cur_die);
+			}else{
+				print_die_data(cur_die, level, sf);
+			}
+			break;
+		case DW_TAG_subroutine_type:
+			cursym = new Function(cur_die);
+			break;
+		case DW_TAG_formal_parameter:
+			function = dynamic_cast<Function*>(parent);
+			if(function){
+				function->addParam(cur_die);
+			}
+			break;
 		case DW_TAG_compile_unit:
 		case DW_TAG_namespace:
 		case DW_TAG_imported_declaration:
 		case DW_TAG_class_type:
 		case DW_TAG_lexical_block:
-		case DW_TAG_formal_parameter:
 		case DW_TAG_subprogram:
 			/* This tag is currently not supported */
 			break;
@@ -417,6 +504,7 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 	uint64_t result;
 	Dwarf_Attribute myattr;
 	Dwarf_Bool hasattr;
+	Dwarf_Block* block;
 
 	int res = dwarf_hasattr(die, attr, &hasattr, &error);
     if(hasattr == 0) {
@@ -428,18 +516,93 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
     	throw DwarfException("Error in dwarf_attr\n");
     }
 	
-    res = dwarf_formudata(myattr, (Dwarf_Unsigned*) &result, &error);
-    if(res == DW_DLV_OK) {
-    	return result;
-    }
-    res = dwarf_formsdata(myattr,(Dwarf_Signed*) &result,&error);
-	if(res == DW_DLV_OK){
-    	return result;
-    }
-	res = dwarf_formref(myattr,(Dwarf_Off*) &result,&error);
-	if(res == DW_DLV_OK){
-		return result;
-	}
+	uint16_t formid = ((uint16_t*)myattr)[1];
+	switch(formid){
+		case DW_FORM_block1:
+			res = dwarf_formblock(myattr, &block, &error);
+			if(res == DW_DLV_OK){
+				assert(block->bl_len > 0);
+				switch(((uint8_t*) block->bl_data)[0]){
+					case DW_OP_addr:
+						result = 0;
+						if(block->bl_len > 10)
+							std::cout << "Error with " << std::hex << 
+							   	getDieOffset(die) << std::dec << std::endl;
+						assert(block->bl_len <= 10);
+						for(Dwarf_Unsigned i = 1; i < 9; i++){
+							result = result << 8;
+							result += ((uint8_t*) block->bl_data)[i];
+							//TODO Handle the last byte DW_OP_stack_value
+						}
+						break;
+					case DW_OP_plus_uconst:
+						result = 0;
+						assert(block->bl_len <= 9);
+						for(Dwarf_Unsigned i = 1; i < block->bl_len; i++){
+							result = result << 8;
+							result += ((uint8_t*) block->bl_data)[i];
+						}
+						break;
+					default:
+						result = 0;
+						break;
+						//TODO add other operators
+						const char * atname;
+						dwarf_get_AT_name(attr, &atname);
+						const char* formname;
+						dwarf_get_FORM_name(formid, &formname);
+
+						std::cout << std::hex << getDieOffset(die) << std::dec << std::endl;
+						std::cout << atname << ": ";
+						std::cout << formname << std::endl;
+						std::cout << "Value: " << std::endl;
+						for(Dwarf_Unsigned i = 0; i < block->bl_len; i++){
+							std::cout << std::hex << 
+								(uint32_t) ((uint8_t*) block->bl_data)[i] << 
+								std::dec << " ";
+						}
+						std::cout << std::endl;
+						result = 0;
+				}
+				dwarf_dealloc(dbg,block,DW_DLA_BLOCK);
+				return result;
+			}
+			break;
+		case DW_FORM_data1:
+		case DW_FORM_data2:
+		case DW_FORM_data4:
+			res = dwarf_formudata(myattr, (Dwarf_Unsigned*) &result, &error);
+			if(res == DW_DLV_OK) {
+				return result;
+			}
+			break;
+		case DW_FORM_ref4:
+			res = dwarf_formref(myattr,(Dwarf_Off*) &result,&error);
+			if(res == DW_DLV_OK){
+				return result + this->curCUOffset;
+			}
+			break;
+		case DW_FORM_sdata:
+			res = dwarf_formsdata(myattr,(Dwarf_Signed*) &result,&error);
+			if(res == DW_DLV_OK){
+				return result;
+			}
+			break;
+		default:
+			const char* formname;
+			dwarf_get_FORM_name(formid, &formname);
+			std::cout << formname << " currently not supported" << std::endl;
+	}	
+
+	const char * atname;
+	dwarf_get_AT_name(attr, &atname);
+	const char* formname;
+	dwarf_get_FORM_name(formid, &formname);
+	
+	std::cout << getDieName(die) << std::endl;
+	std::cout << atname << ": ";
+	std::cout << formname << std::endl;
+
 	throw DwarfException("Error in getDieAttributeNumber\n");
 	return 0;
 }
@@ -494,12 +657,21 @@ uint64_t DwarfParser::getDieAttributeAddress(Dwarf_Die die, Dwarf_Half attr){
 	return 0;
 }
 
+bool DwarfParser::isDieExternal(Dwarf_Die die){
+	return this->getDieAttributeFlag(die, DW_AT_external);
+}
+
+bool DwarfParser::isDieDeclaration(Dwarf_Die die){
+	return this->getDieAttributeFlag(die, DW_AT_declaration);
+}
+
 bool DwarfParser::getDieAttributeFlag(Dwarf_Die die, Dwarf_Half attr){
 	Dwarf_Attribute myattr;
 	Dwarf_Bool hasattr;
 
 	int res = dwarf_hasattr(die, attr, &hasattr, &error);
     if(hasattr == 0) {
+		return false;
     	throw DwarfException("Attr not in Die\n");
     }
 	

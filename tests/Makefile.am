@@ -1,5 +1,5 @@
-AM_CPPFLAGS = -Wall -Wextra -Werror 
-AM_CXXFLAGS = -fpic -I $(top_builddir) -rdynamic -std=c++11
+AM_CPPFLAGS = -Wall -Wextra -Werror  -I $(top_builddir)/common
+AM_CXXFLAGS = -fpic -I $(top_builddir) -rdynamic -std=c++1y
 AM_CFLAGS = -fpic  -I $(top_builddir) 
 
 bin_PROGRAMS = test \
@@ -8,5 +8,9 @@ bin_PROGRAMS = test \
 test_SOURCES = test.c
 
 dwarfsymbols_SOURCES = dwarfsymbols.cpp
-dwarfsymbols_CXXFLAGS = -I /home/kittel/projekte/libvmi/libdwarf/libdwarf/ $(AM_CXXFLAGS)
-dwarfsymbols_LDFLAGS = -L../libdwarfparser/ -ldwarfparser -ldwarf -lelf  -L/home/kittel/projekte/libvmi/libdwarf/libdwarf/
+dwarfsymbols_CXXFLAGS = -I /home/kittel/projekte/code/libdwarf/libdwarf/ \
+						$(AM_CXXFLAGS) \
+						$(GLIB_CFLAGS) 
+dwarfsymbols_LDFLAGS = -L../libdwarfparser/ \
+					   -ldwarfparser -ldwarf -lelf \
+					   -L/home/kittel/projekte/code/libdwarf/libdwarf/ 

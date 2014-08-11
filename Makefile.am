@@ -1,2 +1,3 @@
 SUBDIRS=libdwarfparser \
+		libvmiwrapper \
 		tests

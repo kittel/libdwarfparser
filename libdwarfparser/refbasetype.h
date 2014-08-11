@@ -10,10 +10,16 @@ public:
 
 	void resolveBaseType();
 	BaseType* getBaseType();
+	
+	static RefBaseType* findRefBaseTypeByID(uint64_t id);
+	static RefBaseType* findRefBaseTypeByName(std::string name);
 
 protected:
 	uint64_t type;
 	BaseType* base;
+	
+	typedef std::map<std::string, RefBaseType*> RefBaseTypeNameMap;
+	static RefBaseTypeNameMap refBaseTypeNameMap;
 };
 
 

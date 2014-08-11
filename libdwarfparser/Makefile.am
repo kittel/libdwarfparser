@@ -1,5 +1,5 @@
 # @configure_input@
-AM_CXXFLAGS = -Wall -Wextra -Werror -fpic -std=c++11 -I $(top_builddir)/src
+AM_CXXFLAGS = -Wall -Wextra -Werror -fpic -std=c++1y -I $(top_builddir)/ -I $(top_builddir)/common
 
 
 # Package-specific substitution variables
@@ -24,6 +24,7 @@ libdwarfparser_la_SOURCES =	basetype.cpp \
 							funcpointer.cpp \
 							function.cpp \
 							pointer.cpp \
+							array.cpp \
 							refbasetype.cpp \
 							referencingtype.cpp \
 							struct.cpp \
@@ -32,7 +33,8 @@ libdwarfparser_la_SOURCES =	basetype.cpp \
 							symbol.cpp \
 							typedef.cpp \
 							union.cpp \
-							variable.cpp 
+							variable.cpp \
+							instance.cpp
 
 #libdwarfparser_la_HEADERS =	basetype.h \
 #							consttype.h \
@@ -42,6 +44,7 @@ libdwarfparser_la_SOURCES =	basetype.cpp \
 #							funcpointer.h \
 #							function.h \
 #							pointer.h \
+#							array.h \
 #							refbasetype.h \
 #							referencingtype.h \
 #							struct.h \
@@ -52,7 +55,10 @@ libdwarfparser_la_SOURCES =	basetype.cpp \
 #							union.h \
 #							variable.h \
 #							libdwarfparser.h \
-#							helpers.h
+#							helpers.h \
+#							instance.h
 
-libdwarfparser_la_CPPFLAGS = -I /home/kittel/projekte/libvmi/libdwarf/libdwarf/ -ggdb
-libdwarfparser_la_LDFLAGS  = -ldwarf -lelf  -L/home/kittel/projekte/libvmi/libdwarf/libdwarf/
+libdwarfparser_la_CPPFLAGS = -I /home/kittel/projekte/code/libdwarf/libdwarf/ \
+							 -ggdb \
+							$(GLIB_CFLAGS) 
+#libdwarfparser_la_LDFLAGS  = -ldwarf -lelf  -L/home/kittel/projekte/libvmi/libdwarf/libdwarf/
