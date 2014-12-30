@@ -13,12 +13,14 @@ Variable::VariableNameMap Variable::variableNameMap;
 
 Variable::Variable(Dwarf_Die object):
 	Symbol(object), ReferencingType(object){
-	
-	
-	//Get location from elf
 	this->location = 0;
 	if(this->name.size() != 0){
 		variableNameMap[this->name] = this;
+	}
+
+	DwarfParser *parser = DwarfParser::getInstance();
+	if(parser->dieHasAttr(object, DW_AT_location)){
+		this->location = parser->getDieAttributeNumber(object, DW_AT_location);
 	}
 }
 
@@ -29,6 +31,7 @@ uint64_t Variable::getLocation(){
 }
 
 void Variable::update(Dwarf_Die object){
+	if(this->location != 0) return;
 	DwarfParser *parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_location)){
 		this->location = parser->getDieAttributeNumber(object, DW_AT_location);
@@ -41,6 +44,7 @@ void Variable::setLocation(uint64_t location){
 }
 
 Instance Variable::getInstance(){
+	assert(this->location);
 	Instance instance = Instance(this->getBaseType(), this->location);
 	return instance;
 }

@@ -8,4 +8,3 @@ Typedef::Typedef(Dwarf_Die object):
 Typedef::~Typedef(){
 
 }
-

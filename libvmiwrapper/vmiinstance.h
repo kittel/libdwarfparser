@@ -16,7 +16,6 @@ class VMIInstance {
 		static VMIInstance *instance;
 		void pauseVM();
 		void resumeVM();
-		void getKernelPages();
 
 	public:
 		VMIInstance(std::string name, uint32_t flags = 0);
@@ -29,7 +28,9 @@ class VMIInstance {
 		uint16_t read16FromVA(uint64_t va, uint32_t pid = 0);
 		uint32_t read32FromVA(uint64_t va, uint32_t pid = 0);
 		uint64_t read64FromVA(uint64_t va, uint32_t pid = 0);
+		std::string readStrFromVA(uint64_t va, uint32_t pid = 0);
 		GSList *get_Kernel_Pages(vmi_instance_t *vmi);
+		void getKernelPages();
 
 };
 

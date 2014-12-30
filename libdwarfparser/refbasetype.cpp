@@ -31,6 +31,11 @@ void RefBaseType::resolveBaseType(){
 	this->base = BaseType::findBaseTypeByID(this->type);
 }
 
+uint32_t RefBaseType::getByteSize(){
+	if(!base) this->resolveBaseType();
+	return base->getByteSize();
+}
+
 RefBaseType* RefBaseType::findRefBaseTypeByID(uint64_t id){
 	RefBaseType* base;
 	Symbol *symbol = Symbol::findSymbolByID(id);

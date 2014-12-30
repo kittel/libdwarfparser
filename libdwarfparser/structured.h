@@ -13,7 +13,7 @@ public:
 	virtual ~Structured();
 
 	virtual StructuredMember *addMember(Dwarf_Die object);
-	StructuredMember* getMemberByName(std::string name);
+	StructuredMember* memberByName(std::string name);
 
 	void listMembers();
 	StructuredMember *memberByOffset(uint32_t offset);

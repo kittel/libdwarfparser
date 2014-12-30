@@ -49,11 +49,6 @@ bool Function::operator==(const Function& func) const{
 		if (this->paramList[i] != func.paramList[i]) return false;
 	}
 	return true;
-
-}
-
-bool Function::operator()(const Function *f1, const Function *f2){
-	return *f1 < *f2;
 }
 
 void Function::updateTypes(){

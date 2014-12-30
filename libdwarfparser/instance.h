@@ -7,44 +7,31 @@
 class Instance {
 
 	public:
-		Instance(BaseType* type, uint64_t va, Instance *parent = 0);
+		Instance(BaseType* type = 0, uint64_t va = 0, Instance *parent = 0);
 		virtual ~Instance();
 
 		BaseType *getType();
-		Instance getMember(std::string name);
+		uint64_t getAddress();
+		void changeBaseType(std::string newType, std::string fieldname="list");
 
 		uint64_t getLength();
 		Instance arrayElem(uint64_t element);
-		Instance memberByOffset(uint64_t offset);
+		Instance memberByName(std::string name, bool ptr = false);
+		Instance memberByOffset(uint64_t offset, bool ptr = false);
 
 		uint32_t size();
 
-		template<typename T>
-		inline T getValue(){
-			assert(address);
-			assert(type);
-			BaseType* bt = this->type;
-			RefBaseType* rbt;
-			while((rbt = dynamic_cast<RefBaseType*>(bt))){
-				bt = rbt->getBaseType();
-			}
-			return bt->getValue<T>(this->address);
-		}
-		
-		template<typename T>
-		inline T getRawValue(){
-			assert(address);
-			assert(type);
-			BaseType* bt = this->type;
-			RefBaseType* rbt;
-			while((rbt = dynamic_cast<RefBaseType*>(bt))){
-				bt = rbt->getBaseType();
-			}
-			return bt->getRawValue<T>(this->address);
-		}
-
 		uint32_t memberOffset(std::string name) const;
+		Instance dereference();
 		
+		template<typename T>
+		inline T getValue();
+		
+		template<typename T>
+		inline T getRawValue(bool dereference = true);
+
+		bool operator==(const Instance& instance) const;
+		bool operator!=(const Instance& instance) const;
 
 	private:
 		Instance *parent;
@@ -52,5 +39,29 @@ class Instance {
 		uint64_t address;
 };
 
+template<typename T>
+inline T Instance::getValue(){
+	assert(address);
+	assert(type);
+	BaseType* bt = this->type;
+	RefBaseType* rbt;
+	while((rbt = dynamic_cast<RefBaseType*>(bt))){
+		bt = rbt->getBaseType();
+	}
+	return bt->getValue<T>(this->address);
+}
+
+template<typename T>
+inline T Instance::getRawValue(bool dereference){
+	assert(address);
+	assert(type);
+	if(typeid(T) != typeid(std::string) && dereference && 
+			dynamic_cast<RefBaseType*>(this->type)){
+		std::cout << "dereferencing" << std::endl;
+		Instance i = this->dereference();
+	   	return i.getRawValue<T>(i.address);
+	}
+	return this->type->getRawValue<T>(this->address);
+}
 
 #endif /* _INSTANCE_H_ */

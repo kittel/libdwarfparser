@@ -11,6 +11,8 @@ public:
 	void resolveBaseType();
 	BaseType* getBaseType();
 	
+	virtual uint32_t getByteSize();
+	
 	static RefBaseType* findRefBaseTypeByID(uint64_t id);
 	static RefBaseType* findRefBaseTypeByName(std::string name);
 

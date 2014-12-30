@@ -6,25 +6,26 @@
 #include <sys/mman.h>
 #include <stdio.h>
 #include <inttypes.h>
+#include <cassert>
+#include <iostream>
 #include "vmiexception.h"
-#include "vmiinstance.h"
-
-#include <libvmi/x86.h>
 
 #include "helpers.h"
 
-#define IS_PAGE_USER_SUPERVISOR(page_info)   (USER_SUPERVISOR(page_info->l1_v) || \
-											 USER_SUPERVISOR(page_info->l2_v) || \
-											 USER_SUPERVISOR(page_info->l3_v) || \
-											 USER_SUPERVISOR(page_info->l4_v))
+#define IA32E_IS_PAGE_USER_SUPERVISOR(page_info) \
+  	(USER_SUPERVISOR(page_info->x86_ia32e.pte_value) || \
+ 	 USER_SUPERVISOR(page_info->x86_ia32e.pgd_value) || \
+	 USER_SUPERVISOR(page_info->x86_ia32e.pdpte_value) || \
+	 USER_SUPERVISOR(page_info->x86_ia32e.pml4e_value))
 
-#define IS_PAGE_SUPERVISOR(page_info)        (!(IS_PAGE_USER_SUPERVISOR(page_info)))
+#define IA32E_IS_PAGE_SUPERVISOR(page_info)        (!(IA32E_IS_PAGE_USER_SUPERVISOR(page_info)))
 
 #define PAGE_NX(entry)	        VMI_GET_BIT(entry, 63)
-#define IS_PAGE_NX(page_info)				(PAGE_NX(page_info->l1_v) || \
-											 PAGE_NX(page_info->l2_v) || \
-											 PAGE_NX(page_info->l3_v) || \
-											 PAGE_NX(page_info->l4_v))
+#define IS_PAGE_NX(page_info) \
+	(PAGE_NX(page_info->x86_ia32e.pte_value) || \
+	 PAGE_NX(page_info->x86_ia32e.pgd_value) || \
+	 PAGE_NX(page_info->x86_ia32e.pdpte_value) || \
+	 PAGE_NX(page_info->x86_ia32e.pml4e_value))
 
 /* GLIB Macros */
 
@@ -104,13 +105,13 @@ void VMIInstance::getKernelPages(){
 
     for(GSList *__glist = pages; __glist ; __glist = __glist->next){
 	    item = (page_info_t*) __glist->data;
-	    if (item-> l4_v == 0){
+	    if (item->x86_ia32e.pml4e_value == 0){
             printf("l4_v is null\n");
     	}else {
-			if(ENTRY_PRESENT(item->l1_v, VMI_OS_LINUX) && IS_PAGE_SUPERVISOR(item)){
+			//if(ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && IA32E_IS_PAGE_SUPERVISOR(item)){
+			if(ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX)){
+		        printf("Page at %16lx : %016lx - %s, %s ", item->vaddr, item->paddr, (IA32E_IS_PAGE_SUPERVISOR(item)) ? "S": "U" , (IS_PAGE_NX(item)) ? "NX" : "X");
 				printf("Page size: %i\n", item->size);
-		        printf("Page at %016lx - %i, %i\n", item->paddr, IS_PAGE_SUPERVISOR(item), IS_PAGE_NX(item));
-				printf("\n");
 			}
         }
 
@@ -143,3 +144,10 @@ uint64_t VMIInstance::read64FromVA(uint64_t va, uint32_t pid){
 	return value;
 }
 
+std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid){
+	char * str = vmi_read_str_va(vmi, va, pid);
+	assert(str);
+	std::string result = std::string(str);
+	delete str;
+	return result;
+}

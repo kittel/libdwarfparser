@@ -7,6 +7,7 @@ class Typedef: public RefBaseType {
 public:
 	Typedef(Dwarf_Die object);
 	virtual ~Typedef();
+	
 };
 
 #endif  /* _TYPEDEF_H_ */

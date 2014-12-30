@@ -14,7 +14,6 @@ class Function : public BaseType {
 
 		bool operator< (const Function& func) const;
 		bool operator==(const Function& func) const;
-		bool operator()(const Function *f1, const Function *f2);
 		static void cleanFunctions();
 
 	protected:

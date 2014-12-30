@@ -27,14 +27,14 @@ void checkStruct(void){
 	structPtr = dynamic_cast<Struct*>(bt);
 	assert(structPtr);
 	StructuredMember* sm;
-	sm = structPtr->getMemberByName("testmember1");
+	sm = structPtr->memberByName("testmember1");
 	assert(sm);
 
 	bt = BaseType::findBaseTypeByName("teststruct2");
 	assert(bt);
 	structPtr = dynamic_cast<Struct*>(bt);
 	assert(structPtr);
-	sm = structPtr->getMemberByName("testmember3");
+	sm = structPtr->memberByName("testmember3");
 	assert(sm);
 	assert(sm->getByteSize() == 4);
 	assert(sm->getBitSize() == 1);

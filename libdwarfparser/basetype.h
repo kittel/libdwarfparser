@@ -54,6 +54,9 @@ private:
 template<typename T>
 inline T BaseType::getValue(uint64_t va, uint64_t pid){
 	assert(va);
+	if (!encoding){
+		std::cout << std::hex << this->getID() << std::dec << " " << this->getName() << std::endl;
+	}
 	assert(encoding);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	switch(this->encoding){
@@ -182,6 +185,13 @@ inline uint64_t BaseType::getRawValue(uint64_t va, uint64_t pid){
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read64FromVA(va, pid);
+}
+
+template<>
+inline std::string BaseType::getRawValue(uint64_t va, uint64_t pid){
+	assert(va);
+	VMIInstance *vmi = VMIInstance::getInstance();
+	return vmi->readStrFromVA(va, pid);
 }
 
 template<typename T>

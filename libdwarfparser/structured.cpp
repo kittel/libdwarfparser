@@ -26,7 +26,7 @@ StructuredMember* Structured::addMember(Dwarf_Die object){
 	return member;
 }
 
-StructuredMember* Structured::getMemberByName(std::string name){
+StructuredMember* Structured::memberByName(std::string name){
 	return memberNameMap[name];
 }
 

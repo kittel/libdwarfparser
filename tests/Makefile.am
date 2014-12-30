@@ -12,5 +12,7 @@ dwarfsymbols_CXXFLAGS = -I /home/kittel/projekte/code/libdwarf/ \
 						$(AM_CXXFLAGS) \
 						$(GLIB_CFLAGS) 
 dwarfsymbols_LDFLAGS = -L../libdwarfparser/ \
+					   -L../libvmiwrapper/ \
+					   -lvmiwrapper \
 					   -ldwarfparser -ldwarf -lelf \
 					   -L/home/kittel/projekte/code/libdwarf/libdwarf

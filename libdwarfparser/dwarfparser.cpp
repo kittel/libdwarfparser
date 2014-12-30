@@ -527,10 +527,10 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 						if(block->bl_len > 10)
 							std::cout << "Error with " << std::hex << 
 							   	getDieOffset(die) << std::dec << std::endl;
-						assert(block->bl_len <= 10);
+						//assert(block->bl_len <= 10);
 						for(Dwarf_Unsigned i = 1; i < 9; i++){
 							result = result << 8;
-							result += ((uint8_t*) block->bl_data)[i];
+							result += ((uint8_t*) block->bl_data)[9-i];
 							//TODO Handle the last byte DW_OP_stack_value
 						}
 						break;
