@@ -43,6 +43,8 @@ public:
 	template<typename T>
 	inline T getRawValue(uint64_t va, uint64_t pid = 0);
 
+	void print();
+
 private:
 	uint64_t encoding;
 	

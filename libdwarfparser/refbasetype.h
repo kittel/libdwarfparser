@@ -16,6 +16,8 @@ public:
 	static RefBaseType* findRefBaseTypeByID(uint64_t id);
 	static RefBaseType* findRefBaseTypeByName(std::string name);
 
+	void print();
+
 protected:
 	uint64_t type;
 	BaseType* base;

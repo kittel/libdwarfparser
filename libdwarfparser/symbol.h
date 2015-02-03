@@ -2,6 +2,7 @@
 #define _SYMBOL_H_
 
 #include <list>
+#include <set>
 #include <map>
 #include <string.h>
 #include <cstdint>
@@ -12,13 +13,14 @@ typedef struct Dwarf_Die_s* Dwarf_Die;
 class IDManager {
 
 public:
-	static uint64_t getID(uint64_t dwarfID, uint64_t fileID);
+	static uint64_t getID(uint64_t dwarfID, uint32_t fileID);
+	static std::pair<uint64_t, uint32_t> getRevID(uint64_t id);
 
 protected:
 
 	static uint64_t nextID;
-	typedef std::map<std::pair<uint64_t, uint64_t>, uint64_t> IDMap;
-	typedef std::map<uint64_t, std::pair<uint64_t, uint64_t>> IDRevMap;
+	typedef std::map<std::pair<uint64_t, uint32_t>, uint64_t> IDMap;
+	typedef std::map<uint64_t, std::pair<uint64_t, uint32_t>> IDRevMap;
 	static IDMap idMap;
 	static IDRevMap idRevMap;
 
@@ -40,7 +42,11 @@ public:
 	std::string getName();
 
 	void addAlternativeID(uint64_t id);
+	void addAlternativeDwarfID(uint64_t id, uint32_t fileID);
+	void print();
 
+
+	//Static Functions
 	static Symbol* findSymbolByName(std::string name);
 	template<class T>
 	static inline T* findSymbolByName(std::string name){
@@ -54,7 +60,7 @@ public:
 
 	static Symbol* findSymbolByID(uint64_t id);
 	static uint64_t numberOfSymbols();
-	static std::list<uint64_t> getAliases(uint64_t id);
+	static std::set<uint64_t> getAliases(uint64_t id);
 
 protected:
 	uint64_t id;
@@ -64,7 +70,7 @@ protected:
 	typedef std::multimap<std::string, Symbol*> SymbolNameMap;
 	typedef std::map<uint64_t, Symbol*> SymbolIDMap;
 	typedef std::map<uint64_t, uint64_t> SymbolIDAliasMap;
-	typedef std::map<uint64_t, std::list<uint64_t>> SymbolIDAliasReverseList;
+	typedef std::map<uint64_t, std::set<uint64_t>> SymbolIDAliasReverseList;
 
 	static SymbolNameMap symbolNameMap;
 	static SymbolIDMap symbolIDMap;

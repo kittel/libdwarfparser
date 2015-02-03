@@ -19,12 +19,15 @@
 #include <typeinfo>
 
 DwarfParser *DwarfParser::instance = NULL;
+uint32_t DwarfParser::nextFileID = 0;
 
 DwarfParser::DwarfParser(int fd) :
 	dbg(), fd(fd), res(DW_DLV_ERROR), 
+	fileID(++nextFileID),
 	error(), errhand(), errarg(),
 	curCUOffset(0), nextCUOffset(0)
 {
+	std::cout << "Loaded parser with id: " << fileID << std::endl;
 	res = dwarf_init(this->fd,DW_DLC_READ,errhand,errarg, &dbg,&error);
 	if(res != DW_DLV_OK) {
 	    throw DwarfException("Giving up, cannot do DWARF processing\n");
@@ -65,16 +68,23 @@ void DwarfParser::parseDwarfFromFilename(std::string filename){
 	DwarfParser::instance = new DwarfParser(fd);
 
 	instance->read_cu_list();
+
+	DELETE(instance);
 }
 
 void DwarfParser::parseDwarfFromFD(int fd){
 	DwarfParser::instance = new DwarfParser(fd);
 
 	instance->read_cu_list();
+
+	DELETE(instance);
 }
 
 DwarfParser* DwarfParser::getInstance(){
 	return instance;
+}
+uint32_t DwarfParser::getFileID(){
+	return this->fileID;
 }
 
 void DwarfParser::read_cu_list()
@@ -297,7 +307,7 @@ T* DwarfParser::getRefTypeInstance(Dwarf_Die object){
 			" current ID: " << getDieOffset(object) << std::dec << std::endl;
 		return NULL;
 	}
-	cursym->addAlternativeID(getDieOffset(object));
+	cursym->addAlternativeDwarfID(getDieOffset(object), fileID);
 	return cursym;
 }
 
@@ -310,7 +320,7 @@ Variable* DwarfParser::getTypeInstance(Dwarf_Die object){
 		return new Variable(object);
 	}
 	cursym->update(object);
-	cursym->addAlternativeID(getDieOffset(object));
+	cursym->addAlternativeDwarfID(getDieOffset(object), fileID);
 	return cursym;
 
 }
@@ -321,7 +331,11 @@ T* DwarfParser::getTypeInstance(Dwarf_Die object){
 	if(!cursym){
 		return new T(object);
 	}
-	cursym->addAlternativeID(getDieOffset(object));
+	//TODO Include
+	//We need to update the representation of the object that we
+	//already know about
+	//cursym->update(object);
+	cursym->addAlternativeDwarfID(getDieOffset(object), fileID);
 	return cursym;
 }
 
@@ -526,7 +540,8 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 						result = 0;
 						if(block->bl_len > 10)
 							std::cout << "Error with " << std::hex << 
-							   	getDieOffset(die) << std::dec << std::endl;
+							   	getDieOffset(die) << std::dec << 
+								" Block length mismatch" << std::endl;
 						//assert(block->bl_len <= 10);
 						for(Dwarf_Unsigned i = 1; i < 9; i++){
 							result = result << 8;

@@ -42,13 +42,14 @@ public:
 	bool isDieExternal(Dwarf_Die die);
 	bool isDieDeclaration(Dwarf_Die die);
 	bool getDieAttributeFlag(Dwarf_Die die, Dwarf_Half attr);
-	
+
 	template<class T>
 	T* getTypeInstance(Dwarf_Die object);
 	template<class T>
 	T* getRefTypeInstance(Dwarf_Die object);
 
-
+	uint32_t getFileID();
+	
 private:
 	DwarfParser(int fd);
 	virtual ~DwarfParser();
@@ -56,6 +57,7 @@ private:
 	Dwarf_Debug dbg;
 	int fd;
 	int res;
+	uint32_t fileID;
 	Dwarf_Error error;
 	Dwarf_Handler errhand;
 	Dwarf_Ptr errarg;
@@ -63,6 +65,7 @@ private:
 	uint64_t curCUOffset;
 	uint64_t nextCUOffset;
 
+	static uint32_t nextFileID;
 	static DwarfParser *instance;
 
 	void read_cu_list();

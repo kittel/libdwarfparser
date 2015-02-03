@@ -32,7 +32,10 @@ uint32_t Array::getByteSize(){
 void Array::update(Dwarf_Die object){
 	DwarfParser *parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_type)){
-		this->lengthType = parser->getDieAttributeNumber(object, DW_AT_type);
+		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
+		uint32_t fileID = parser->getFileID();
+		this->lengthType = IDManager::getID(dwarfType, fileID);
+		if(!this->lengthType) assert(false);
 	}
 	if(parser->dieHasAttr(object, DW_AT_upper_bound)){
 		this->length = parser->getDieAttributeNumber(object, DW_AT_upper_bound) + 1;
@@ -81,6 +84,8 @@ bool Array::operator< (const Array& array) const{
 		return this->type < array.type;
 	if (this->length != array.length) 
 		return this->length < array.length;
+	if (this->id != array.id) 
+		return this->id < array.id;
 	return false;
 
 }
@@ -99,6 +104,13 @@ void Array::updateTypes(){
 		sym = Symbol::findSymbolByID(this->type);
 		this->type = sym->getID();
 	}
+}
+
+void Array::print(){
+	Pointer::print();
+	std::cout << "\t Array Type:   " << std::hex << this->type << 
+										std::dec << std::endl;
+	std::cout << "\t Length        " << this->length << std::endl;
 }
 
 void Array::cleanArrays(){
@@ -123,6 +135,9 @@ void Array::cleanArrays(){
 		if (*oldPtr == *(*item)){
 			oldPtr->addAlternativeID((*item)->id);
 			delPtr = *item;
+			//std::cout << "Deleting array: " << std::endl;
+			//oldPtr->print();
+			//delPtr->print();
 			item = arrayVector.erase(item);
 			delete delPtr;
 		}else{

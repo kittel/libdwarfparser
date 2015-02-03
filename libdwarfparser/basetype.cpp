@@ -53,3 +53,8 @@ Instance BaseType::getInstance(uint64_t va){
 	return instance;
 }
 
+void BaseType::print(){
+	Symbol::print();
+	std::cout << "\t Encoding:     " << this->encoding << std::endl;
+}
+

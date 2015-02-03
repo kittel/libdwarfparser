@@ -7,6 +7,8 @@ class Pointer: public RefBaseType {
 public:
 	Pointer(Dwarf_Die object);
 	virtual ~Pointer();
+
+	void print();
 };
 
 #endif  /* _POINTER_H_ */

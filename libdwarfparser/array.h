@@ -28,6 +28,7 @@ class Array: public Pointer {
 		BaseType *lengthTypeBT;
 
 		void updateTypes();
+		void print();
 
 		typedef std::multimap<uint64_t, Array*> ArrayTypeMap;
 		static ArrayTypeMap arrayTypeMap;

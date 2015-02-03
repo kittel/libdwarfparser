@@ -10,7 +10,10 @@ RefBaseType::RefBaseType(Dwarf_Die object):
 	BaseType(object), type(0), base(0){
 	DwarfParser* parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_type)){
-		this->type = parser->getDieAttributeNumber(object, DW_AT_type);
+		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
+		uint32_t fileID = parser->getFileID();
+		this->type = IDManager::getID(dwarfType, fileID);
+		if(!this->type) assert(false);
 	}
 	this->base = NULL;
 	if(this->name.compare("") != 0){
@@ -53,3 +56,7 @@ RefBaseType* RefBaseType::findRefBaseTypeByName(std::string name){
 	else return NULL;
 }
 
+void RefBaseType::print(){
+	BaseType::print();
+	std::cout << "\t Ref Type      " << this->type << std::endl;
+}

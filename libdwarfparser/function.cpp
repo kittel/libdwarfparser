@@ -11,7 +11,10 @@ Function::Function(Dwarf_Die object):
 	rettype(0), paramList(){
 	DwarfParser* parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_type)){
-		this->rettype = parser->getDieAttributeNumber(object, DW_AT_type);
+		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
+		uint32_t fileID = parser->getFileID();
+		this->rettype = IDManager::getID(dwarfType, fileID);
+		if(!this->rettype) assert(false);
 	}
 	funcList.push_back(this);
 }
@@ -23,7 +26,11 @@ Function::~Function(){
 void Function::addParam(Dwarf_Die object){
 	DwarfParser* parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_type)){
-		paramList.push_back(parser->getDieAttributeNumber(object, DW_AT_type));
+		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
+		uint32_t fileID = parser->getFileID();
+		uint64_t paramType = IDManager::getID(dwarfType, fileID);
+		if(!paramType) assert(false);
+		paramList.push_back(paramType);
 	}
 }
 
@@ -37,6 +44,8 @@ bool Function::operator< (const Function& func) const{
 		if (this->paramList[i] != func.paramList[i]) 
 			return this->paramList[i] < func.paramList[i];
 	}
+	if (this->id != func.id) 
+		return this->id < func.id;
 	return false;
 
 }
