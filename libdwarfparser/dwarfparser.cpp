@@ -27,7 +27,7 @@ DwarfParser::DwarfParser(int fd) :
 	error(), errhand(), errarg(),
 	curCUOffset(0), nextCUOffset(0)
 {
-	std::cout << "Loaded parser with id: " << fileID << std::endl;
+	//std::cout << "Loaded parser with id: " << fileID << std::endl;
 	res = dwarf_init(this->fd,DW_DLC_READ,errhand,errarg, &dbg,&error);
 	if(res != DW_DLV_OK) {
 	    throw DwarfException("Giving up, cannot do DWARF processing\n");

@@ -80,7 +80,7 @@ void Function::cleanFunctions(){
 	}
 
 	auto item = funcList.begin();
-	std::sort(item, funcList.end(), [](Function* a, Function* b) {return *a < *b; });
+	std::sort(item, funcList.end(), [](const Function* a, const Function* b) {return *a < *b; });
 	item = funcList.begin();
 
 	if (item == funcList.end()){

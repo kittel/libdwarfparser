@@ -120,7 +120,7 @@ void Array::cleanArrays(){
 	}
 
 	auto item = arrayVector.begin();
-	std::sort(item, arrayVector.end(), [](Array* a, Array* b) {return *a < *b; });
+	std::sort(item, arrayVector.end(), [](const Array *a, const Array *b) {return *a < *b; });
 	item = arrayVector.begin();
 
 	if (item == arrayVector.end()){
