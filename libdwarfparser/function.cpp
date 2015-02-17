@@ -13,7 +13,7 @@ Function::Function(Dwarf_Die object):
 	paramList(),paramsFinal(false){
 	this->update(object);
 	if(this->name.size() != 0 && 
-		functionNameMap.find(this->name) != functionNameMap.end()){
+		functionNameMap.find(this->name) == functionNameMap.end()){
 		functionNameMap[this->name] = this;
 	}
 	this->paramsFinal = false;
@@ -21,7 +21,6 @@ Function::Function(Dwarf_Die object):
 }
 
 Function::~Function(){
-
 }
 
 void Function::addParam(Dwarf_Die object){
