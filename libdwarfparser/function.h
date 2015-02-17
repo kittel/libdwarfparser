@@ -18,6 +18,9 @@ class Function : public BaseType {
 		void update(Dwarf_Die object);
 		void print();
 
+		static Function* findFunctionByID(uint64_t id);
+		static Function* findFunctionByName(std::string name);
+
 	protected:
 		uint64_t rettype;
 
@@ -29,6 +32,9 @@ class Function : public BaseType {
 
 		void updateTypes();
 		
+		typedef std::map<std::string, Function*> FunctionNameMap;
+		static FunctionNameMap functionNameMap;
+
 		typedef std::vector<Function*> FuncList;
 		static FuncList funcList;
 		

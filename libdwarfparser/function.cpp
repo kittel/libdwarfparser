@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+Function::FunctionNameMap Function::functionNameMap;
 Function::FuncList Function::funcList;
 
 Function::Function(Dwarf_Die object):
@@ -11,6 +12,10 @@ Function::Function(Dwarf_Die object):
 	rettype(0), address(0),
 	paramList(),paramsFinal(false){
 	this->update(object);
+	if(this->name.size() != 0 && 
+		functionNameMap.find(this->name) != functionNameMap.end()){
+		functionNameMap[this->name] = this;
+	}
 	this->paramsFinal = false;
 	funcList.push_back(this);
 }
@@ -133,4 +138,17 @@ void Function::print(){
 		std::cout << "\t Param:        " << std::hex <<
 	                         param << std::dec << std::endl;
 	}
+}
+
+Function* Function::findFunctionByID(uint64_t id){
+	Function* var;
+	Symbol *symbol = Symbol::findSymbolByID(id);
+	assert(symbol);
+	var = dynamic_cast<Function*>(symbol);
+	assert(var);
+	return var;
+}
+
+Function* Function::findFunctionByName(std::string name){
+	return functionNameMap.find(name)->second;
 }
