@@ -53,6 +53,13 @@ private:
 	
 };
 
+template<>
+inline std::string BaseType::getValue(uint64_t va, uint64_t pid){
+	assert(va);
+	VMIInstance *vmi = VMIInstance::getInstance();
+	return vmi->readStrFromVA(va, pid);
+}
+
 template<typename T>
 inline T BaseType::getValue(uint64_t va, uint64_t pid){
 	assert(va);
