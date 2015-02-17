@@ -15,12 +15,17 @@ class Function : public BaseType {
 		bool operator< (const Function& func) const;
 		bool operator==(const Function& func) const;
 		static void cleanFunctions();
+		void update(Dwarf_Die object);
+		void print();
 
 	protected:
 		uint64_t rettype;
 
+		uint64_t address;
+
 		typedef std::vector<uint64_t> ParamList;
 		ParamList paramList;
+		bool paramsFinal;
 
 		void updateTypes();
 		

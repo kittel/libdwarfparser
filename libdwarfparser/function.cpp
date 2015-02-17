@@ -8,14 +8,10 @@ Function::FuncList Function::funcList;
 
 Function::Function(Dwarf_Die object):
 	BaseType(object),
-	rettype(0), paramList(){
-	DwarfParser* parser = DwarfParser::getInstance();
-	if(parser->dieHasAttr(object, DW_AT_type)){
-		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
-		uint32_t fileID = parser->getFileID();
-		this->rettype = IDManager::getID(dwarfType, fileID);
-		if(!this->rettype) assert(false);
-	}
+	rettype(0), address(0),
+	paramList(),paramsFinal(false){
+	this->update(object);
+	this->paramsFinal = false;
 	funcList.push_back(this);
 }
 
@@ -24,6 +20,7 @@ Function::~Function(){
 }
 
 void Function::addParam(Dwarf_Die object){
+	if (this->paramsFinal) return;
 	DwarfParser* parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
@@ -33,6 +30,21 @@ void Function::addParam(Dwarf_Die object){
 		paramList.push_back(paramType);
 	}
 }
+
+void Function::update(Dwarf_Die object){
+	DwarfParser* parser = DwarfParser::getInstance();
+	if(this->rettype == 0 && parser->dieHasAttr(object, DW_AT_type)){
+		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
+		uint32_t fileID = parser->getFileID();
+		this->rettype = IDManager::getID(dwarfType, fileID);
+		if(!this->rettype) assert(false);
+	}
+	if(this->address == 0 && parser->dieHasAttr(object, DW_AT_low_pc)){
+		this->address = parser->getDieAttributeNumber(object, DW_AT_low_pc);
+	}
+	this->paramsFinal = true;
+}
+
 
 bool Function::operator< (const Function& func) const{
 	if (this->rettype != func.rettype) 
@@ -57,6 +69,7 @@ bool Function::operator==(const Function& func) const{
 	for (size_t i = 0 ; i < this->paramList.size() ; i++){
 		if (this->paramList[i] != func.paramList[i]) return false;
 	}
+	if(this->name != func.name) return false;
 	return true;
 }
 
@@ -93,8 +106,14 @@ void Function::cleanFunctions(){
 
 	while(item != funcList.end()){
 		if (*oldPtr == *(*item)){
-			oldPtr->addAlternativeID((*item)->id);
 			delPtr = *item;
+#if 0
+			std::cout << "Keeping Function: " << std::endl;
+			oldPtr->print();
+			std::cout << "Removing Function: " << std::endl;
+			delPtr->print();
+#endif
+			oldPtr->addAlternativeID(delPtr->id);
 			item = funcList.erase(item);
 			delete delPtr;
 		}else{
@@ -104,4 +123,14 @@ void Function::cleanFunctions(){
 	}
 	funcList.shrink_to_fit();
 	//TODO Eigentlich brauchen wir den Vector hier nicht mehr.
+}
+
+void Function::print(){
+	BaseType::print();
+	std::cout << "\t Address:      " << std::hex << 
+	                         this->address << std::dec << std::endl;
+	for (auto& param : this->paramList) {
+		std::cout << "\t Param:        " << std::hex <<
+	                         param << std::dec << std::endl;
+	}
 }

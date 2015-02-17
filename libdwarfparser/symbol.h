@@ -43,7 +43,7 @@ public:
 
 	void addAlternativeID(uint64_t id);
 	void addAlternativeDwarfID(uint64_t id, uint32_t fileID);
-	void print();
+	virtual void print();
 
 
 	//Static Functions

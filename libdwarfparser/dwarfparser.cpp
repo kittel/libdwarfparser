@@ -312,6 +312,20 @@ T* DwarfParser::getRefTypeInstance(Dwarf_Die object){
 }
 
 template<>
+Function* DwarfParser::getTypeInstance(Dwarf_Die object){
+	Function* cursym;
+
+	cursym = BaseType::findBaseTypeByName<Function>(getDieName(object));
+	if(!cursym){
+		return new Function(object);
+	}
+	cursym->update(object);
+	cursym->addAlternativeDwarfID(getDieOffset(object), fileID);
+	return cursym;
+
+}
+
+template<>
 Variable* DwarfParser::getTypeInstance(Dwarf_Die object){
 	Variable* cursym;
 
@@ -424,8 +438,11 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 				print_die_data(cur_die, level, sf);
 			}
 			break;
-		case DW_TAG_subroutine_type:
-			cursym = new Function(cur_die);
+		case DW_TAG_subprogram:
+		//case DW_TAG_subroutine_type:
+			cursym = getTypeInstance<Function>(cur_die);
+			//cursym = new Function(cur_die);
+			//print_die_data(cur_die, level, sf);
 			break;
 		case DW_TAG_formal_parameter:
 			function = dynamic_cast<Function*>(parent);
@@ -438,7 +455,6 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 		case DW_TAG_imported_declaration:
 		case DW_TAG_class_type:
 		case DW_TAG_lexical_block:
-		case DW_TAG_subprogram:
 			/* This tag is currently not supported */
 			break;
 
@@ -598,6 +614,12 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 			break;
 		case DW_FORM_sdata:
 			res = dwarf_formsdata(myattr,(Dwarf_Signed*) &result,&error);
+			if(res == DW_DLV_OK){
+				return result;
+			}
+			break;
+		case DW_FORM_addr:
+			res = dwarf_formaddr(myattr,(Dwarf_Addr*) &result,&error);
 			if(res == DW_DLV_OK){
 				return result;
 			}
