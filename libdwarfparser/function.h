@@ -21,6 +21,8 @@ class Function : public BaseType {
 		static Function* findFunctionByID(uint64_t id);
 		static Function* findFunctionByName(std::string name);
 
+		uint64_t getAddress();
+
 	protected:
 		uint64_t rettype;
 

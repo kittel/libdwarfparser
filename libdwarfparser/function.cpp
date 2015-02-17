@@ -152,3 +152,7 @@ Function* Function::findFunctionByID(uint64_t id){
 Function* Function::findFunctionByName(std::string name){
 	return functionNameMap.find(name)->second;
 }
+
+uint64_t Function::getAddress(){
+	return this->address;
+}
