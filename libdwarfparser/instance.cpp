@@ -112,7 +112,7 @@ uint64_t Instance::getLength(){
 }
 
 Instance Instance::arrayElem(uint64_t element){
-	if(element >= this->getLength()){
+	if(element >= this->getLength() && 0 != this->getLength()){
 		//TODO throw exception
 		std::cout << "Array only got length of " << this->getLength() << 
 			" element " << element << " requested" << std::endl;
