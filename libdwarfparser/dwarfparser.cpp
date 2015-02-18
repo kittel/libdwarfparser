@@ -566,11 +566,13 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 						}
 						break;
 					case DW_OP_plus_uconst:
+						// For further details see: binutils/dwarf.c:256
 						result = 0;
 						assert(block->bl_len <= 9);
 						for(Dwarf_Unsigned i = 1; i < block->bl_len; i++){
-							result = result << 8;
-							result += ((uint8_t*) block->bl_data)[i];
+							uint8_t byte = ((uint8_t*) block->bl_data)[i];
+							result |= ((uint64_t) (byte & 0x7f)) << (i-1)*7;
+							if ((byte & 0x80) == 0) break;
 						}
 						break;
 					default:

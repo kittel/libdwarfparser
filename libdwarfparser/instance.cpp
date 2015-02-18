@@ -27,17 +27,23 @@ uint64_t Instance::getAddress(){
 	return this->address;
 }
 
-void Instance::changeBaseType(std::string newType, std::string fieldname){
+Instance Instance::changeBaseType(std::string newType, std::string fieldname){
 	BaseType *structModule = BaseType::findBaseTypeByName(newType);
 	assert(structModule);
+	uint64_t newAddress = this->address;
+	BaseType *newBT = this->type;
+
 	if(this->type->getName() == "list_head"){
 		Structured *structured = dynamic_cast<Structured*>(structModule);
 		assert(structured);
 		StructuredMember *sm = structured->memberByName(fieldname);
 		assert(sm);
-		this->address -= sm->getMemberLocation();
+		newAddress -= sm->getMemberLocation();
 	}
-	this->type = structModule;
+	newBT = structModule;
+	return Instance(newBT, 
+			newAddress,
+			this);
 }
 
 Instance Instance::memberByName(std::string name, bool ptr){
@@ -53,6 +59,7 @@ Instance Instance::memberByName(std::string name, bool ptr){
 	assert(member);
 	bt = member->getBaseType();
 	assert(bt);
+
 	newAddress = address + member->getMemberLocation();
 	assert(newAddress);
 	if(ptr){

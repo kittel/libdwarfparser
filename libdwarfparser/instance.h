@@ -12,7 +12,7 @@ class Instance {
 
 		BaseType *getType();
 		uint64_t getAddress();
-		void changeBaseType(std::string newType, std::string fieldname="list");
+		Instance changeBaseType(std::string newType, std::string fieldname="list");
 
 		uint64_t getLength();
 		Instance arrayElem(uint64_t element);
