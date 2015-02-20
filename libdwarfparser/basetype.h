@@ -64,7 +64,9 @@ template<typename T>
 inline T BaseType::getValue(uint64_t va, uint64_t pid){
 	assert(va);
 	if (!encoding){
-		std::cout << std::hex << this->getID() << std::dec << " " << this->getName() << std::endl;
+		std::cout << std::hex << this->getID() << std::dec 
+		          << " " << this->getName() << std::endl;
+		this->print();
 	}
 	assert(encoding);
 	VMIInstance *vmi = VMIInstance::getInstance();
