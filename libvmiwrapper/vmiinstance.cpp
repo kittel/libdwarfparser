@@ -13,9 +13,9 @@
 #include "helpers.h"
 
 #define IA32E_IS_PAGE_USER_SUPERVISOR(page_info) \
-  	(USER_SUPERVISOR(page_info->x86_ia32e.pte_value) || \
- 	 USER_SUPERVISOR(page_info->x86_ia32e.pgd_value) || \
-	 USER_SUPERVISOR(page_info->x86_ia32e.pdpte_value) || \
+  	(USER_SUPERVISOR(page_info->x86_ia32e.pte_value) && \
+ 	 USER_SUPERVISOR(page_info->x86_ia32e.pgd_value) && \
+	 USER_SUPERVISOR(page_info->x86_ia32e.pdpte_value) && \
 	 USER_SUPERVISOR(page_info->x86_ia32e.pml4e_value))
 
 #define IA32E_IS_PAGE_SUPERVISOR(page_info)        (!(IA32E_IS_PAGE_USER_SUPERVISOR(page_info)))
@@ -91,7 +91,7 @@ vmi_instance_t VMIInstance::getLibVMIInstance(){
 	return vmi;
 }
 
-void VMIInstance::getKernelPages(){
+void VMIInstance::printKernelPages(){
 
     addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
 
@@ -109,16 +109,82 @@ void VMIInstance::getKernelPages(){
             printf("l4_v is null\n");
     	}else {
 			//if(ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && IA32E_IS_PAGE_SUPERVISOR(item)){
-			if(ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX)){
+			if(ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
+					item->vaddr >> 40 != 0x88){
+				if(IA32E_IS_PAGE_USER_SUPERVISOR(item)) continue;
 		        printf("Page at %16lx : %016lx - %s, %s ", item->vaddr, item->paddr, (IA32E_IS_PAGE_SUPERVISOR(item)) ? "S": "U" , (IS_PAGE_NX(item)) ? "NX" : "X");
 				printf("Page size: %i\n", item->size);
+				
+				//printf("Settings: %i - %i - %i - %i\n", 
+				//    USER_SUPERVISOR(item->x86_ia32e.pte_value),
+				//    USER_SUPERVISOR(item->x86_ia32e.pgd_value),
+				//    USER_SUPERVISOR(item->x86_ia32e.pdpte_value),
+				//    USER_SUPERVISOR(item->x86_ia32e.pml4e_value));
+				
 			}
         }
-
-
+		free(item);
     }
-
+	free(pages);
 }
+
+PageMap VMIInstance::destroyMap(PageMap map){
+	for (auto item : map){
+		free(item.second);
+	}
+	map.clear();
+	return map;
+}
+
+PageMap VMIInstance::getExecutableKernelPages(){
+    
+	addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
+    GSList* pages = vmi_get_va_pages(vmi, init_dtb);
+    assert(pages);
+
+    page_info_t *item;
+	PageMap pageMap;
+
+    for(GSList *__glist = pages; __glist ; __glist = __glist->next){
+	    item = (page_info_t*) __glist->data;
+	    if (item->x86_ia32e.pml4e_value != 0 &&
+		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
+			item->vaddr >> 40 != 0x88 &&
+		    IA32E_IS_PAGE_SUPERVISOR(item) &&
+			!IS_PAGE_NX(item)){
+			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
+		}else{
+			free(item);
+		}
+    }
+	g_slist_free(pages);
+	return pageMap;
+}
+
+PageMap VMIInstance::getKernelPages(){
+    
+	addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
+    GSList* pages = vmi_get_va_pages(vmi, init_dtb);
+    assert(pages);
+
+    page_info_t *item;
+	PageMap pageMap;
+
+    for(GSList *__glist = pages; __glist ; __glist = __glist->next){
+	    item = (page_info_t*) __glist->data;
+	    if (item->x86_ia32e.pml4e_value != 0 &&
+		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
+			item->vaddr >> 40 != 0x88 &&
+		    IA32E_IS_PAGE_SUPERVISOR(item)){
+			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
+		}else{
+			free(item);
+		}
+    }
+	g_slist_free(pages);
+	return pageMap;
+}
+
 
 uint8_t VMIInstance::read8FromVA(uint64_t va, uint32_t pid){
 	uint8_t value = 0;

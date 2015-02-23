@@ -8,6 +8,11 @@
 
 #include <string>
 
+#include <map>
+
+
+typedef std::map<uint64_t, page_info_t*> PageMap;
+		
 
 class VMIInstance {
 
@@ -29,8 +34,11 @@ class VMIInstance {
 		uint32_t read32FromVA(uint64_t va, uint32_t pid = 0);
 		uint64_t read64FromVA(uint64_t va, uint32_t pid = 0);
 		std::string readStrFromVA(uint64_t va, uint32_t pid = 0);
-		GSList *get_Kernel_Pages(vmi_instance_t *vmi);
-		void getKernelPages();
+		void printKernelPages();
+
+		PageMap destroyMap(PageMap map);
+		PageMap getExecutableKernelPages();
+		PageMap getKernelPages();
 
 };
 
