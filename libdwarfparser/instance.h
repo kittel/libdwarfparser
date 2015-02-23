@@ -57,7 +57,6 @@ inline T Instance::getRawValue(bool dereference){
 	assert(type);
 	if(typeid(T) != typeid(std::string) && dereference && 
 			dynamic_cast<RefBaseType*>(this->type)){
-		std::cout << "dereferencing" << std::endl;
 		Instance i = this->dereference();
 	   	return i.getRawValue<T>(i.address);
 	}
