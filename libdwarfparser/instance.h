@@ -19,6 +19,8 @@ class Instance {
 		Instance memberByName(std::string name, bool ptr = false);
 		Instance memberByOffset(uint64_t offset, bool ptr = false);
 
+		std::string memberName(uint64_t offset);
+
 		uint32_t size();
 
 		uint32_t memberOffset(std::string name) const;

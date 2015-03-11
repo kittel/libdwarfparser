@@ -17,6 +17,7 @@ public:
 
 	void listMembers();
 	StructuredMember *memberByOffset(uint32_t offset);
+	std::string memberNameByOffset(uint32_t offset);
 	uint32_t memberOffset(std::string member) const;
 
 private:

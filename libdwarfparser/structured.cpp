@@ -38,12 +38,26 @@ void Structured::listMembers(){
 }
 
 StructuredMember *Structured::memberByOffset(uint32_t offset){
-	for(auto i = memberNameMap.begin(); i != memberNameMap.end(); i++){
-		if(i->second->getMemberLocation() <= offset){
-			return i->second;
+	StructuredMember * result = NULL;
+	for (auto i : memberNameMap){
+		if ( i.second->getMemberLocation() == offset)
+			return i.second;
+		if ( i.second->getMemberLocation() < offset &&
+			(!result || 
+			 i.second->getMemberLocation() > result->getMemberLocation())){
+			result = i.second;
 		}
 	}
-	return NULL;
+	return result;
+}
+
+std::string Structured::memberNameByOffset(uint32_t offset){
+	for(auto i = memberNameMap.begin(); i != memberNameMap.end(); i++){
+		if(i->second->getMemberLocation() == offset){
+			return i->first;
+		}
+	}
+	return "";
 }
 
 uint32_t Structured::memberOffset(std::string member) const{

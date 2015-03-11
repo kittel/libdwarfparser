@@ -101,6 +101,17 @@ Instance Instance::memberByOffset(uint64_t offset, bool ptr){
 			this);
 }
 
+std::string Instance::memberName(uint64_t offset){
+	assert(address);
+	BaseType* bt = this->type;
+	while(dynamic_cast<RefBaseType*>(bt)){
+		bt = (dynamic_cast<RefBaseType*>(bt))->getBaseType();
+	}
+	Structured *structured = dynamic_cast<Structured*>(bt);
+	assert(structured);
+	return structured->memberNameByOffset(offset);
+}
+
 uint32_t Instance::size(){
 	return this->type->getByteSize();
 }
