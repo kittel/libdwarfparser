@@ -210,6 +210,19 @@ uint64_t VMIInstance::read64FromVA(uint64_t va, uint32_t pid){
 	return value;
 }
 
+std::vector<uint8_t> 
+    VMIInstance::readVectorFromVA(uint64_t va, uint64_t len,
+                                  uint32_t pid){
+	uint8_t* buffer = (uint8_t*) malloc(len);
+	vmi_read_va(vmi, va, pid, buffer, len);
+
+	std::vector<uint8_t> result;
+	result.insert(result.end(), buffer, buffer + len);
+	free(buffer);
+	return result;
+
+}
+
 std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid){
 	char * str = vmi_read_str_va(vmi, va, pid);
 	assert(str);

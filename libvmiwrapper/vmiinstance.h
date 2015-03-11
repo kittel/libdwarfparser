@@ -7,6 +7,7 @@
 #include <libvmi/x86.h>
 
 #include <string>
+#include <vector>
 
 #include <map>
 
@@ -33,6 +34,9 @@ class VMIInstance {
 		uint16_t read16FromVA(uint64_t va, uint32_t pid = 0);
 		uint32_t read32FromVA(uint64_t va, uint32_t pid = 0);
 		uint64_t read64FromVA(uint64_t va, uint32_t pid = 0);
+		std::vector<uint8_t> readVectorFromVA(uint64_t va, 
+		                                      uint64_t len,
+		                                      uint32_t pid = 0);
 		std::string readStrFromVA(uint64_t va, uint32_t pid = 0);
 		void printKernelPages();
 
