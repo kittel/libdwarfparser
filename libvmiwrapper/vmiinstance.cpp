@@ -230,3 +230,14 @@ std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid){
 	delete str;
 	return result;
 }
+
+bool VMIInstance::isPageSuperuser(page_info_t* page){
+    bool ret = IA32E_IS_PAGE_SUPERVISOR(page);
+	return ret;
+}
+
+bool VMIInstance::isPageExecutable(page_info_t* page){
+	bool ret = !IS_PAGE_NX(page);
+	return ret;
+}
+

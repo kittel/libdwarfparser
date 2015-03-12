@@ -40,6 +40,9 @@ class VMIInstance {
 		std::string readStrFromVA(uint64_t va, uint32_t pid = 0);
 		void printKernelPages();
 
+		bool isPageSuperuser(page_info_t* page);
+		bool isPageExecutable(page_info_t* page);
+
 		PageMap destroyMap(PageMap map);
 		PageMap getExecutableKernelPages();
 		PageMap getKernelPages();
