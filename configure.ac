@@ -29,7 +29,7 @@ PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.16])
 AC_SUBST([GLIB_CFLAGS])                                                         
 AC_SUBST([GLIB_LIBS])                                                           
                                                                                 
-AC_CHECK_LIB(vmi, vmi_init, [], [echo "Error! You need to have libavl around."; exit 1])
+AC_CHECK_LIB(vmi, vmi_init, [], [echo "Error! You need to have libvmi around."; exit 1])
 AC_CHECK_HEADERS([libvmi/libvmi.h]) 
 
 AC_CONFIG_FILES([Makefile])
