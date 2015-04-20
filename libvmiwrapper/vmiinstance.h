@@ -1,15 +1,15 @@
 #ifndef _VMIINSTANCE_H_
 #define _VMIINSTANCE_H_
 
-#undef _GNU_SOURCE
-#include <libvmi/libvmi.h>
-#include <libvmi/libvmi_extra.h>
-#include <libvmi/x86.h>
-
 #include <string>
 #include <vector>
 
 #include <map>
+
+#undef _GNU_SOURCE
+#include <libvmi/libvmi.h>
+#include <libvmi/libvmi_extra.h>
+#include <libvmi/x86.h>
 
 
 typedef std::map<uint64_t, page_info_t*> PageMap;

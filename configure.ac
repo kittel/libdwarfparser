@@ -8,7 +8,6 @@ AM_PROG_AR
 LT_INIT
 AC_PROG_LIBTOOL
 AC_PROG_CXX
-AC_PROG_RANLIB
 AC_PROG_INSTALL
 
 
@@ -28,6 +27,32 @@ AC_CHECK_HEADERS([string])
 PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.16])                                   
 AC_SUBST([GLIB_CFLAGS])                                                         
 AC_SUBST([GLIB_LIBS])                                                           
+
+dnl check libelf library 
+AC_CHECK_HEADER([libelf.h],[ac_cv_has_libelf=1],[ac_cv_has_libelf=0]) 
+if [[ x"${ac_cv_has_libelf}" != x1 ]] 
+then 
+  AC_MSG_FAILURE([please install libelf development package]) 
+fi 
+AC_CHECK_LIB([elf],[elf_begin],[ac_cv_has_libelf=1],[ac_cv_has_libelf=0]) 
+if [[ x"${ac_cv_has_libelf}" != x1 ]] 
+then 
+  AC_MSG_FAILURE([please install libelf development package]) 
+fi 
+ 
+#dnl checl libdwarf library 
+#saved_LIBS="${LIBS}" 
+#LIBS="-lelf" 
+#AC_CHECK_HEADER([libdwarf/libdwarf.h],[ac_cv_has_libdwarf=1],[ac_cv_has_libdwarf=0]) 
+#if [[ x"${ac_cv_has_libdwarf}" != x1 ]] 
+#then 
+#  AC_MSG_FAILURE([please install libdwarf development package]) 
+#fi 
+#AC_CHECK_LIB([dwarf],[dwarf_init],[ac_cv_has_libdwarf=1],[ac_cv_has_libdwarf=0]) 
+#if [[ x"${ac_cv_has_libdwarf}" != x1 ]] 
+#then 
+#  AC_MSG_FAILURE([please install libdwarf development package]) 
+#fi 
                                                                                 
 AC_CHECK_LIB(vmi, vmi_init, [], [echo "Error! You need to have libvmi around."; exit 1])
 AC_CHECK_HEADERS([libvmi/libvmi.h]) 
