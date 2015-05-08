@@ -529,8 +529,59 @@ bool DwarfParser::dieHasAttr(Dwarf_Die die, Dwarf_Half attr){
 	return true;
 }
 
+uint64_t parseBlock(uint64_t blen, uint8_t* bdata){
+	uint64_t result = 0;
+	switch(bdata[0]){
+		case DW_OP_addr:
+			if(blen > 10)
+				std::cout << "Error with " << std::hex << 
+					" Die: " <<
+				//   	getDieOffset(die) << std::dec << 
+					" Block length mismatch" << std::endl;
+			//assert(block->bl_len <= 10);
+			for(Dwarf_Unsigned i = 1; i < 9; i++){
+				result = result << 8;
+				result += bdata[9-i];
+				//TODO Handle the last byte DW_OP_stack_value
+			}
+			break;
+		case DW_OP_plus_uconst:
+			// For further details see: binutils/dwarf.c:256
+			result = 0;
+			assert(blen <= 9);
+			for(Dwarf_Unsigned i = 1; i < blen; i++){
+				uint8_t byte = bdata[i];
+				result |= ((uint64_t) (byte & 0x7f)) << (i-1)*7;
+				if ((byte & 0x80) == 0) break;
+			}
+			break;
+		default:
+			result = 0;
+			break;
+			//TODO add other operators
+			//const char * atname;
+			//dwarf_get_AT_name(attr, &atname);
+			//const char* formname;
+			//dwarf_get_FORM_name(formid, &formname);
+
+			//std::cout << std::hex << getDieOffset(die) << std::dec << std::endl;
+			//std::cout << atname << ": ";
+			//std::cout << formname << std::endl;
+			//std::cout << "Value: " << std::endl;
+			//for(Dwarf_Unsigned i = 0; i < block->bl_len; i++){
+			//	std::cout << std::hex << 
+			//		(uint32_t) ((uint8_t*) block->bl_data)[i] << 
+			//		std::dec << " ";
+			//}
+			//std::cout << std::endl;
+			//result = 0;
+	}
+	return result;
+}
+
 uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 	uint64_t result;
+	uint64_t result2;
 	Dwarf_Attribute myattr;
 	Dwarf_Bool hasattr;
 	Dwarf_Block* block;
@@ -551,51 +602,7 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 			res = dwarf_formblock(myattr, &block, &error);
 			if(res == DW_DLV_OK){
 				assert(block->bl_len > 0);
-				switch(((uint8_t*) block->bl_data)[0]){
-					case DW_OP_addr:
-						result = 0;
-						if(block->bl_len > 10)
-							std::cout << "Error with " << std::hex << 
-							   	getDieOffset(die) << std::dec << 
-								" Block length mismatch" << std::endl;
-						//assert(block->bl_len <= 10);
-						for(Dwarf_Unsigned i = 1; i < 9; i++){
-							result = result << 8;
-							result += ((uint8_t*) block->bl_data)[9-i];
-							//TODO Handle the last byte DW_OP_stack_value
-						}
-						break;
-					case DW_OP_plus_uconst:
-						// For further details see: binutils/dwarf.c:256
-						result = 0;
-						assert(block->bl_len <= 9);
-						for(Dwarf_Unsigned i = 1; i < block->bl_len; i++){
-							uint8_t byte = ((uint8_t*) block->bl_data)[i];
-							result |= ((uint64_t) (byte & 0x7f)) << (i-1)*7;
-							if ((byte & 0x80) == 0) break;
-						}
-						break;
-					default:
-						result = 0;
-						break;
-						//TODO add other operators
-						const char * atname;
-						dwarf_get_AT_name(attr, &atname);
-						const char* formname;
-						dwarf_get_FORM_name(formid, &formname);
-
-						std::cout << std::hex << getDieOffset(die) << std::dec << std::endl;
-						std::cout << atname << ": ";
-						std::cout << formname << std::endl;
-						std::cout << "Value: " << std::endl;
-						for(Dwarf_Unsigned i = 0; i < block->bl_len; i++){
-							std::cout << std::hex << 
-								(uint32_t) ((uint8_t*) block->bl_data)[i] << 
-								std::dec << " ";
-						}
-						std::cout << std::endl;
-						result = 0;
-				}
+				result = parseBlock(block->bl_len, (uint8_t*) block->bl_data);
 				dwarf_dealloc(dbg,block,DW_DLA_BLOCK);
 				return result;
 			}
@@ -603,6 +610,7 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 		case DW_FORM_data1:
 		case DW_FORM_data2:
 		case DW_FORM_data4:
+		case DW_FORM_data8:
 			res = dwarf_formudata(myattr, (Dwarf_Unsigned*) &result, &error);
 			if(res == DW_DLV_OK) {
 				return result;
@@ -624,6 +632,22 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 			res = dwarf_formaddr(myattr,(Dwarf_Addr*) &result,&error);
 			if(res == DW_DLV_OK){
 				return result;
+			}
+			break;
+		case DW_FORM_sec_offset:
+			res = dwarf_global_formref(myattr,(Dwarf_Off*) &result,&error);
+			//TODO we do not know where the offset is relative to...
+			if(res == DW_DLV_OK){
+				return result + this->curCUOffset;
+			}
+			break;
+		case DW_FORM_exprloc:
+			res = dwarf_formexprloc(myattr,
+					                (Dwarf_Unsigned*) &result, 
+					                (Dwarf_Ptr*) &result2, 
+					                &error);
+			if(res == DW_DLV_OK){
+				return parseBlock(result, (uint8_t*) result2);
 			}
 			break;
 		default:

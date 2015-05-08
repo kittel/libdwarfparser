@@ -48,6 +48,7 @@ inline T Instance::getValue(){
 	BaseType* bt = this->type;
 	RefBaseType* rbt;
 	while((rbt = dynamic_cast<RefBaseType*>(bt))){
+		assert(rbt->getBaseType());
 		bt = rbt->getBaseType();
 	}
 	return bt->getValue<T>(this->address);

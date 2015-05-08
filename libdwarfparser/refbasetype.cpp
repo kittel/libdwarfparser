@@ -31,6 +31,10 @@ BaseType* RefBaseType::getBaseType(){
 }
 
 void RefBaseType::resolveBaseType(){
+	if(!this->type){
+		std::cout << "DO NOT DEREFERENCE void *" << std::endl;
+	}
+	assert(this->type);
 	this->base = BaseType::findBaseTypeByID(this->type);
 }
 
