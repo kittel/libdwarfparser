@@ -68,6 +68,7 @@ Instance Instance::memberByName(std::string name, bool ptr){
 		if((ptr_type = dynamic_cast<Pointer*>(bt))){
 			bt = ptr_type->getBaseType();
 			newAddress = vmi->read64FromVA(newAddress);
+			//Dereferencing NULL Ptr?
 			assert(newAddress);
 		}
 	}

@@ -30,6 +30,8 @@ class VMIInstance {
 		static VMIInstance *getInstance();
 		vmi_instance_t getLibVMIInstance();
 
+		uint64_t translateV2P(uint64_t va, uint32_t pid = 0);
+
 		uint8_t read8FromVA(uint64_t va, uint32_t pid = 0);
 		uint16_t read16FromVA(uint64_t va, uint32_t pid = 0);
 		uint32_t read32FromVA(uint64_t va, uint32_t pid = 0);

@@ -185,6 +185,12 @@ PageMap VMIInstance::getKernelPages(){
 	return pageMap;
 }
 
+uint64_t VMIInstance::translateV2P(uint64_t va, uint32_t pid){
+	if(pid){
+		return vmi_translate_uv2p(vmi, va, pid);
+	}
+	return vmi_translate_kv2p(vmi, va);
+}
 
 uint8_t VMIInstance::read8FromVA(uint64_t va, uint32_t pid){
 	uint8_t value = 0;
