@@ -136,6 +136,53 @@ PageMap VMIInstance::destroyMap(PageMap map){
 	return map;
 }
 
+PageMap VMIInstance::getExecutableUserspacePages(uint32_t pid){
+    
+	addr_t init_dtb = vmi_pid_to_dtb(vmi, pid);
+    GSList* pages = vmi_get_va_pages(vmi, init_dtb);
+    assert(pages);
+
+    page_info_t *item;
+	PageMap pageMap;
+
+    for(GSList *__glist = pages; __glist ; __glist = __glist->next){
+	    item = (page_info_t*) __glist->data;
+	    if (item->x86_ia32e.pml4e_value != 0 &&
+		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
+		    !IA32E_IS_PAGE_SUPERVISOR(item) &&
+			!IS_PAGE_NX(item)){
+			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
+		}else{
+			free(item);
+		}
+    }
+	g_slist_free(pages);
+	return pageMap;
+}
+
+PageMap VMIInstance::getUserspacePages(uint32_t pid){
+    
+	addr_t init_dtb = vmi_pid_to_dtb(vmi, pid);
+    GSList* pages = vmi_get_va_pages(vmi, init_dtb);
+    assert(pages);
+
+    page_info_t *item;
+	PageMap pageMap;
+
+    for(GSList *__glist = pages; __glist ; __glist = __glist->next){
+	    item = (page_info_t*) __glist->data;
+	    if (item->x86_ia32e.pml4e_value != 0 &&
+		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
+		    !IA32E_IS_PAGE_SUPERVISOR(item)){
+			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
+		}else{
+			free(item);
+		}
+    }
+	g_slist_free(pages);
+	return pageMap;
+}
+
 PageMap VMIInstance::getExecutableKernelPages(){
     
 	addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
@@ -149,7 +196,6 @@ PageMap VMIInstance::getExecutableKernelPages(){
 	    item = (page_info_t*) __glist->data;
 	    if (item->x86_ia32e.pml4e_value != 0 &&
 		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
-			item->vaddr >> 40 != 0x88 &&
 		    IA32E_IS_PAGE_SUPERVISOR(item) &&
 			!IS_PAGE_NX(item)){
 			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
@@ -174,7 +220,6 @@ PageMap VMIInstance::getKernelPages(){
 	    item = (page_info_t*) __glist->data;
 	    if (item->x86_ia32e.pml4e_value != 0 &&
 		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
-			item->vaddr >> 40 != 0x88 &&
 		    IA32E_IS_PAGE_SUPERVISOR(item)){
 			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
 		}else{

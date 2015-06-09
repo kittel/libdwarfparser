@@ -46,8 +46,11 @@ class VMIInstance {
 		bool isPageExecutable(page_info_t* page);
 
 		PageMap destroyMap(PageMap map);
-		PageMap getExecutableKernelPages();
+		
 		PageMap getKernelPages();
+		PageMap getExecutableKernelPages();
+		PageMap getUserspacePages(uint32_t pid);
+		PageMap getExecutableUserspacePages(uint32_t pid);
 
 };
 
