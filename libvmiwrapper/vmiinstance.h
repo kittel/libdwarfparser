@@ -52,6 +52,8 @@ class VMIInstance {
 		PageMap getUserspacePages(uint32_t pid);
 		PageMap getExecutableUserspacePages(uint32_t pid);
 
+		void dumpMemory(uint64_t address, uint64_t len, std::string filename);
+
 };
 
 #endif /* _VMIINSTANCE_H_ */

@@ -8,6 +8,7 @@
 #include <inttypes.h>
 #include <cassert>
 #include <iostream>
+#include <fstream>
 #include "vmiexception.h"
 
 #include "helpers.h"
@@ -292,3 +293,15 @@ bool VMIInstance::isPageExecutable(page_info_t* page){
 	return ret;
 }
 
+void VMIInstance::dumpMemory(uint64_t address, uint64_t len, std::string filename){
+	std::vector<uint8_t> dump = 
+                 this->readVectorFromVA(address, len);
+
+	std::ofstream file (filename, std::ios::binary);
+	if (file.is_open())
+	{
+		file.write((char*) dump.data(), dump.size());
+		file.close();
+	}
+	return;
+}
