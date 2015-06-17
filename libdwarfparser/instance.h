@@ -35,6 +35,8 @@ class Instance {
 		bool operator==(const Instance& instance) const;
 		bool operator!=(const Instance& instance) const;
 
+		void print();
+
 	private:
 		Instance *parent;
 		BaseType *type;

@@ -20,6 +20,8 @@ public:
 	std::string memberNameByOffset(uint32_t offset);
 	uint32_t memberOffset(std::string member) const;
 
+	void print();
+
 private:
 	
 	typedef std::map<std::string, StructuredMember*> MemberNameMap;

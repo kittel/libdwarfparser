@@ -68,3 +68,18 @@ uint32_t Structured::memberOffset(std::string member) const{
 	}
 	return -1;
 }
+
+void Structured::print(){
+	std::map<uint32_t, std::string> localMemberMap;
+	for(auto i : memberNameMap){
+		localMemberMap[i.second->getMemberLocation()] = i.first;
+	}
+
+	BaseType::print();
+	std::cout << "\t Members:      " << std::endl;
+	for(auto i : localMemberMap){
+		std::cout << "\t\t 0x" << 
+			std::hex << i.first << std::dec <<
+			"\t" << i.second << std::endl;
+	}
+}
