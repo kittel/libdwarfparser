@@ -292,10 +292,10 @@ void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
 }
 
 template<class T>
-T* DwarfParser::getRefTypeInstance(Dwarf_Die object){
+T* DwarfParser::getRefTypeInstance(Dwarf_Die object, std::string dieName){
 	T* cursym;
 
-	RefBaseType* rbt = RefBaseType::findRefBaseTypeByName(getDieName(object));
+	RefBaseType* rbt = RefBaseType::findRefBaseTypeByName(dieName);
 	cursym = dynamic_cast<T*>(rbt);
 	if(!rbt){
 		return new T(object);
@@ -312,10 +312,10 @@ T* DwarfParser::getRefTypeInstance(Dwarf_Die object){
 }
 
 template<>
-Function* DwarfParser::getTypeInstance(Dwarf_Die object){
+Function* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
 	Function* cursym;
 
-	cursym = BaseType::findBaseTypeByName<Function>(getDieName(object));
+	cursym = BaseType::findBaseTypeByName<Function>(dieName);
 	if(!cursym){
 		return new Function(object);
 	}
@@ -326,10 +326,10 @@ Function* DwarfParser::getTypeInstance(Dwarf_Die object){
 }
 
 template<>
-Variable* DwarfParser::getTypeInstance(Dwarf_Die object){
+Variable* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
 	Variable* cursym;
 
-	cursym = Variable::findVariableByName(getDieName(object));
+	cursym = Variable::findVariableByName(dieName);
 	if(!cursym){
 		return new Variable(object);
 	}
@@ -340,8 +340,8 @@ Variable* DwarfParser::getTypeInstance(Dwarf_Die object){
 }
 
 template<class T>
-T* DwarfParser::getTypeInstance(Dwarf_Die object){
-	T* cursym = BaseType::findBaseTypeByName<T>(getDieName(object));
+T* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
+	T* cursym = BaseType::findBaseTypeByName<T>(dieName);
 	if(!cursym){
 		return new T(object);
 	}
@@ -374,13 +374,13 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 	switch(tag){
 
 		case DW_TAG_typedef:
-			cursym = getRefTypeInstance<Typedef>(cur_die);
+			cursym = getRefTypeInstance<Typedef>(cur_die, name);
 			break;
 		case DW_TAG_structure_type:
-			cursym = getTypeInstance<Struct>(cur_die);
+			cursym = getTypeInstance<Struct>(cur_die, name);
 			break;
 		case DW_TAG_union_type:
-			cursym = getTypeInstance<Union>(cur_die);
+			cursym = getTypeInstance<Union>(cur_die, name);
 			break;
 		case DW_TAG_member:
 			if(!parent){
@@ -391,7 +391,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			structured = dynamic_cast<Structured*>(parent);
 			if (structured){
 				cursym = structured->addMember(cur_die);
-				//cursym = getTypeInstance<Variable>(cur_die);
+				//cursym = getTypeInstance<Variable>(cur_die, name);
 				break;
 			}else{
 				//print_die_data(cur_die,level,sf);
@@ -400,15 +400,15 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			}
 			break;
 		case DW_TAG_base_type:
-			cursym = getTypeInstance<BaseType>(cur_die);
+			cursym = getTypeInstance<BaseType>(cur_die, name);
 			break;
 		case DW_TAG_pointer_type:
-			cursym = getRefTypeInstance<Pointer>(cur_die);
+			cursym = getRefTypeInstance<Pointer>(cur_die, name);
 			break;
 		case DW_TAG_const_type:
-			cursym = getTypeInstance<ConstType>(cur_die);
+			cursym = getTypeInstance<ConstType>(cur_die, name);
 		case DW_TAG_enumeration_type:
-			cursym = getTypeInstance<Enum>(cur_die);
+			cursym = getTypeInstance<Enum>(cur_die, name);
 			break;
 		case DW_TAG_enumerator:
 			assert(parent);
@@ -424,7 +424,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 				//This is an initializer for another object
 				break;
 			}
-			cursym = getTypeInstance<Variable>(cur_die);
+			cursym = getTypeInstance<Variable>(cur_die, name);
 			break;
 		case DW_TAG_array_type: 
 			cursym = new Array(cur_die);
@@ -440,7 +440,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			break;
 		case DW_TAG_subprogram:
 		//case DW_TAG_subroutine_type:
-			cursym = getTypeInstance<Function>(cur_die);
+			cursym = getTypeInstance<Function>(cur_die, name);
 			//cursym = new Function(cur_die);
 			//print_die_data(cur_die, level, sf);
 			break;

@@ -59,11 +59,9 @@ Symbol::~Symbol(){
 		std::cout << std::endl << "offenting symbols: " << std::endl;
 
 		auto oTypes = symbolIDAliasReverseList[this->id];
-		for(auto iter = oTypes.begin();
-				iter!=oTypes.end();
-				iter++){
-			std::cout << "ID: " << std::hex << *iter << std::dec << std::endl;
-			Symbol::findSymbolByID(*(iter))->print();
+		for(auto iter : oTypes){
+			std::cout << "ID: " << std::hex << iter << std::dec << std::endl;
+			Symbol::findSymbolByID(iter)->print();
 			//TODO
 			break;
 		}
@@ -81,23 +79,32 @@ Symbol* Symbol::findSymbolByName(std::string name){
 }
 
 Symbol* Symbol::findSymbolByID(uint64_t id){
-	Symbol *sym;
-	sym = symbolIDMap.find(id)->second;
-	if(sym) return sym;
+	auto symbol = symbolIDMap.find(id);
+	if(symbol != symbolIDMap.end()){
+		return symbol->second;
+	}
+	
 	//Look in aliasMap to find symbol
-	id = symbolIDAliasMap.find(id)->second;
-	sym = symbolIDMap.find(id)->second;
-	if(sym) return sym;
+	auto symbolIDAlias = symbolIDAliasMap.find(id);
+	if(symbolIDAlias != symbolIDAliasMap.end()){
+		id = symbolIDAlias->second;
+		symbol = symbolIDMap.find(id);
+		if(symbol != symbolIDMap.end()){
+			return symbol->second;
+		}
+	}
+	
 	//Look in reverseList to find symbol
 	auto revList = symbolIDAliasReverseList[id];
-	for(auto i = revList.begin();
-			i != revList.end();
-			i++){
-		sym = symbolIDMap.find(*i)->second;
-		if(sym) return sym;
+	for(auto i : revList){
+		symbol = symbolIDMap.find(i);
+		if(symbol != symbolIDMap.end()){
+			return symbol->second;
+		}
 	}
 	assert(false);
 }
+
 void Symbol::addAlternativeID(uint64_t id){
 	symbolIDAliasMap[id] = this->id;
 

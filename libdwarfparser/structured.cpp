@@ -17,12 +17,14 @@ Structured::~Structured(){
 StructuredMember* Structured::addMember(Dwarf_Die object){
 	DwarfParser* parser = DwarfParser::getInstance();
 	std::string memberName = parser->getDieName(object);
-	StructuredMember* member = memberNameMap[memberName];
-	if(member){
-		return member;
+	StructuredMember* member;
+	auto memberIter = memberNameMap.find(memberName);
+	if ( memberNameMap.find(memberName) != memberNameMap.end()){
+		member = memberIter->second;
+	}else{
+		member = new StructuredMember(object, this);
+		memberNameMap[memberName] = member;
 	}
-	member = new StructuredMember(object, this);
-	memberNameMap[memberName] = member;
 	return member;
 }
 
@@ -32,8 +34,8 @@ StructuredMember* Structured::memberByName(std::string name){
 
 void Structured::listMembers(){
 	std::cout << "Members of " << this->name << ": " << std::endl;
-	for(auto i = memberNameMap.begin(); i != memberNameMap.end(); i++){
-		std::cout << i->second->getName() << std::endl;
+	for(auto i : memberNameMap){
+		std::cout << i.second->getName() << std::endl;
 	}
 }
 
@@ -52,18 +54,18 @@ StructuredMember *Structured::memberByOffset(uint32_t offset){
 }
 
 std::string Structured::memberNameByOffset(uint32_t offset){
-	for(auto i = memberNameMap.begin(); i != memberNameMap.end(); i++){
-		if(i->second->getMemberLocation() == offset){
-			return i->first;
+	for(auto i : memberNameMap){
+		if(i.second->getMemberLocation() == offset){
+			return i.first;
 		}
 	}
 	return "";
 }
 
 uint32_t Structured::memberOffset(std::string member) const{
-	for(auto i = memberNameMap.begin(); i != memberNameMap.end(); i++){
-		if(i->second->getName() == member){
-			return i->second->getMemberLocation();   
+	for(auto i : memberNameMap){
+		if(i.second->getName() == member){
+			return i.second->getMemberLocation();   
 		}
 	}
 	return -1;

@@ -44,9 +44,9 @@ public:
 	bool getDieAttributeFlag(Dwarf_Die die, Dwarf_Half attr);
 
 	template<class T>
-	T* getTypeInstance(Dwarf_Die object);
+	T* getTypeInstance(Dwarf_Die object, std::string dieName);
 	template<class T>
-	T* getRefTypeInstance(Dwarf_Die object);
+	T* getRefTypeInstance(Dwarf_Die object, std::string dieName);
 
 	uint32_t getFileID();
 	

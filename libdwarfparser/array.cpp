@@ -65,10 +65,8 @@ Array* Array::findArrayByTypeID(uint64_t id, uint64_t length){
 	}
 	//Search for all aliases of this type
 	auto revList = Symbol::getAliases(id);
-	for(auto i = revList.begin();
-			i != revList.end();
-			i++){
-		bt = arrayTypeMap.find(*i);
+	for( auto i : revList ){
+		bt = arrayTypeMap.find(i);
 		while(bt != arrayTypeMap.end()){
 			if(bt->second->length == length){
 				return bt->second;
@@ -114,9 +112,9 @@ void Array::print(){
 }
 
 void Array::cleanArrays(){
-	for(auto item = arrayVector.begin(); item != arrayVector.end(); item++){
-		assert((*item));
-		(*item)->updateTypes();
+	for(auto item : arrayVector){
+		assert(item);
+		item->updateTypes();
 	}
 
 	auto item = arrayVector.begin();
@@ -147,7 +145,7 @@ void Array::cleanArrays(){
 	}
 	arrayVector.shrink_to_fit();
 
-	for (item = arrayVector.begin(); item != arrayVector.end(); item++){
-		arrayTypeMap.insert(std::pair<uint64_t, Array*>((*item)->type, (*item)));
+	for (auto item : arrayVector){
+		arrayTypeMap.insert(std::pair<uint64_t, Array*>(item->type, item));
 	}
 }

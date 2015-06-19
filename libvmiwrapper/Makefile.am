@@ -1,5 +1,5 @@
 # @configure_input@
-AM_CXXFLAGS = -Wall -Wextra -Werror -fpic -std=c++1y -I $(top_builddir)/ -I $(top_builddir)/common
+AM_CXXFLAGS = -Wall -Wextra -Werror -fpic -std=c++1y -I $(top_builddir)/ -I $(top_builddir)/common -O3
 
 
 # Package-specific substitution variables

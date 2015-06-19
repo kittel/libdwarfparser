@@ -91,9 +91,9 @@ void Function::updateTypes(){
 }
 
 void Function::cleanFunctions(){
-	for(auto item = funcList.begin(); item != funcList.end(); item++){
-		assert((*item));
-		(*item)->updateTypes();
+	for(auto item : funcList){
+		assert(item);
+		item->updateTypes();
 	}
 
 	auto item = funcList.begin();

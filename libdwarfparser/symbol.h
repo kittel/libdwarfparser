@@ -51,8 +51,8 @@ public:
 	template<class T>
 	static inline T* findSymbolByName(std::string name){
 		auto bt = symbolNameMap.find(name);
-		for(auto i = bt; bt != symbolNameMap.end(); ++i){
-			T* t = dynamic_cast<T*>(i->second);
+		for(auto i : symbolNameMap){
+			T* t = dynamic_cast<T*>(i.second);
 			if(t) return t;
 		}
 		return NULL;

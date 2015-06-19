@@ -34,18 +34,16 @@ std::string Enum::enumName(uint32_t value){
 }
 
 uint32_t Enum::enumValue(std::string name){
-	EnumValues::const_iterator it;
-	for (it = enumValues.begin(); it != enumValues.end(); ++it)	{
-		if (it->second == name){
-			return it->first;
+	for (auto it : enumValues)	{
+		if (it.second == name){
+			return it.first;
 		}
 	}
 	throw DwarfException("Enum name not found");
 }
 
 void Enum::printEnumMembers(std::ostream &stream){
-	EnumValues::const_iterator it;
-	for (it = enumValues.begin(); it != enumValues.end(); ++it)	{
-		stream << it->second << ": " << it->first << std::endl;
+	for (auto it : enumValues)	{
+		stream << it.second << ": " << it.first << std::endl;
 	}
 }
