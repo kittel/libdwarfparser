@@ -4,14 +4,12 @@
 
 #include <libdwarf/libdwarf.h>
 
-#include "dwarfparser.h"
 #include "instance.h"
 
 BaseType::BaseTypeNameMap BaseType::baseTypeNameMap;
 
-BaseType::BaseType(Dwarf_Die object):
-	Symbol(object), encoding(0){
-	DwarfParser *parser = DwarfParser::getInstance();
+BaseType::BaseType(DwarfParser *parser, Dwarf_Die object, std::string name):
+	Symbol(parser, object, name), encoding(0){
 	if(parser->dieHasAttr(object, DW_AT_encoding)){
 		this->encoding = parser->getDieAttributeNumber(object, DW_AT_encoding);
 	}

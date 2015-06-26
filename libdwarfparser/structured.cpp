@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-Structured::Structured(Dwarf_Die object):
-	BaseType(object),
+Structured::Structured(DwarfParser *parser, Dwarf_Die object, std::string name):
+	BaseType(parser, object, name),
 	memberNameMap(){
 
 }
@@ -14,15 +14,14 @@ Structured::~Structured(){
 
 }
 
-StructuredMember* Structured::addMember(Dwarf_Die object){
-	DwarfParser* parser = DwarfParser::getInstance();
-	std::string memberName = parser->getDieName(object);
+StructuredMember* Structured::addMember(DwarfParser *parser, 
+		Dwarf_Die object, std::string memberName){
 	StructuredMember* member;
 	auto memberIter = memberNameMap.find(memberName);
 	if ( memberNameMap.find(memberName) != memberNameMap.end()){
 		member = memberIter->second;
 	}else{
-		member = new StructuredMember(object, this);
+		member = new StructuredMember(parser, object, memberName, this);
 		memberNameMap[memberName] = member;
 	}
 	return member;

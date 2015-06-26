@@ -5,7 +5,7 @@
 
 class Typedef: public RefBaseType {
 public:
-	Typedef(Dwarf_Die object);
+	Typedef(DwarfParser *parser, Dwarf_Die object, std::string name);
 	virtual ~Typedef();
 	
 };

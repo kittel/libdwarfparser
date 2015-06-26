@@ -10,6 +10,7 @@
 #include <iostream>
 
 #include "libvmiwrapper/vmiinstance.h"
+#include "dwarfparser.h"
 
 #include "dwarfexception.h"
 
@@ -17,7 +18,7 @@ class Instance;
 
 class BaseType: public Symbol {
 public:
-	BaseType(Dwarf_Die object);
+	BaseType(DwarfParser *parser, Dwarf_Die object, std::string name);
 	virtual ~BaseType();
 
 	static BaseType* findBaseTypeByID(uint64_t id);

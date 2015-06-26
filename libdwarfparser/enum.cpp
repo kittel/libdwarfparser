@@ -10,20 +10,17 @@
 #include <libdwarf/dwarf.h>
 #include <libdwarf/libdwarf.h>
 
-Enum::Enum(Dwarf_Die object):
-	BaseType(object), enumValues(){
+Enum::Enum(DwarfParser *parser, Dwarf_Die object, std::string name):
+	BaseType(parser, object, name), enumValues(){
 }
 
 Enum::~Enum(){}
 
-void Enum::addEnum(Dwarf_Die object){
+void Enum::addEnum(DwarfParser *parser, Dwarf_Die object, std::string name){
 //TODO get ENUM Value
-	UNUSED(object);
-	DwarfParser* parser = DwarfParser::getInstance();
-	std::string enumName = parser->getDieName(object);
 	uint32_t enumValue = parser->getDieAttributeNumber(object, DW_AT_const_value);
 
-	enumValues[enumValue] = enumName;
+	enumValues[enumValue] = name;
 }
 
 std::string Enum::enumName(uint32_t value){

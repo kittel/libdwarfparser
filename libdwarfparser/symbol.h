@@ -7,6 +7,8 @@
 #include <string.h>
 #include <cstdint>
 
+class DwarfParser;
+
 struct Dwarf_Die_s;
 typedef struct Dwarf_Die_s* Dwarf_Die;
 
@@ -34,7 +36,7 @@ class Symbol {
 
 
 public:
-	Symbol(Dwarf_Die object);
+	Symbol(DwarfParser *parser, Dwarf_Die object, std::string name);
 	virtual ~Symbol();
 
 	virtual uint32_t getByteSize();

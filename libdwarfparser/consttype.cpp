@@ -1,7 +1,7 @@
 #include "consttype.h"
 
-ConstType::ConstType(Dwarf_Die object):
-	RefBaseType(object){
+ConstType::ConstType(DwarfParser *parser, Dwarf_Die object, std::string name):
+	RefBaseType(parser, object, name){
 
 }
 

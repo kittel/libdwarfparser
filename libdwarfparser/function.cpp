@@ -7,11 +7,11 @@
 Function::FunctionNameMap Function::functionNameMap;
 Function::FuncList Function::funcList;
 
-Function::Function(Dwarf_Die object):
-	BaseType(object),
+Function::Function(DwarfParser *parser, Dwarf_Die object, std::string name):
+	BaseType(parser, object, name),
 	rettype(0), address(0),
 	paramList(),paramsFinal(false){
-	this->update(object);
+	this->update(parser, object);
 	if(this->name.size() != 0 && 
 		functionNameMap.find(this->name) == functionNameMap.end()){
 		functionNameMap[this->name] = this;
@@ -23,9 +23,8 @@ Function::Function(Dwarf_Die object):
 Function::~Function(){
 }
 
-void Function::addParam(Dwarf_Die object){
+void Function::addParam(DwarfParser *parser, Dwarf_Die object){
 	if (this->paramsFinal) return;
-	DwarfParser* parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
 		uint32_t fileID = parser->getFileID();
@@ -35,8 +34,7 @@ void Function::addParam(Dwarf_Die object){
 	}
 }
 
-void Function::update(Dwarf_Die object){
-	DwarfParser* parser = DwarfParser::getInstance();
+void Function::update(DwarfParser *parser, Dwarf_Die object){
 	if(this->rettype == 0 && parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
 		uint32_t fileID = parser->getFileID();

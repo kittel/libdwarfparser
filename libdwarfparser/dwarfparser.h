@@ -29,7 +29,6 @@ public:
 
 	static void parseDwarfFromFilename(std::string filename);
 	static void parseDwarfFromFD(int fd);
-	static DwarfParser* getInstance();
 
 	bool dieHasAttr(Dwarf_Die die, Dwarf_Half attr);
 	std::string getDieName(Dwarf_Die die);

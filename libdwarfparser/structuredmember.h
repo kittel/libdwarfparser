@@ -8,7 +8,8 @@
 
 class StructuredMember: public Symbol, public ReferencingType {
 public:
-	StructuredMember(Dwarf_Die object, Structured *parent);
+	StructuredMember(DwarfParser *parser, Dwarf_Die object, 
+			std::string name, Structured *parent);
 	virtual ~StructuredMember();
 
 	uint32_t getByteSize();

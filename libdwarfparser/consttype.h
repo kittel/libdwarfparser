@@ -5,7 +5,7 @@
 
 class ConstType: public RefBaseType {
 public:
-	ConstType(Dwarf_Die object);
+	ConstType(DwarfParser *parser, Dwarf_Die object, std::string name);
 	virtual ~ConstType();
 };
 

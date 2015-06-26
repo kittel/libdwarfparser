@@ -9,10 +9,11 @@ class StructuredMember;
 
 class Structured: public BaseType {
 public:
-	Structured(Dwarf_Die object);
+	Structured(DwarfParser *parser, Dwarf_Die object, std::string name);
 	virtual ~Structured();
 
-	virtual StructuredMember *addMember(Dwarf_Die object);
+	virtual StructuredMember *addMember(DwarfParser *parser, 
+			Dwarf_Die object, std::string memberName);
 	StructuredMember* memberByName(std::string name);
 
 	void listMembers();

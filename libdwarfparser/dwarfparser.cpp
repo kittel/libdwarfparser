@@ -18,7 +18,6 @@
 
 #include <typeinfo>
 
-DwarfParser *DwarfParser::instance = NULL;
 uint32_t DwarfParser::nextFileID = 0;
 
 DwarfParser::DwarfParser(int fd) :
@@ -65,24 +64,17 @@ DwarfParser::Srcfilesdata::~Srcfilesdata()
 
 void DwarfParser::parseDwarfFromFilename(std::string filename){
 	int fd = open(filename.c_str(),O_RDONLY);
-	DwarfParser::instance = new DwarfParser(fd);
-
-	instance->read_cu_list();
-
-	DELETE(instance);
+	DwarfParser::parseDwarfFromFD(fd);
 }
 
 void DwarfParser::parseDwarfFromFD(int fd){
-	DwarfParser::instance = new DwarfParser(fd);
+	DwarfParser *instance = new DwarfParser(fd);
 
 	instance->read_cu_list();
 
 	DELETE(instance);
 }
 
-DwarfParser* DwarfParser::getInstance(){
-	return instance;
-}
 uint32_t DwarfParser::getFileID(){
 	return this->fileID;
 }
@@ -298,7 +290,7 @@ T* DwarfParser::getRefTypeInstance(Dwarf_Die object, std::string dieName){
 	RefBaseType* rbt = RefBaseType::findRefBaseTypeByName(dieName);
 	cursym = dynamic_cast<T*>(rbt);
 	if(!rbt){
-		return new T(object);
+		return new T(this, object, dieName);
 	}else if (!cursym){
 		std::cout << "RefBaseType with same name but different type!" << 
 			typeid(T).name() << " vs " << typeid(rbt).name() <<
@@ -317,9 +309,9 @@ Function* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
 
 	cursym = BaseType::findBaseTypeByName<Function>(dieName);
 	if(!cursym){
-		return new Function(object);
+		return new Function(this, object, dieName);
 	}
-	cursym->update(object);
+	cursym->update(this, object);
 	cursym->addAlternativeDwarfID(getDieOffset(object), fileID);
 	return cursym;
 
@@ -331,9 +323,9 @@ Variable* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
 
 	cursym = Variable::findVariableByName(dieName);
 	if(!cursym){
-		return new Variable(object);
+		return new Variable(this, object, dieName);
 	}
-	cursym->update(object);
+	cursym->update(this, object);
 	cursym->addAlternativeDwarfID(getDieOffset(object), fileID);
 	return cursym;
 
@@ -343,7 +335,7 @@ template<class T>
 T* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
 	T* cursym = BaseType::findBaseTypeByName<T>(dieName);
 	if(!cursym){
-		return new T(object);
+		return new T(this, object, dieName);
 	}
 	//TODO Include
 	//We need to update the representation of the object that we
@@ -390,7 +382,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			}
 			structured = dynamic_cast<Structured*>(parent);
 			if (structured){
-				cursym = structured->addMember(cur_die);
+				cursym = structured->addMember(this, cur_die, name);
 				//cursym = getTypeInstance<Variable>(cur_die, name);
 				break;
 			}else{
@@ -414,7 +406,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			assert(parent);
 			enumType = dynamic_cast<Enum*>(parent);
 			if(enumType){
-				enumType->addEnum(cur_die);
+				enumType->addEnum(this, cur_die, name);
 			}else{
 				print_die_data(cur_die, level, sf);
 			}
@@ -427,13 +419,13 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 			cursym = getTypeInstance<Variable>(cur_die, name);
 			break;
 		case DW_TAG_array_type: 
-			cursym = new Array(cur_die);
+			cursym = new Array(this, cur_die, name);
 			break;
 		case DW_TAG_subrange_type:
 			assert(parent);
 			array = dynamic_cast<Array*>(parent);
 			if(array){
-				array->update(cur_die);
+				array->update(this, cur_die);
 			}else{
 				print_die_data(cur_die, level, sf);
 			}
@@ -447,7 +439,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 		case DW_TAG_formal_parameter:
 			function = dynamic_cast<Function*>(parent);
 			if(function){
-				function->addParam(cur_die);
+				function->addParam(this, cur_die);
 			}
 			break;
 		case DW_TAG_compile_unit:

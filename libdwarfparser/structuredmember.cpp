@@ -4,15 +4,15 @@
 #include "dwarfexception.h"
 
 
-StructuredMember::StructuredMember(Dwarf_Die object, Structured *parent):
-	Symbol(object), ReferencingType(object),
+StructuredMember::StructuredMember(DwarfParser *parser, Dwarf_Die object, 
+		std::string name, Structured *parent):
+	Symbol(parser, object, name), ReferencingType(parser, object),
 	bitSize(0), bitOffset(0), memberLocation(0),
 	parent(parent){
 	if(parent == NULL){
 		std::cout << "parent not set" << std::endl;
 		throw DwarfException("Parent not set");
 	}
-	DwarfParser *parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_bit_size)){
 		this->bitSize = parser->getDieAttributeNumber(object, DW_AT_bit_size);
 	}

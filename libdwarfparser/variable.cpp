@@ -11,14 +11,13 @@
 
 Variable::VariableNameMap Variable::variableNameMap;
 
-Variable::Variable(Dwarf_Die object):
-	Symbol(object), ReferencingType(object){
+Variable::Variable(DwarfParser *parser, Dwarf_Die object, std::string name):
+	Symbol(parser, object, name), ReferencingType(parser, object){
 	this->location = 0;
 	if(this->name.size() != 0){
 		variableNameMap[this->name] = this;
 	}
 
-	DwarfParser *parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_location)){
 		this->location = parser->getDieAttributeNumber(object, DW_AT_location);
 	}
@@ -30,9 +29,8 @@ uint64_t Variable::getLocation(){
 	return this->location;
 }
 
-void Variable::update(Dwarf_Die object){
+void Variable::update(DwarfParser *parser, Dwarf_Die object){
 	if(this->location != 0) return;
-	DwarfParser *parser = DwarfParser::getInstance();
 	if(parser->dieHasAttr(object, DW_AT_location)){
 		this->location = parser->getDieAttributeNumber(object, DW_AT_location);
 	}

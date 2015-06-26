@@ -6,9 +6,9 @@
 
 RefBaseType::RefBaseTypeNameMap RefBaseType::refBaseTypeNameMap;
 
-RefBaseType::RefBaseType(Dwarf_Die object):
-	BaseType(object), type(0), base(0){
-	DwarfParser* parser = DwarfParser::getInstance();
+RefBaseType::RefBaseType(DwarfParser *parser, 
+		Dwarf_Die object, std::string name):
+	BaseType(parser, object, name), type(0), base(0){
 	if(parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
 		uint32_t fileID = parser->getFileID();

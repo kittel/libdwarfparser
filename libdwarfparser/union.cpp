@@ -1,7 +1,7 @@
 #include "union.h"
 
-Union::Union(Dwarf_Die object):
-	Structured(object){
+Union::Union(DwarfParser *parser, Dwarf_Die object, std::string name):
+	Structured(parser, object, name){
 
 }
 

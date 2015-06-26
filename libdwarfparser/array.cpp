@@ -10,8 +10,8 @@
 Array::ArrayTypeMap Array::arrayTypeMap;
 Array::ArrayVector Array::arrayVector;
 
-Array::Array(Dwarf_Die object):
-	Pointer(object), 
+Array::Array(DwarfParser *parser, Dwarf_Die object, std::string name):
+	Pointer(parser, object, name), 
 	length(0), lengthType(0), lengthTypeBT(0){
 
 	arrayVector.push_back(this);
@@ -29,8 +29,7 @@ uint32_t Array::getByteSize(){
 	return this->length * symbol->getByteSize();
 }
 
-void Array::update(Dwarf_Die object){
-	DwarfParser *parser = DwarfParser::getInstance();
+void Array::update(DwarfParser *parser, Dwarf_Die object){
 	if(parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
 		uint32_t fileID = parser->getFileID();

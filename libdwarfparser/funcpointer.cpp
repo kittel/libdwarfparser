@@ -1,7 +1,7 @@
 #include "funcpointer.h"
 
-FuncPointer::FuncPointer(Dwarf_Die object):
-	RefBaseType(object){
+FuncPointer::FuncPointer(DwarfParser *parser, Dwarf_Die object, std::string name):
+	RefBaseType(parser, object, name){
 
 }
 

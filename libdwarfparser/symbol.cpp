@@ -36,12 +36,11 @@ Symbol::SymbolIDMap Symbol::symbolIDMap;
 Symbol::SymbolIDAliasMap Symbol::symbolIDAliasMap;
 Symbol::SymbolIDAliasReverseList Symbol::symbolIDAliasReverseList;
 
-Symbol::Symbol(Dwarf_Die object){
-	DwarfParser* instance = DwarfParser::getInstance();
-	this->byteSize = instance->getDieByteSize(object);
-	this->id = IDManager::getID(instance->getDieOffset(object),
-								instance->getFileID());
-	this->name = instance->getDieName(object);
+Symbol::Symbol(DwarfParser *parser, Dwarf_Die object, std::string name){
+	this->byteSize = parser->getDieByteSize(object);
+	this->id = IDManager::getID(parser->getDieOffset(object),
+								parser->getFileID());
+	this->name = name;
 
 	if(this->name.size() != 0){
 		symbolNameMap.insert ( std::pair<std::string, Symbol*>(this->name, this));

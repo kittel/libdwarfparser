@@ -8,11 +8,11 @@ class Instance;
 
 class Variable : public Symbol, public ReferencingType {
 public:
-	Variable(Dwarf_Die object);
+	Variable(DwarfParser *parser, Dwarf_Die object, std::string name);
 	virtual ~Variable();
 
 	uint64_t getLocation();
-	void update(Dwarf_Die object);
+	void update(DwarfParser *parser, Dwarf_Die object);
 	void setLocation(uint64_t location);
 
 	static Variable* findVariableByID(uint64_t id);
