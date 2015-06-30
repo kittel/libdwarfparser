@@ -35,9 +35,11 @@ class Function : public BaseType {
 		void updateTypes();
 		
 		typedef std::map<std::string, Function*> FunctionNameMap;
+		static std::mutex functionNameMapMutex;
 		static FunctionNameMap functionNameMap;
 
 		typedef std::vector<Function*> FuncList;
+		static std::mutex funcListMutex;
 		static FuncList funcList;
 		
 };

@@ -31,8 +31,10 @@ class Array: public Pointer {
 		void print();
 
 		typedef std::multimap<uint64_t, Array*> ArrayTypeMap;
+		static std::mutex arrayTypeMapMutex;
 		static ArrayTypeMap arrayTypeMap;
 		typedef std::vector<Array*> ArrayVector;
+		static std::mutex arrayVectorMutex;
 		static ArrayVector arrayVector;
 };
 

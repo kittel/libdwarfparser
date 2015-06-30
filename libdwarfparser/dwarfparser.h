@@ -7,6 +7,8 @@
 
 #include <string>
 
+#include <mutex>
+
 struct Dwarf_Die_s;
 typedef struct Dwarf_Die_s* Dwarf_Die; 
 

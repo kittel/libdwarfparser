@@ -6,6 +6,8 @@
 
 Function::FunctionNameMap Function::functionNameMap;
 Function::FuncList Function::funcList;
+std::mutex Function::functionNameMapMutex;
+std::mutex Function::funcListMutex;
 
 Function::Function(DwarfParser *parser, Dwarf_Die object, std::string name):
 	BaseType(parser, object, name),
@@ -14,10 +16,14 @@ Function::Function(DwarfParser *parser, Dwarf_Die object, std::string name):
 	this->update(parser, object);
 	if(this->name.size() != 0 && 
 		functionNameMap.find(this->name) == functionNameMap.end()){
+		functionNameMapMutex.lock();
 		functionNameMap[this->name] = this;
+		functionNameMapMutex.unlock();
 	}
 	this->paramsFinal = false;
+	funcListMutex.lock();
 	funcList.push_back(this);
+	funcListMutex.unlock();
 }
 
 Function::~Function(){
@@ -89,6 +95,7 @@ void Function::updateTypes(){
 }
 
 void Function::cleanFunctions(){
+	funcListMutex.lock();
 	for(auto item : funcList){
 		assert(item);
 		item->updateTypes();
@@ -125,6 +132,7 @@ void Function::cleanFunctions(){
 	}
 	funcList.shrink_to_fit();
 	//TODO Eigentlich brauchen wir den Vector hier nicht mehr.
+	funcListMutex.unlock();
 }
 
 void Function::print(){

@@ -6,6 +6,7 @@
 #include <map>
 #include <string.h>
 #include <cstdint>
+#include <mutex>
 
 class DwarfParser;
 
@@ -74,10 +75,14 @@ protected:
 	typedef std::map<uint64_t, uint64_t> SymbolIDAliasMap;
 	typedef std::map<uint64_t, std::set<uint64_t>> SymbolIDAliasReverseList;
 
-	static SymbolNameMap symbolNameMap;
-	static SymbolIDMap symbolIDMap;
-	static SymbolIDAliasMap symbolIDAliasMap;
+	static SymbolNameMap            symbolNameMap;
+	static std::mutex               symbolNameMapMutex;
+	static SymbolIDMap              symbolIDMap;
+	static std::mutex               symbolIDMapMutex;
+	static SymbolIDAliasMap         symbolIDAliasMap;
+	static std::mutex               symbolIDAliasMapMutex;
 	static SymbolIDAliasReverseList symbolIDAliasReverseList;
+	static std::mutex               symbolIDAliasReverseListMutex;
 
 };
 

@@ -9,12 +9,16 @@
 
 Array::ArrayTypeMap Array::arrayTypeMap;
 Array::ArrayVector Array::arrayVector;
+std::mutex Array::arrayVectorMutex;
+std::mutex Array::arrayTypeMapMutex;
 
 Array::Array(DwarfParser *parser, Dwarf_Die object, std::string name):
 	Pointer(parser, object, name), 
 	length(0), lengthType(0), lengthTypeBT(0){
 
+	arrayVectorMutex.lock();
 	arrayVector.push_back(this);
+	arrayVectorMutex.unlock();
 }
 
 Array::~Array(){
@@ -55,7 +59,9 @@ Array* Array::findArrayByID(uint64_t id){
 
 Array* Array::findArrayByTypeID(uint64_t id, uint64_t length){
 	//Search for array with type
+	arrayTypeMapMutex.lock();
 	auto bt = arrayTypeMap.find(id);
+	arrayTypeMapMutex.unlock();
 	while(bt != arrayTypeMap.end()){
 		if(bt->second->length == length){
 			return bt->second;
@@ -65,7 +71,9 @@ Array* Array::findArrayByTypeID(uint64_t id, uint64_t length){
 	//Search for all aliases of this type
 	auto revList = Symbol::getAliases(id);
 	for( auto i : revList ){
+		arrayTypeMapMutex.lock();
 		bt = arrayTypeMap.find(i);
+		arrayTypeMapMutex.unlock();
 		while(bt != arrayTypeMap.end()){
 			if(bt->second->length == length){
 				return bt->second;
@@ -111,6 +119,7 @@ void Array::print(){
 }
 
 void Array::cleanArrays(){
+	arrayVectorMutex.lock();
 	for(auto item : arrayVector){
 		assert(item);
 		item->updateTypes();
@@ -144,7 +153,10 @@ void Array::cleanArrays(){
 	}
 	arrayVector.shrink_to_fit();
 
+	arrayTypeMapMutex.lock();
 	for (auto item : arrayVector){
 		arrayTypeMap.insert(std::pair<uint64_t, Array*>(item->type, item));
 	}
+	arrayTypeMapMutex.unlock();
+	arrayVectorMutex.unlock();
 }

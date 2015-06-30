@@ -13,7 +13,10 @@ IDManager::IDManager(){};
 IDManager::~IDManager(){};
 
 uint64_t IDManager::getID(uint64_t dwarfID, uint32_t fileID){
+	static std::mutex funcMutex;
+	
 	auto pair = std::make_pair(dwarfID, fileID);
+	funcMutex.lock();
 	if(idMap[pair] == 0){
 		//return new ID, as this ID was not yet seen.
 		uint64_t newID = ++nextID;
@@ -21,8 +24,10 @@ uint64_t IDManager::getID(uint64_t dwarfID, uint32_t fileID){
 		idMap[pair] = newID;
 		idRevMap[newID] = pair;
 
+		funcMutex.unlock();
 		return newID;
 	}else{
+		funcMutex.unlock();
 		return idMap[pair];
 	}
 }
@@ -32,9 +37,13 @@ std::pair<uint64_t, uint32_t> IDManager::getRevID(uint64_t id){
 }
 
 Symbol::SymbolNameMap Symbol::symbolNameMap;
+std::mutex Symbol::symbolNameMapMutex;
 Symbol::SymbolIDMap Symbol::symbolIDMap;
+std::mutex Symbol::symbolIDMapMutex;
 Symbol::SymbolIDAliasMap Symbol::symbolIDAliasMap;
+std::mutex Symbol::symbolIDAliasMapMutex;
 Symbol::SymbolIDAliasReverseList Symbol::symbolIDAliasReverseList;
+std::mutex Symbol::symbolIDAliasReverseListMutex;
 
 Symbol::Symbol(DwarfParser *parser, Dwarf_Die object, std::string name){
 	this->byteSize = parser->getDieByteSize(object);
@@ -42,11 +51,16 @@ Symbol::Symbol(DwarfParser *parser, Dwarf_Die object, std::string name){
 								parser->getFileID());
 	this->name = name;
 
+
 	if(this->name.size() != 0){
+		symbolNameMapMutex.lock();
 		symbolNameMap.insert ( std::pair<std::string, Symbol*>(this->name, this));
+		symbolNameMapMutex.unlock();
 	}
+
+	symbolNameMapMutex.lock();
 	symbolIDMap[this->id] = this;
-	
+	symbolNameMapMutex.unlock();
 }
 
 Symbol::~Symbol(){
@@ -57,7 +71,9 @@ Symbol::~Symbol(){
 
 		std::cout << std::endl << "offenting symbols: " << std::endl;
 
+		symbolIDAliasReverseListMutex.lock();
 		auto oTypes = symbolIDAliasReverseList[this->id];
+		symbolIDAliasReverseListMutex.unlock();
 		for(auto iter : oTypes){
 			std::cout << "ID: " << std::hex << iter << std::dec << std::endl;
 			Symbol::findSymbolByID(iter)->print();
@@ -70,31 +86,44 @@ Symbol::~Symbol(){
 		
 		assert(false);
 	}
+	symbolIDMapMutex.lock();
 	symbolIDMap.erase(this->id);
+	symbolIDMapMutex.unlock();
 }
 
 Symbol* Symbol::findSymbolByName(std::string name){
-	return symbolNameMap.find(name)->second;
+	symbolNameMapMutex.lock();
+	auto ret = symbolNameMap.find(name)->second;
+	symbolNameMapMutex.unlock();
+	return ret;
 }
 
 Symbol* Symbol::findSymbolByID(uint64_t id){
+	symbolIDMapMutex.lock();
 	auto symbol = symbolIDMap.find(id);
+	symbolIDMapMutex.unlock();
 	if(symbol != symbolIDMap.end()){
 		return symbol->second;
 	}
 	
 	//Look in aliasMap to find symbol
+	symbolIDAliasMapMutex.lock();
 	auto symbolIDAlias = symbolIDAliasMap.find(id);
+	symbolIDAliasMapMutex.unlock();
 	if(symbolIDAlias != symbolIDAliasMap.end()){
 		id = symbolIDAlias->second;
+		symbolIDMapMutex.lock();
 		symbol = symbolIDMap.find(id);
+		symbolIDMapMutex.unlock();
 		if(symbol != symbolIDMap.end()){
 			return symbol->second;
 		}
 	}
 	
 	//Look in reverseList to find symbol
+	symbolIDAliasReverseListMutex.lock();
 	auto revList = symbolIDAliasReverseList[id];
+	symbolIDAliasReverseListMutex.unlock();
 	for(auto i : revList){
 		symbol = symbolIDMap.find(i);
 		if(symbol != symbolIDMap.end()){
@@ -105,9 +134,13 @@ Symbol* Symbol::findSymbolByID(uint64_t id){
 }
 
 void Symbol::addAlternativeID(uint64_t id){
+	symbolIDAliasMapMutex.lock();
 	symbolIDAliasMap[id] = this->id;
+	symbolIDAliasMapMutex.unlock();
 
+	symbolIDAliasReverseListMutex.lock();
 	symbolIDAliasReverseList[this->id].insert(id);
+	symbolIDAliasReverseListMutex.unlock();
 }
 
 void Symbol::addAlternativeDwarfID(uint64_t id, uint32_t fileID){
