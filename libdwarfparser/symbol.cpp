@@ -75,7 +75,7 @@ Symbol::~Symbol(){
 		auto oTypes = symbolIDAliasReverseList[this->id];
 		symbolIDAliasReverseListMutex.unlock();
 		for(auto iter : oTypes){
-			std::cout << "ID: " << std::hex << iter << std::dec << std::endl;
+			std::cout << "\tID: " << std::hex << iter << std::dec << std::endl;
 			Symbol::findSymbolByID(iter)->print();
 			//TODO
 			break;

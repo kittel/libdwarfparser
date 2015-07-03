@@ -129,8 +129,6 @@ void DwarfParser::read_cu_list()
         get_die_and_siblings(cu_die, 0, 0, sf);
         dwarf_dealloc(dbg, cu_die,DW_DLA_DIE);
     }
-	Array::cleanArrays();
-	Function::cleanFunctions();
 }
 
 void DwarfParser::get_die_and_siblings(Dwarf_Die in_die, Symbol *parent, int in_level, Srcfilesdata sf)
