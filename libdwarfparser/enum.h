@@ -14,7 +14,7 @@ public:
 
 	void addEnum(DwarfParser *parser, const Dwarf_Die &object, const std::string &name);
 	std::string enumName(uint32_t value);
-	uint32_t enumValue(std::string name);
+	uint32_t enumValue(const std::string &name);
 	void printEnumMembers(std::ostream &stream);
 
 private:

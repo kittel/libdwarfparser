@@ -50,9 +50,9 @@ public:
 
 
 	//Static Functions
-	static Symbol* findSymbolByName(std::string name);
+	static Symbol* findSymbolByName(const std::string &name);
 	template<class T>
-	static inline T* findSymbolByName(std::string name){
+	static inline T* findSymbolByName(const std::string &name){
 		auto bt = symbolNameMap.find(name);
 		for(auto i : symbolNameMap){
 			T* t = dynamic_cast<T*>(i.second);

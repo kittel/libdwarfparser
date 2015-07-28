@@ -12,18 +12,19 @@ class Instance {
 
 		BaseType *getType();
 		uint64_t getAddress();
-		Instance changeBaseType(std::string newType, std::string fieldname="list");
+		Instance changeBaseType(const std::string &newType, 
+				const std::string &fieldname="list");
 
 		uint64_t getLength();
 		Instance arrayElem(uint64_t element);
-		Instance memberByName(std::string name, bool ptr = false);
+		Instance memberByName(const std::string &name, bool ptr = false);
 		Instance memberByOffset(uint64_t offset, bool ptr = false);
 
 		std::string memberName(uint64_t offset);
 
 		uint32_t size();
 
-		uint32_t memberOffset(std::string name) const;
+		uint32_t memberOffset(const std::string &name) const;
 		Instance dereference();
 		
 		template<typename T>

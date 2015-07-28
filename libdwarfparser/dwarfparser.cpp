@@ -62,7 +62,7 @@ DwarfParser::Srcfilesdata::~Srcfilesdata()
     this->srcfilescount = 0;
 }
 
-void DwarfParser::parseDwarfFromFilename(std::string filename){
+void DwarfParser::parseDwarfFromFilename(const std::string &filename){
 	int fd = open(filename.c_str(),O_RDONLY);
 	DwarfParser::parseDwarfFromFD(fd);
 }
@@ -131,7 +131,8 @@ void DwarfParser::read_cu_list()
     }
 }
 
-void DwarfParser::get_die_and_siblings(Dwarf_Die in_die, Symbol *parent, int in_level, Srcfilesdata sf)
+void DwarfParser::get_die_and_siblings(const Dwarf_Die &in_die, 
+		Symbol *parent, int in_level, Srcfilesdata sf)
 {
     int res = DW_DLV_ERROR;
     Dwarf_Die cur_die=in_die;
@@ -172,7 +173,8 @@ void DwarfParser::get_die_and_siblings(Dwarf_Die in_die, Symbol *parent, int in_
     return;
 }
 
-void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
+void DwarfParser::print_die_data(const Dwarf_Die &print_me,
+		int level, Srcfilesdata sf)
 {
     UNUSED(sf);
 	char *name = 0;
@@ -282,7 +284,8 @@ void DwarfParser::print_die_data(Dwarf_Die print_me,int level, Srcfilesdata sf)
 }
 
 template<class T>
-T* DwarfParser::getRefTypeInstance(Dwarf_Die object, std::string dieName){
+T* DwarfParser::getRefTypeInstance(const Dwarf_Die &object, 
+		const std::string &dieName){
 	T* cursym;
 
 	RefBaseType* rbt = RefBaseType::findRefBaseTypeByName(dieName);
@@ -302,7 +305,8 @@ T* DwarfParser::getRefTypeInstance(Dwarf_Die object, std::string dieName){
 }
 
 template<>
-Function* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
+Function* DwarfParser::getTypeInstance(const Dwarf_Die &object, 
+		const std::string &dieName){
 	Function* cursym;
 
 	cursym = BaseType::findBaseTypeByName<Function>(dieName);
@@ -316,7 +320,8 @@ Function* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
 }
 
 template<>
-Variable* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
+Variable* DwarfParser::getTypeInstance(const Dwarf_Die &object, 
+		const std::string &dieName){
 	Variable* cursym;
 
 	cursym = Variable::findVariableByName(dieName);
@@ -330,7 +335,8 @@ Variable* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
 }
 
 template<class T>
-T* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
+T* DwarfParser::getTypeInstance(const Dwarf_Die &object, 
+		const std::string &dieName){
 	T* cursym = BaseType::findBaseTypeByName<T>(dieName);
 	if(!cursym){
 		return new T(this, object, dieName);
@@ -343,7 +349,8 @@ T* DwarfParser::getTypeInstance(Dwarf_Die object, std::string dieName){
 	return cursym;
 }
 
-Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int level, Srcfilesdata sf){
+Symbol *DwarfParser::initSymbolFromDie(const Dwarf_Die &cur_die, 
+		Symbol *parent, int level, Srcfilesdata sf){
 
 	Dwarf_Half tag = 0;
     const char *tagname = 0;
@@ -460,7 +467,7 @@ Symbol *DwarfParser::initSymbolFromDie(Dwarf_Die cur_die, Symbol *parent, int le
 	return cursym;
 }
 
-std::string DwarfParser::getDieName(Dwarf_Die die){
+std::string DwarfParser::getDieName(const Dwarf_Die &die){
 	char *name = 0;
 
 	std::string result = std::string("");
@@ -477,7 +484,7 @@ std::string DwarfParser::getDieName(Dwarf_Die die){
 	return result;
 }
 
-uint64_t DwarfParser::getDieOffset(Dwarf_Die die){
+uint64_t DwarfParser::getDieOffset(const Dwarf_Die &die){
 	Dwarf_Off offset;
 
 	int res = dwarf_dieoffset(die,&offset,&error);
@@ -488,7 +495,7 @@ uint64_t DwarfParser::getDieOffset(Dwarf_Die die){
 	return (uint64_t) offset;
 }
 
-uint64_t DwarfParser::getDieByteSize(Dwarf_Die die){
+uint64_t DwarfParser::getDieByteSize(const Dwarf_Die &die){
 	Dwarf_Unsigned size;
 
 	int res = dwarf_bytesize(die,&size,&error);
@@ -499,7 +506,7 @@ uint64_t DwarfParser::getDieByteSize(Dwarf_Die die){
 	return (uint64_t) size;
 }
 
-uint64_t DwarfParser::getDieBitOffset(Dwarf_Die die){
+uint64_t DwarfParser::getDieBitOffset(const Dwarf_Die &die){
 	Dwarf_Unsigned size;
 
 	int res = dwarf_bitoffset(die,&size,&error);
@@ -510,7 +517,7 @@ uint64_t DwarfParser::getDieBitOffset(Dwarf_Die die){
 	return (uint64_t) size;
 }
 
-bool DwarfParser::dieHasAttr(Dwarf_Die die, Dwarf_Half attr){
+bool DwarfParser::dieHasAttr(const Dwarf_Die &die, const Dwarf_Half &attr){
 	Dwarf_Bool hasattr;
 	dwarf_hasattr(die, attr, &hasattr, &error);
     if(hasattr == 0) {
@@ -569,7 +576,7 @@ uint64_t parseBlock(uint64_t blen, uint8_t* bdata){
 	return result;
 }
 
-uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
+uint64_t DwarfParser::getDieAttributeNumber(const Dwarf_Die &die, const Dwarf_Half &attr){
 	uint64_t result;
 	uint64_t result2;
 	Dwarf_Attribute myattr;
@@ -659,7 +666,7 @@ uint64_t DwarfParser::getDieAttributeNumber(Dwarf_Die die, Dwarf_Half attr){
 	return 0;
 }
 
-std::string DwarfParser::getDieAttributeString(Dwarf_Die die, Dwarf_Half attr){
+std::string DwarfParser::getDieAttributeString(const Dwarf_Die &die, const Dwarf_Half &attr){
 	char* str;
 	std::string result;
 	Dwarf_Attribute myattr;
@@ -685,7 +692,7 @@ std::string DwarfParser::getDieAttributeString(Dwarf_Die die, Dwarf_Half attr){
 	return NULL;
 }
 
-uint64_t DwarfParser::getDieAttributeAddress(Dwarf_Die die, Dwarf_Half attr){
+uint64_t DwarfParser::getDieAttributeAddress(const Dwarf_Die &die, const Dwarf_Half &attr){
 	uint64_t result;
 	Dwarf_Attribute myattr;
 	Dwarf_Bool hasattr;
@@ -709,15 +716,15 @@ uint64_t DwarfParser::getDieAttributeAddress(Dwarf_Die die, Dwarf_Half attr){
 	return 0;
 }
 
-bool DwarfParser::isDieExternal(Dwarf_Die die){
+bool DwarfParser::isDieExternal(const Dwarf_Die &die){
 	return this->getDieAttributeFlag(die, DW_AT_external);
 }
 
-bool DwarfParser::isDieDeclaration(Dwarf_Die die){
+bool DwarfParser::isDieDeclaration(const Dwarf_Die &die){
 	return this->getDieAttributeFlag(die, DW_AT_declaration);
 }
 
-bool DwarfParser::getDieAttributeFlag(Dwarf_Die die, Dwarf_Half attr){
+bool DwarfParser::getDieAttributeFlag(const Dwarf_Die &die, const Dwarf_Half &attr){
 	Dwarf_Attribute myattr;
 	Dwarf_Bool hasattr;
 

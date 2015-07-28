@@ -27,7 +27,8 @@ uint64_t Instance::getAddress(){
 	return this->address;
 }
 
-Instance Instance::changeBaseType(std::string newType, std::string fieldname){
+Instance Instance::changeBaseType(const std::string &newType, 
+		const std::string &fieldname){
 	BaseType *structModule = BaseType::findBaseTypeByName(newType);
 	assert(structModule);
 	uint64_t newAddress = this->address;
@@ -46,7 +47,7 @@ Instance Instance::changeBaseType(std::string newType, std::string fieldname){
 			this);
 }
 
-Instance Instance::memberByName(std::string name, bool ptr){
+Instance Instance::memberByName(const std::string &name, bool ptr){
 	uint64_t newAddress;
 	assert(address);
 	BaseType* bt = this->type;
@@ -143,7 +144,7 @@ Instance Instance::arrayElem(uint64_t element){
 			this);
 }
 
-uint32_t Instance::memberOffset(std::string name) const{
+uint32_t Instance::memberOffset(const std::string &name) const{
 	Structured* structured = dynamic_cast<Structured*>(this->type);
 	assert(structured);
 	return structured->memberOffset(name);

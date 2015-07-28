@@ -17,7 +17,7 @@ public:
 	void setLocation(uint64_t location);
 
 	static Variable* findVariableByID(uint64_t id);
-	static Variable* findVariableByName(std::string name);
+	static Variable* findVariableByName(const std::string &name);
 	Instance getInstance();
 
 private:

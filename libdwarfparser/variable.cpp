@@ -58,6 +58,6 @@ Variable* Variable::findVariableByID(uint64_t id){
 	return var;
 }
 
-Variable* Variable::findVariableByName(std::string name){
+Variable* Variable::findVariableByName(const std::string &name){
 	return variableNameMap.find(name)->second;
 }

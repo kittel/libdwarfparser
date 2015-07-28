@@ -17,12 +17,12 @@ public:
 	virtual StructuredMember *addMember(DwarfParser *parser, 
 			const Dwarf_Die &object, 
 			const std::string &memberName);
-	StructuredMember* memberByName(std::string name);
+	StructuredMember* memberByName(const std::string &name);
 
 	void listMembers();
 	StructuredMember *memberByOffset(uint32_t offset);
 	std::string memberNameByOffset(uint32_t offset);
-	uint32_t memberOffset(std::string member) const;
+	uint32_t memberOffset(const std::string &member) const;
 
 	void print();
 

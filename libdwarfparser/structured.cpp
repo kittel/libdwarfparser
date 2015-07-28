@@ -29,7 +29,7 @@ StructuredMember* Structured::addMember(DwarfParser *parser,
 	return member;
 }
 
-StructuredMember* Structured::memberByName(std::string name){
+StructuredMember* Structured::memberByName(const std::string &name){
 	return memberNameMap[name];
 }
 
@@ -63,7 +63,7 @@ std::string Structured::memberNameByOffset(uint32_t offset){
 	return "";
 }
 
-uint32_t Structured::memberOffset(std::string member) const{
+uint32_t Structured::memberOffset(const std::string &member) const{
 	for(auto i : memberNameMap){
 		if(i.second->getName() == member){
 			return i.second->getMemberLocation();   

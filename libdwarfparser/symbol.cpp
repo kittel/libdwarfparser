@@ -91,7 +91,7 @@ Symbol::~Symbol(){
 	symbolIDMapMutex.unlock();
 }
 
-Symbol* Symbol::findSymbolByName(std::string name){
+Symbol* Symbol::findSymbolByName(const std::string &name){
 	symbolNameMapMutex.lock();
 	auto ret = symbolNameMap.find(name)->second;
 	symbolNameMapMutex.unlock();

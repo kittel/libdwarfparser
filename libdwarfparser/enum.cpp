@@ -30,7 +30,7 @@ std::string Enum::enumName(uint32_t value){
 	throw DwarfException("Enum value not found");
 }
 
-uint32_t Enum::enumValue(std::string name){
+uint32_t Enum::enumValue(const std::string &name){
 	for (auto it : enumValues)	{
 		if (it.second == name){
 			return it.first;
