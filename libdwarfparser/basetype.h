@@ -18,7 +18,7 @@ class Instance;
 
 class BaseType: public Symbol {
 public:
-	BaseType(DwarfParser *parser, Dwarf_Die object, std::string name);
+	BaseType(DwarfParser *parser, const Dwarf_Die &object, const std::string &name);
 	virtual ~BaseType();
 
 	static BaseType* findBaseTypeByID(uint64_t id);

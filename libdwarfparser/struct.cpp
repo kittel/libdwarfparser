@@ -1,6 +1,8 @@
 #include "struct.h"
 
-Struct::Struct(DwarfParser *parser, Dwarf_Die object, std::string name):
+Struct::Struct(DwarfParser *parser, 
+		const Dwarf_Die &object, 
+		const std::string &name):
 	Structured(parser, object, name){
 
 }

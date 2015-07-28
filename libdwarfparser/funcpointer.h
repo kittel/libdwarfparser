@@ -5,7 +5,9 @@
 
 class FuncPointer: public RefBaseType {
 public:
-	FuncPointer(DwarfParser *parser, Dwarf_Die object, std::string name);
+	FuncPointer(DwarfParser *parser, 
+			const Dwarf_Die &object, 
+			const std::string &name);
 	virtual ~FuncPointer();
 };
 

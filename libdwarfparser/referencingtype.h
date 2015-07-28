@@ -10,7 +10,7 @@
 
 class ReferencingType {
 public:
-	ReferencingType(DwarfParser *parser, Dwarf_Die object);
+	ReferencingType(DwarfParser *parser, const Dwarf_Die &object);
 	virtual ~ReferencingType();
 
 	BaseType *getBaseType();

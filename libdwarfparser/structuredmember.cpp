@@ -4,8 +4,9 @@
 #include "dwarfexception.h"
 
 
-StructuredMember::StructuredMember(DwarfParser *parser, Dwarf_Die object, 
-		std::string name, Structured *parent):
+StructuredMember::StructuredMember(DwarfParser *parser, 
+		const Dwarf_Die &object, 
+		const std::string &name, Structured *parent):
 	Symbol(parser, object, name), ReferencingType(parser, object),
 	bitSize(0), bitOffset(0), memberLocation(0),
 	parent(parent){

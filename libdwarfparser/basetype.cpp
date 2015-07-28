@@ -8,7 +8,9 @@
 
 BaseType::BaseTypeNameMap BaseType::baseTypeNameMap;
 
-BaseType::BaseType(DwarfParser *parser, Dwarf_Die object, std::string name):
+BaseType::BaseType(DwarfParser *parser, 
+		const Dwarf_Die &object, 
+		const std::string &name):
 	Symbol(parser, object, name), encoding(0){
 	if(parser->dieHasAttr(object, DW_AT_encoding)){
 		this->encoding = parser->getDieAttributeNumber(object, DW_AT_encoding);

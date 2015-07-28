@@ -45,7 +45,7 @@ std::mutex Symbol::symbolIDAliasMapMutex;
 Symbol::SymbolIDAliasReverseList Symbol::symbolIDAliasReverseList;
 std::mutex Symbol::symbolIDAliasReverseListMutex;
 
-Symbol::Symbol(DwarfParser *parser, Dwarf_Die object, std::string name){
+Symbol::Symbol(DwarfParser *parser, const Dwarf_Die &object, const std::string &name){
 	this->byteSize = parser->getDieByteSize(object);
 	this->id = IDManager::getID(parser->getDieOffset(object),
 								parser->getFileID());

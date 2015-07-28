@@ -12,7 +12,7 @@ Array::ArrayVector Array::arrayVector;
 std::mutex Array::arrayVectorMutex;
 std::mutex Array::arrayTypeMapMutex;
 
-Array::Array(DwarfParser *parser, Dwarf_Die object, std::string name):
+Array::Array(DwarfParser *parser, const Dwarf_Die &object, const std::string &name):
 	Pointer(parser, object, name), 
 	length(0), lengthType(0), lengthTypeBT(0){
 
@@ -33,7 +33,7 @@ uint32_t Array::getByteSize(){
 	return this->length * symbol->getByteSize();
 }
 
-void Array::update(DwarfParser *parser, Dwarf_Die object){
+void Array::update(DwarfParser *parser, const Dwarf_Die &object){
 	if(parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
 		uint32_t fileID = parser->getFileID();

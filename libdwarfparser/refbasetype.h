@@ -5,7 +5,7 @@
 
 class RefBaseType: public BaseType {
 public:
-	RefBaseType(DwarfParser *parser, Dwarf_Die object, std::string name);
+	RefBaseType(DwarfParser *parser, const Dwarf_Die & object, const std::string &name);
 	virtual ~RefBaseType();
 
 	void resolveBaseType();

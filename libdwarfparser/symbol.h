@@ -37,7 +37,7 @@ class Symbol {
 
 
 public:
-	Symbol(DwarfParser *parser, Dwarf_Die object, std::string name);
+	Symbol(DwarfParser *parser, const Dwarf_Die &object, const std::string &name);
 	virtual ~Symbol();
 
 	virtual uint32_t getByteSize();

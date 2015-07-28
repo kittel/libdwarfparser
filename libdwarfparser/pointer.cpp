@@ -1,6 +1,6 @@
 #include "pointer.h"
 
-Pointer::Pointer(DwarfParser *parser, Dwarf_Die object, std::string name):
+Pointer::Pointer(DwarfParser *parser, const Dwarf_Die &object, std::string name):
 	RefBaseType(parser, object, name){
 	this->byteSize = 8;
 

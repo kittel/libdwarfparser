@@ -5,7 +5,9 @@
 
 class Union: public Structured {
 public:
-	Union(DwarfParser *parser, Dwarf_Die object, std::string name);
+	Union(DwarfParser *parser, 
+			const Dwarf_Die &object, 
+			const std::string &name);
 	virtual ~Union();
 };
 

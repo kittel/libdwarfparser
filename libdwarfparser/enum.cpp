@@ -10,13 +10,13 @@
 #include <libdwarf/dwarf.h>
 #include <libdwarf/libdwarf.h>
 
-Enum::Enum(DwarfParser *parser, Dwarf_Die object, std::string name):
+Enum::Enum(DwarfParser *parser, const Dwarf_Die &object, const std::string &name):
 	BaseType(parser, object, name), enumValues(){
 }
 
 Enum::~Enum(){}
 
-void Enum::addEnum(DwarfParser *parser, Dwarf_Die object, std::string name){
+void Enum::addEnum(DwarfParser *parser, const Dwarf_Die &object, const std::string &name){
 //TODO get ENUM Value
 	uint32_t enumValue = parser->getDieAttributeNumber(object, DW_AT_const_value);
 

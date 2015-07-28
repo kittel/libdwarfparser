@@ -9,7 +9,9 @@ Function::FuncList Function::funcList;
 std::mutex Function::functionNameMapMutex;
 std::mutex Function::funcListMutex;
 
-Function::Function(DwarfParser *parser, Dwarf_Die object, std::string name):
+Function::Function(DwarfParser *parser, 
+		const Dwarf_Die &object, 
+		const std::string &name):
 	BaseType(parser, object, name),
 	rettype(0), address(0),
 	paramList(),paramsFinal(false){
@@ -29,7 +31,7 @@ Function::Function(DwarfParser *parser, Dwarf_Die object, std::string name):
 Function::~Function(){
 }
 
-void Function::addParam(DwarfParser *parser, Dwarf_Die object){
+void Function::addParam(DwarfParser *parser, const Dwarf_Die &object){
 	if (this->paramsFinal) return;
 	if(parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
@@ -40,7 +42,7 @@ void Function::addParam(DwarfParser *parser, Dwarf_Die object){
 	}
 }
 
-void Function::update(DwarfParser *parser, Dwarf_Die object){
+void Function::update(DwarfParser *parser, const Dwarf_Die &object){
 	if(this->rettype == 0 && parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
 		uint32_t fileID = parser->getFileID();

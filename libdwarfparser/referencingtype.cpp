@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-ReferencingType::ReferencingType(DwarfParser *parser, Dwarf_Die object){
+ReferencingType::ReferencingType(DwarfParser *parser, const Dwarf_Die &object){
 	if(parser->dieHasAttr(object, DW_AT_type)){
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
 		uint32_t fileID = parser->getFileID();

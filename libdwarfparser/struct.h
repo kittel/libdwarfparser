@@ -5,7 +5,7 @@
 
 class Struct: public Structured {
 public:
-	Struct(DwarfParser *parser, Dwarf_Die object, std::string name);
+	Struct(DwarfParser *parser, const Dwarf_Die &object, const std::string &name);
 	virtual ~Struct();
 };
 

@@ -7,15 +7,17 @@
 
 class Function : public BaseType {
 	public:
-		Function(DwarfParser *parser, Dwarf_Die object, std::string name);
+		Function(DwarfParser *parser, 
+				const Dwarf_Die &object, 
+				const std::string &name);
 		virtual ~Function();
 
-		void addParam(DwarfParser *parser, Dwarf_Die object);
+		void addParam(DwarfParser *parser, const Dwarf_Die &object);
 
 		bool operator< (const Function& func) const;
 		bool operator==(const Function& func) const;
 		static void cleanFunctions();
-		void update(DwarfParser *parser, Dwarf_Die object);
+		void update(DwarfParser *parser, const Dwarf_Die &object);
 		void print();
 
 		static Function* findFunctionByID(uint64_t id);

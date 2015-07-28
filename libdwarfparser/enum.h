@@ -9,10 +9,10 @@ typedef std::map<uint32_t, std::string> EnumValues;
 
 class Enum: public BaseType {
 public:
-	Enum(DwarfParser *parser, Dwarf_Die object, std::string name);
+	Enum(DwarfParser *parser, const Dwarf_Die &object, const std::string &name);
 	virtual ~Enum();
 
-	void addEnum(DwarfParser *parser, Dwarf_Die object, std::string name);
+	void addEnum(DwarfParser *parser, const Dwarf_Die &object, const std::string &name);
 	std::string enumName(uint32_t value);
 	uint32_t enumValue(std::string name);
 	void printEnumMembers(std::ostream &stream);

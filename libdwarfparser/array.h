@@ -7,12 +7,12 @@
 
 class Array: public Pointer {
 	public: 
-		Array(DwarfParser *parser, Dwarf_Die object, std::string name);
+		Array(DwarfParser *parser, const Dwarf_Die &object, const std::string &name);
 		virtual ~Array();
 
 		uint64_t getLength();
 		virtual uint32_t getByteSize();
-		void update(DwarfParser *parser, Dwarf_Die object);
+		void update(DwarfParser *parser, const Dwarf_Die &object);
 
 		static void cleanArrays();
 	

@@ -5,7 +5,7 @@
 
 class Pointer: public RefBaseType {
 public:
-	Pointer(DwarfParser *parser, Dwarf_Die object, std::string name);
+	Pointer(DwarfParser *parser, const Dwarf_Die &object, std::string name);
 	virtual ~Pointer();
 
 	void print();
