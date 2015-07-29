@@ -30,6 +30,7 @@ private:
 	
 	typedef std::map<std::string, StructuredMember*> MemberNameMap;
 	MemberNameMap memberNameMap;
+	std::mutex memberMutex;
 };
 
 #endif  /* _STRUCTURED_H_ */

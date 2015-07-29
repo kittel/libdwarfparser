@@ -34,7 +34,8 @@
 
 VMIInstance *VMIInstance::instance = NULL;
 
-VMIInstance::VMIInstance(std::string name, uint32_t flags){
+VMIInstance::VMIInstance(std::string name, uint32_t flags):
+	vmiMutex(){
 	
 	if(!flags){
 		flags = VMI_AUTO | VMI_INIT_COMPLETE;
@@ -139,8 +140,10 @@ PageMap VMIInstance::destroyMap(PageMap map){
 
 PageMap VMIInstance::getExecutableUserspacePages(uint32_t pid){
     
+	vmiMutex.lock();
 	addr_t init_dtb = vmi_pid_to_dtb(vmi, pid);
     GSList* pages = vmi_get_va_pages(vmi, init_dtb);
+	vmiMutex.unlock();
     assert(pages);
 
     page_info_t *item;
@@ -163,8 +166,10 @@ PageMap VMIInstance::getExecutableUserspacePages(uint32_t pid){
 
 PageMap VMIInstance::getUserspacePages(uint32_t pid){
     
+	vmiMutex.lock();
 	addr_t init_dtb = vmi_pid_to_dtb(vmi, pid);
     GSList* pages = vmi_get_va_pages(vmi, init_dtb);
+	vmiMutex.unlock();
     assert(pages);
 
     page_info_t *item;
@@ -186,8 +191,10 @@ PageMap VMIInstance::getUserspacePages(uint32_t pid){
 
 PageMap VMIInstance::getExecutableKernelPages(){
     
+	vmiMutex.lock();
 	addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
     GSList* pages = vmi_get_va_pages(vmi, init_dtb);
+	vmiMutex.unlock();
     assert(pages);
 
     page_info_t *item;
@@ -210,8 +217,10 @@ PageMap VMIInstance::getExecutableKernelPages(){
 
 PageMap VMIInstance::getKernelPages(){
     
+	vmiMutex.lock();
 	addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
     GSList* pages = vmi_get_va_pages(vmi, init_dtb);
+	vmiMutex.unlock();
     assert(pages);
 
     page_info_t *item;
@@ -232,6 +241,7 @@ PageMap VMIInstance::getKernelPages(){
 }
 
 uint64_t VMIInstance::translateV2P(uint64_t va, uint32_t pid){
+	std::lock_guard<std::mutex> lock(vmiMutex);
 	if(pid){
 		return vmi_translate_uv2p(vmi, va, pid);
 	}
@@ -240,25 +250,33 @@ uint64_t VMIInstance::translateV2P(uint64_t va, uint32_t pid){
 
 uint8_t VMIInstance::read8FromVA(uint64_t va, uint32_t pid){
 	uint8_t value = 0;
+	vmiMutex.lock();
 	vmi_read_8_va(vmi, va, pid, &value);
+	vmiMutex.unlock();
 	return value;
 }
 
 uint16_t VMIInstance::read16FromVA(uint64_t va, uint32_t pid){
 	uint16_t value = 0;
+	vmiMutex.lock();
 	vmi_read_16_va(vmi, va, pid, &value);
+	vmiMutex.unlock();
 	return value;
 }
 
 uint32_t VMIInstance::read32FromVA(uint64_t va, uint32_t pid){
 	uint32_t value = 0;
+	vmiMutex.lock();
 	vmi_read_32_va(vmi, va, pid, &value);
+	vmiMutex.unlock();
 	return value;
 }
 
 uint64_t VMIInstance::read64FromVA(uint64_t va, uint32_t pid){
 	uint64_t value = 0;
+	vmiMutex.lock();
 	vmi_read_64_va(vmi, va, pid, &value);
+	vmiMutex.unlock();
 	return value;
 }
 
@@ -266,7 +284,9 @@ std::vector<uint8_t>
     VMIInstance::readVectorFromVA(uint64_t va, uint64_t len,
                                   uint32_t pid){
 	uint8_t* buffer = (uint8_t*) malloc(len);
+	vmiMutex.lock();
 	vmi_read_va(vmi, va, pid, buffer, len);
+	vmiMutex.unlock();
 
 	std::vector<uint8_t> result;
 	result.insert(result.end(), buffer, buffer + len);
@@ -276,7 +296,9 @@ std::vector<uint8_t>
 }
 
 std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid){
+	vmiMutex.lock();
 	char * str = vmi_read_str_va(vmi, va, pid);
+	vmiMutex.unlock();
 	assert(str);
 	std::string result = std::string(str);
 	delete str;
@@ -294,8 +316,10 @@ bool VMIInstance::isPageExecutable(page_info_t* page){
 }
 
 void VMIInstance::dumpMemory(uint64_t address, uint64_t len, std::string filename){
+	vmiMutex.lock();
 	std::vector<uint8_t> dump = 
                  this->readVectorFromVA(address, len);
+	vmiMutex.unlock();
 
 	std::ofstream file (filename, std::ios::binary);
 	if (file.is_open())

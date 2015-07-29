@@ -6,6 +6,8 @@
 
 #include <map>
 
+#include <mutex>
+
 #undef _GNU_SOURCE
 #include <libvmi/libvmi.h>
 #include <libvmi/libvmi_extra.h>
@@ -22,6 +24,8 @@ class VMIInstance {
 		static VMIInstance *instance;
 		void pauseVM();
 		void resumeVM();
+
+		std::mutex vmiMutex;
 
 	public:
 		VMIInstance(std::string name, uint32_t flags = 0);

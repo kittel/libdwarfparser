@@ -20,6 +20,8 @@ public:
 private:
 
 	EnumValues enumValues;
+	std::mutex enumMutex;
+
 	
 };
 

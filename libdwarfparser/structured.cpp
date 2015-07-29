@@ -8,7 +8,7 @@ Structured::Structured(DwarfParser *parser,
 		const Dwarf_Die &object, 
 		const std::string &name):
 	BaseType(parser, object, name),
-	memberNameMap(){
+	memberNameMap(), memberMutex(){
 
 }
 
@@ -19,6 +19,7 @@ Structured::~Structured(){
 StructuredMember* Structured::addMember(DwarfParser *parser, 
 		const Dwarf_Die &object, const std::string &memberName){
 	StructuredMember* member;
+	memberMutex.lock();
 	auto memberIter = memberNameMap.find(memberName);
 	if ( memberNameMap.find(memberName) != memberNameMap.end()){
 		member = memberIter->second;
@@ -26,6 +27,7 @@ StructuredMember* Structured::addMember(DwarfParser *parser,
 		member = new StructuredMember(parser, object, memberName, this);
 		memberNameMap[memberName] = member;
 	}
+	memberMutex.unlock();
 	return member;
 }
 

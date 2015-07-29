@@ -11,7 +11,7 @@
 #include <libdwarf/libdwarf.h>
 
 Enum::Enum(DwarfParser *parser, const Dwarf_Die &object, const std::string &name):
-	BaseType(parser, object, name), enumValues(){
+	BaseType(parser, object, name), enumValues(), enumMutex(){
 }
 
 Enum::~Enum(){}
@@ -20,7 +20,9 @@ void Enum::addEnum(DwarfParser *parser, const Dwarf_Die &object, const std::stri
 //TODO get ENUM Value
 	uint32_t enumValue = parser->getDieAttributeNumber(object, DW_AT_const_value);
 
+	enumMutex.lock();
 	enumValues[enumValue] = name;
+	enumMutex.unlock();
 }
 
 std::string Enum::enumName(uint32_t value){
