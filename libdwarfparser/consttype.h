@@ -8,6 +8,8 @@ public:
 	ConstType(DwarfParser *parser, const Dwarf_Die &object, 
 			const std::string &name);
 	virtual ~ConstType();
+
+	void print();
 };
 
 #endif  /* _CONSTTYPE_H_ */

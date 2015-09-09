@@ -403,7 +403,8 @@ Symbol *DwarfParser::initSymbolFromDie(const Dwarf_Die &cur_die,
 			cursym = getRefTypeInstance<Pointer>(cur_die, name);
 			break;
 		case DW_TAG_const_type:
-			cursym = getTypeInstance<ConstType>(cur_die, name);
+			cursym = getRefTypeInstance<ConstType>(cur_die, name);
+			break;
 		case DW_TAG_enumeration_type:
 			cursym = getTypeInstance<Enum>(cur_die, name);
 			break;

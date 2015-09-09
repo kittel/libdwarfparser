@@ -5,9 +5,10 @@
 
 #include "helpers.h"
 
-
 #include "structured.h"
 #include "structuredmember.h"
+
+#include "consttype.h"
 
 #include "array.h"
 

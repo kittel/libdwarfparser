@@ -10,3 +10,8 @@ ConstType::ConstType(DwarfParser *parser,
 ConstType::~ConstType(){
 
 }
+
+void ConstType::print(){
+	RefBaseType::print();
+	std::cout << "\t ConstType:" << std::endl;
+}
