@@ -12,12 +12,16 @@ class Instance {
 
 		BaseType *getType();
 		uint64_t getAddress();
+		uint64_t getLength();
+		bool isNULL();
+
 		Instance changeBaseType(const std::string &newType, 
 				const std::string &fieldname="list");
 
-		uint64_t getLength();
 		Instance arrayElem(uint64_t element);
-		Instance memberByName(const std::string &name, bool ptr = false);
+		Instance memberByName(const std::string &name,
+		                      bool ptr = false,
+		                      bool expectZeroPtr = false);
 		Instance memberByOffset(uint64_t offset, bool ptr = false);
 
 		std::string memberName(uint64_t offset);

@@ -28,6 +28,17 @@ uint64_t Instance::getAddress(){
 	return this->address;
 }
 
+uint64_t Instance::getLength(){
+	Array* array = dynamic_cast<Array*>(this->type);
+	if(!array) return 1;
+	else return array->getLength();
+}
+
+bool Instance::isNULL(){
+	return (this->address == 0);
+}
+
+
 Instance Instance::changeBaseType(const std::string &newType, 
 		const std::string &fieldname){
 	BaseType *structModule = BaseType::findBaseTypeByName(newType);
@@ -48,7 +59,9 @@ Instance Instance::changeBaseType(const std::string &newType,
 			this);
 }
 
-Instance Instance::memberByName(const std::string &name, bool ptr){
+Instance Instance::memberByName(const std::string &name,
+                                bool ptr,
+                                bool expectZeroPtr){
 	uint64_t newAddress;
 	assert(address);
 	BaseType* bt = this->type;
@@ -71,7 +84,9 @@ Instance Instance::memberByName(const std::string &name, bool ptr){
 			bt = ptr_type->getBaseType();
 			newAddress = vmi->read64FromVA(newAddress);
 			//Dereferencing NULL Ptr?
-			assert(newAddress);
+			if(!expectZeroPtr){
+				assert(newAddress);
+			}
 		}
 	}
 	return Instance(bt, 
@@ -117,12 +132,6 @@ std::string Instance::memberName(uint64_t offset){
 
 uint32_t Instance::size(){
 	return this->type->getByteSize();
-}
-
-uint64_t Instance::getLength(){
-	Array* array = dynamic_cast<Array*>(this->type);
-	if(!array) return 1;
-	else return array->getLength();
 }
 
 Instance Instance::arrayElem(uint64_t element){
