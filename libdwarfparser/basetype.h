@@ -27,7 +27,7 @@ public:
 	template<class T>
 	static inline T* findBaseTypeByName(std::string name){
 		auto bt = baseTypeNameMap.find(name);
-		for(auto i = bt; bt != baseTypeNameMap.end(); ++i){
+		for(auto& i = bt; bt != baseTypeNameMap.end(); ++i){
 			T* t = dynamic_cast<T*>(i->second);
 			if(t) return t;
 		}

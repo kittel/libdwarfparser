@@ -33,7 +33,7 @@ std::string Enum::enumName(uint32_t value){
 }
 
 uint32_t Enum::enumValue(const std::string &name){
-	for (auto it : enumValues)	{
+	for (auto& it : enumValues)	{
 		if (it.second == name){
 			return it.first;
 		}
@@ -42,7 +42,7 @@ uint32_t Enum::enumValue(const std::string &name){
 }
 
 void Enum::printEnumMembers(std::ostream &stream){
-	for (auto it : enumValues)	{
+	for (auto& it : enumValues)	{
 		stream << it.second << ": " << it.first << std::endl;
 	}
 }

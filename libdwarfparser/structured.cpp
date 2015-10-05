@@ -37,14 +37,14 @@ StructuredMember* Structured::memberByName(const std::string &name){
 
 void Structured::listMembers(){
 	std::cout << "Members of " << this->name << ": " << std::endl;
-	for(auto i : memberNameMap){
+	for(auto& i : memberNameMap){
 		std::cout << i.second->getName() << std::endl;
 	}
 }
 
 StructuredMember *Structured::memberByOffset(uint32_t offset){
 	StructuredMember * result = NULL;
-	for (auto i : memberNameMap){
+	for (auto& i : memberNameMap){
 		if ( i.second->getMemberLocation() == offset)
 			return i.second;
 		if ( i.second->getMemberLocation() < offset &&
@@ -57,7 +57,7 @@ StructuredMember *Structured::memberByOffset(uint32_t offset){
 }
 
 std::string Structured::memberNameByOffset(uint32_t offset){
-	for(auto i : memberNameMap){
+	for(auto& i : memberNameMap){
 		if(i.second->getMemberLocation() == offset){
 			return i.first;
 		}
@@ -66,7 +66,7 @@ std::string Structured::memberNameByOffset(uint32_t offset){
 }
 
 uint32_t Structured::memberOffset(const std::string &member) const{
-	for(auto i : memberNameMap){
+	for(auto& i : memberNameMap){
 		if(i.second->getName() == member){
 			return i.second->getMemberLocation();   
 		}
@@ -76,13 +76,13 @@ uint32_t Structured::memberOffset(const std::string &member) const{
 
 void Structured::print(){
 	std::map<uint32_t, std::string> localMemberMap;
-	for(auto i : memberNameMap){
+	for(auto& i : memberNameMap){
 		localMemberMap[i.second->getMemberLocation()] = i.first;
 	}
 
 	BaseType::print();
 	std::cout << "\t Members:      " << std::endl;
-	for(auto i : localMemberMap){
+	for(auto& i : localMemberMap){
 		std::cout << "\t\t 0x" << 
 			std::hex << i.first << std::dec <<
 			"\t" << i.second << std::endl;

@@ -70,7 +70,7 @@ Array* Array::findArrayByTypeID(uint64_t id, uint64_t length){
 	}
 	//Search for all aliases of this type
 	auto revList = Symbol::getAliases(id);
-	for( auto i : revList ){
+	for( auto& i : revList ){
 		arrayTypeMapMutex.lock();
 		bt = arrayTypeMap.find(i);
 		arrayTypeMapMutex.unlock();
@@ -120,7 +120,7 @@ void Array::print(){
 
 void Array::cleanArrays(){
 	arrayVectorMutex.lock();
-	for(auto item : arrayVector){
+	for(auto& item : arrayVector){
 		assert(item);
 		item->updateTypes();
 	}
@@ -154,7 +154,7 @@ void Array::cleanArrays(){
 	arrayVector.shrink_to_fit();
 
 	arrayTypeMapMutex.lock();
-	for (auto item : arrayVector){
+	for (auto& item : arrayVector){
 		arrayTypeMap.insert(std::pair<uint64_t, Array*>(item->type, item));
 	}
 	arrayTypeMapMutex.unlock();

@@ -131,7 +131,7 @@ void VMIInstance::printKernelPages(){
 }
 
 PageMap VMIInstance::destroyMap(PageMap map){
-	for (auto item : map){
+	for (auto& item : map){
 		free(item.second);
 	}
 	map.clear();

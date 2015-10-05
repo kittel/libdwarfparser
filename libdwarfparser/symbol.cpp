@@ -74,7 +74,7 @@ Symbol::~Symbol(){
 		symbolIDAliasReverseListMutex.lock();
 		auto oTypes = symbolIDAliasReverseList[this->id];
 		symbolIDAliasReverseListMutex.unlock();
-		for(auto iter : oTypes){
+		for(auto& iter : oTypes){
 			std::cout << "\tID: " << std::hex << iter << std::dec << std::endl;
 			Symbol::findSymbolByID(iter)->print();
 			//TODO
@@ -124,7 +124,7 @@ Symbol* Symbol::findSymbolByID(uint64_t id){
 	symbolIDAliasReverseListMutex.lock();
 	auto revList = symbolIDAliasReverseList[id];
 	symbolIDAliasReverseListMutex.unlock();
-	for(auto i : revList){
+	for(auto& i : revList){
 		symbol = symbolIDMap.find(i);
 		if(symbol != symbolIDMap.end()){
 			return symbol->second;

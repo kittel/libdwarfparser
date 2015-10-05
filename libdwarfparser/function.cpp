@@ -98,7 +98,7 @@ void Function::updateTypes(){
 
 void Function::cleanFunctions(){
 	funcListMutex.lock();
-	for(auto item : funcList){
+	for(auto& item : funcList){
 		assert(item);
 		item->updateTypes();
 	}

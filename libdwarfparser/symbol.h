@@ -54,7 +54,7 @@ public:
 	template<class T>
 	static inline T* findSymbolByName(const std::string &name){
 		auto bt = symbolNameMap.find(name);
-		for(auto i : symbolNameMap){
+		for(auto& i : symbolNameMap){
 			T* t = dynamic_cast<T*>(i.second);
 			if(t) return t;
 		}
