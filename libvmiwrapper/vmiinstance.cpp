@@ -5,10 +5,13 @@
 #include <errno.h>
 #include <sys/mman.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <inttypes.h>
 #include <cassert>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
+
 #include "vmiexception.h"
 
 #include "helpers.h"
@@ -284,12 +287,25 @@ std::vector<uint8_t>
     VMIInstance::readVectorFromVA(uint64_t va, uint64_t len,
                                   uint32_t pid){
 	uint8_t* buffer = (uint8_t*) malloc(len);
-	vmiMutex.lock();
-	vmi_read_va(vmi, va, pid, buffer, len);
-	vmiMutex.unlock();
-
 	std::vector<uint8_t> result;
-	result.insert(result.end(), buffer, buffer + len);
+	size_t size = 0;
+	size_t res = 0;
+
+	while(size < len){
+		vmiMutex.lock();
+		res = vmi_read_va(vmi, va + size, pid,
+		    buffer + size,
+		    std::min(0x1000, (int)(len - size)));
+		vmiMutex.unlock();
+		size += res;
+		if(res == 0){
+			// Unable to return more, probably not mapped
+			break;
+		}
+	}
+
+	result.insert(result.end(), buffer, buffer + size);
+
 	free(buffer);
 	return result;
 
@@ -299,6 +315,7 @@ std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid){
 	vmiMutex.lock();
 	char * str = vmi_read_str_va(vmi, va, pid);
 	vmiMutex.unlock();
+
 	assert(str);
 	std::string result = std::string(str);
 	delete str;
