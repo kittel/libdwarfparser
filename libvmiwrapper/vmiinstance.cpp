@@ -76,7 +76,7 @@ VMIInstance *VMIInstance::getInstance(){
 	return VMIInstance::instance;
 }
 
-void VMIInstance::pauseVM(){
+void VMIInstance::pauseVM() const{
     /* pause the vm for consistent memory access */
     if (vmi_pause_vm(vmi) != VMI_SUCCESS) {
         printf("Failed to pause VM\n");
@@ -84,7 +84,7 @@ void VMIInstance::pauseVM(){
     }
 }
 
-void VMIInstance::resumeVM(){
+void VMIInstance::resumeVM() const{
     /* pause the vm for consistent memory access */
     if (vmi_resume_vm(vmi) != VMI_SUCCESS) {
         printf("Failed to resume VM\n");
@@ -96,7 +96,7 @@ vmi_instance_t VMIInstance::getLibVMIInstance(){
 	return vmi;
 }
 
-void VMIInstance::printKernelPages(){
+void VMIInstance::printKernelPages() const{
 
     addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
 
@@ -133,7 +133,7 @@ void VMIInstance::printKernelPages(){
 	free(pages);
 }
 
-PageMap VMIInstance::destroyMap(PageMap map){
+PageMap VMIInstance::destroyMap(PageMap map) const{
 	for (auto& item : map){
 		free(item.second);
 	}
@@ -141,10 +141,9 @@ PageMap VMIInstance::destroyMap(PageMap map){
 	return map;
 }
 
-PageMap VMIInstance::getExecutableUserspacePages(uint32_t pid){
-    
+PageMap VMIInstance::getPages(uint32_t pid, bool executable) {
 	vmiMutex.lock();
-	addr_t init_dtb = vmi_pid_to_dtb(vmi, pid);
+	addr_t init_dtb = vmi_pid_to_dtb(vmi, ((pid == 0)? 1: pid));
     GSList* pages = vmi_get_va_pages(vmi, init_dtb);
 	vmiMutex.unlock();
     assert(pages);
@@ -156,84 +155,9 @@ PageMap VMIInstance::getExecutableUserspacePages(uint32_t pid){
 	    item = (page_info_t*) __glist->data;
 	    if (item->x86_ia32e.pml4e_value != 0 &&
 		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
-		    !IA32E_IS_PAGE_SUPERVISOR(item) &&
-			!IS_PAGE_NX(item)){
-			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
-		}else{
-			free(item);
-		}
-    }
-	g_slist_free(pages);
-	return pageMap;
-}
-
-PageMap VMIInstance::getUserspacePages(uint32_t pid){
-    
-	vmiMutex.lock();
-	addr_t init_dtb = vmi_pid_to_dtb(vmi, pid);
-    GSList* pages = vmi_get_va_pages(vmi, init_dtb);
-	vmiMutex.unlock();
-    assert(pages);
-
-    page_info_t *item;
-	PageMap pageMap;
-
-    for(GSList *__glist = pages; __glist ; __glist = __glist->next){
-	    item = (page_info_t*) __glist->data;
-	    if (item->x86_ia32e.pml4e_value != 0 &&
-		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
-		    !IA32E_IS_PAGE_SUPERVISOR(item)){
-			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
-		}else{
-			free(item);
-		}
-    }
-	g_slist_free(pages);
-	return pageMap;
-}
-
-PageMap VMIInstance::getExecutableKernelPages(){
-    
-	vmiMutex.lock();
-	addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
-    GSList* pages = vmi_get_va_pages(vmi, init_dtb);
-	vmiMutex.unlock();
-    assert(pages);
-
-    page_info_t *item;
-	PageMap pageMap;
-
-    for(GSList *__glist = pages; __glist ; __glist = __glist->next){
-	    item = (page_info_t*) __glist->data;
-	    if (item->x86_ia32e.pml4e_value != 0 &&
-		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
-		    IA32E_IS_PAGE_SUPERVISOR(item) &&
-			!IS_PAGE_NX(item)){
-			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
-		}else{
-			free(item);
-		}
-    }
-	g_slist_free(pages);
-	return pageMap;
-}
-
-PageMap VMIInstance::getKernelPages(){
-    
-	vmiMutex.lock();
-	addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
-    GSList* pages = vmi_get_va_pages(vmi, init_dtb);
-	vmiMutex.unlock();
-    assert(pages);
-
-    page_info_t *item;
-	PageMap pageMap;
-
-    for(GSList *__glist = pages; __glist ; __glist = __glist->next){
-	    item = (page_info_t*) __glist->data;
-	    if (item->x86_ia32e.pml4e_value != 0 &&
-		    ENTRY_PRESENT(item->x86_ia32e.pte_value, VMI_OS_LINUX) && 
-		    IA32E_IS_PAGE_SUPERVISOR(item)){
+		    ((pid == 0 &&  IA32E_IS_PAGE_SUPERVISOR(item)) ||
+			 (pid != 0 && !IA32E_IS_PAGE_SUPERVISOR(item))) &&
+		    (!executable || !IS_PAGE_NX(item))){
 			pageMap.insert(std::pair<uint64_t,page_info_t *>(item->vaddr, item));
 		}else{
 			free(item);
@@ -285,8 +209,9 @@ uint64_t VMIInstance::read64FromVA(uint64_t va, uint32_t pid){
 
 std::vector<uint8_t> 
     VMIInstance::readVectorFromVA(uint64_t va, uint64_t len,
-                                  uint32_t pid){
+                                  uint32_t pid, bool fillunmapped){
 	uint8_t* buffer = (uint8_t*) malloc(len);
+	memset(buffer, 0, len);
 	std::vector<uint8_t> result;
 	size_t size = 0;
 	size_t res = 0;
@@ -299,8 +224,13 @@ std::vector<uint8_t>
 		vmiMutex.unlock();
 		size += res;
 		if(res == 0){
-			// Unable to return more, probably not mapped
-			break;
+			if (fillunmapped){
+				// Try to read next page
+				size += 0x1000;
+			}else{
+				// Unable to return more, probably not mapped
+				break;
+			}
 		}
 	}
 
@@ -322,12 +252,12 @@ std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid){
 	return result;
 }
 
-bool VMIInstance::isPageSuperuser(page_info_t* page){
+bool VMIInstance::isPageSuperuser(page_info_t* page) const{
     bool ret = IA32E_IS_PAGE_SUPERVISOR(page);
 	return ret;
 }
 
-bool VMIInstance::isPageExecutable(page_info_t* page){
+bool VMIInstance::isPageExecutable(page_info_t* page) const{
 	bool ret = !IS_PAGE_NX(page);
 	return ret;
 }

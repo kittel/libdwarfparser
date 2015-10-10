@@ -22,8 +22,8 @@ class VMIInstance {
 	private:
 		vmi_instance_t vmi;
 		static VMIInstance *instance;
-		void pauseVM();
-		void resumeVM();
+		void pauseVM() const;
+		void resumeVM() const;
 
 		std::mutex vmiMutex;
 
@@ -42,19 +42,17 @@ class VMIInstance {
 		uint64_t read64FromVA(uint64_t va, uint32_t pid = 0);
 		std::vector<uint8_t> readVectorFromVA(uint64_t va, 
 		                                      uint64_t len,
-		                                      uint32_t pid = 0);
+		                                      uint32_t pid = 0,
+											  bool fillunmapped = 0);
 		std::string readStrFromVA(uint64_t va, uint32_t pid = 0);
-		void printKernelPages();
+		void printKernelPages() const;
 
-		bool isPageSuperuser(page_info_t* page);
-		bool isPageExecutable(page_info_t* page);
+		bool isPageSuperuser(page_info_t* page) const;
+		bool isPageExecutable(page_info_t* page) const;
 
-		PageMap destroyMap(PageMap map);
-		
-		PageMap getKernelPages();
-		PageMap getExecutableKernelPages();
-		PageMap getUserspacePages(uint32_t pid);
-		PageMap getExecutableUserspacePages(uint32_t pid);
+		PageMap destroyMap(PageMap map) const;
+	
+		PageMap getPages(uint32_t pid = 0, bool executable = false);	
 
 		void dumpMemory(uint64_t address, uint64_t len, std::string filename);
 
