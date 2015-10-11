@@ -38,7 +38,8 @@
 VMIInstance *VMIInstance::instance = NULL;
 
 VMIInstance::VMIInstance(std::string name, uint32_t flags):
-	vmiMutex(){
+	vmiMutex(),
+	paused(false){
 	
 	if(!flags){
 		flags = VMI_AUTO | VMI_INIT_COMPLETE;
@@ -76,20 +77,23 @@ VMIInstance *VMIInstance::getInstance(){
 	return VMIInstance::instance;
 }
 
-void VMIInstance::pauseVM() const{
+void VMIInstance::pauseVM(){
     /* pause the vm for consistent memory access */
     if (vmi_pause_vm(vmi) != VMI_SUCCESS) {
         printf("Failed to pause VM\n");
         throw VMIException();
     }
+	paused = true;
 }
 
-void VMIInstance::resumeVM() const{
+void VMIInstance::resumeVM(){
     /* pause the vm for consistent memory access */
-    if (vmi_resume_vm(vmi) != VMI_SUCCESS) {
+    if (!paused) return;
+	if (vmi_resume_vm(vmi) != VMI_SUCCESS) {
         printf("Failed to resume VM\n");
         throw VMIException();
     }
+	paused = false;
 }
 
 vmi_instance_t VMIInstance::getLibVMIInstance(){

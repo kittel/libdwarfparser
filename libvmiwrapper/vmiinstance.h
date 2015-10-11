@@ -22,10 +22,12 @@ class VMIInstance {
 	private:
 		vmi_instance_t vmi;
 		static VMIInstance *instance;
-		void pauseVM() const;
-		void resumeVM() const;
 
 		std::mutex vmiMutex;
+
+		bool paused;
+		void pauseVM();
+		void resumeVM();
 
 	public:
 		VMIInstance(std::string name, uint32_t flags = 0);
