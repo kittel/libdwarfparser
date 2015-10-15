@@ -1,26 +1,28 @@
 #ifndef _REFERENCINGTYPE_H_
 #define _REFERENCINGTYPE_H_
 
-#include "libdwarf/dwarf.h"
-#include "libdwarf/libdwarf.h"
+#include <libdwarf/libdwarf.h>
 
 #include "basetype.h"
 
 #include "dwarfparser.h"
 
+class SymbolManager;
+
 class ReferencingType {
 public:
-	ReferencingType(DwarfParser *parser, const Dwarf_Die &object);
+	ReferencingType(SymbolManager *mgr,
+	                DwarfParser *parser,
+	                const Dwarf_Die &object);
 	virtual ~ReferencingType();
 
 	BaseType *getBaseType();
 
 protected:
-
 	uint64_t type;
-	BaseType* base;
-	
+	BaseType *base;
+
+	SymbolManager *const manager;
 };
 
-#endif  /* _REFERENCINGTYPE_H_ */
-
+#endif /* _REFERENCINGTYPE_H_ */

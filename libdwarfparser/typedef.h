@@ -3,14 +3,13 @@
 
 #include "refbasetype.h"
 
-class Typedef: public RefBaseType {
+class Typedef : public RefBaseType {
 public:
-	Typedef(DwarfParser *parser, 
-			const Dwarf_Die &object, 
-			const std::string &name);
+	Typedef(SymbolManager *mgr,
+	        DwarfParser *parser,
+	        const Dwarf_Die &object,
+	        const std::string &name);
 	virtual ~Typedef();
-	
 };
 
-#endif  /* _TYPEDEF_H_ */
-
+#endif /* _TYPEDEF_H_ */

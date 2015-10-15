@@ -3,29 +3,26 @@
 
 #include "basetype.h"
 
-class RefBaseType: public BaseType {
+class RefBaseType : public BaseType {
 public:
-	RefBaseType(DwarfParser *parser, const Dwarf_Die & object, const std::string &name);
+	RefBaseType(SymbolManager *mgr,
+	            DwarfParser *parser,
+	            const Dwarf_Die &object,
+	            const std::string &name);
 	virtual ~RefBaseType();
 
 	void resolveBaseType();
-	BaseType* getBaseType();
-	
+	BaseType *getBaseType();
+
 	virtual uint32_t getByteSize();
-	
-	static RefBaseType* findRefBaseTypeByID(uint64_t id);
-	static RefBaseType* findRefBaseTypeByName(std::string name);
+
+	uint64_t getType();
 
 	void print();
 
 protected:
 	uint64_t type;
-	BaseType* base;
-	
-	typedef std::map<std::string, RefBaseType*> RefBaseTypeNameMap;
-	static RefBaseTypeNameMap refBaseTypeNameMap;
+	BaseType *base;
 };
 
-
-#endif  /* _REFBASETYPE_H_ */
-
+#endif /* _REFBASETYPE_H_ */

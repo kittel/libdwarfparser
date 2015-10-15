@@ -1,22 +1,29 @@
 #include "referencingtype.h"
 
 #include <cassert>
-
 #include <iostream>
 
-ReferencingType::ReferencingType(DwarfParser *parser, const Dwarf_Die &object){
-	if(parser->dieHasAttr(object, DW_AT_type)){
+#include "symbolmanager.h"
+
+ReferencingType::ReferencingType(SymbolManager *mgr,
+                                 DwarfParser *parser,
+                                 const Dwarf_Die &object)
+	:
+	manager{mgr} {
+
+	if (parser->dieHasAttr(object, DW_AT_type)) {
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
-		uint32_t fileID = parser->getFileID();
-		this->type = IDManager::getID(dwarfType, fileID);
-		if(!this->type) assert(false);
+		uint32_t fileID    = parser->getFileID();
+		this->type = this->manager->getID(dwarfType, fileID);
+		if (!this->type)
+			assert(false);
 	}
 }
 
-ReferencingType::~ReferencingType(){}
+ReferencingType::~ReferencingType() {}
 
-BaseType *ReferencingType::getBaseType(){
-	this->base = BaseType::findBaseTypeByID(this->type);
+BaseType *ReferencingType::getBaseType() {
+	this->base = this->manager->findBaseTypeByID(this->type);
 	assert(this->base);
 	return this->base;
 }

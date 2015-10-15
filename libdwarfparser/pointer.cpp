@@ -1,16 +1,18 @@
 #include "pointer.h"
 
-Pointer::Pointer(DwarfParser *parser, const Dwarf_Die &object, std::string name):
-	RefBaseType(parser, object, name){
+Pointer::Pointer(SymbolManager *mgr,
+                 DwarfParser *parser,
+                 const Dwarf_Die &object,
+                 const std::string &name)
+	:
+	RefBaseType(mgr, parser, object, name) {
+
 	this->byteSize = 8;
-
 }
 
-Pointer::~Pointer(){
+Pointer::~Pointer() {}
 
-}
-
-void Pointer::print(){
+void Pointer::print() {
 	RefBaseType::print();
 	std::cout << "\t Pointer Size  " << this->byteSize << std::endl;
 }
