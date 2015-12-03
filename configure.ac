@@ -55,7 +55,9 @@ fi
 #fi 
                                                                                 
 AC_CHECK_LIB(vmi, vmi_init, [], [echo "Error! You need to have libvmi around."; exit 1])
-AC_CHECK_HEADERS([libvmi/libvmi.h]) 
+AC_CHECK_HEADERS([libvmi/libvmi.h])
+AC_CHECK_HEADERS([CppUTest/MemoryLeakDetectorMallocMacros.h])
+AC_CHECK_HEADERS([CppUTest/TestHarness.h])
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libdwarfparser/Makefile])
