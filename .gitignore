@@ -20,6 +20,8 @@ autoscan.log
 
 dwarfsymbols
 test
+tests/dwarftestunit
+tests/tests
 
 m4
 

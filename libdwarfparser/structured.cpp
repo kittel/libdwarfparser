@@ -4,6 +4,8 @@
 
 #include <iostream>
 
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+
 Structured::Structured(DwarfParser *parser, 
 		const Dwarf_Die &object, 
 		const std::string &name):
@@ -13,7 +15,9 @@ Structured::Structured(DwarfParser *parser,
 }
 
 Structured::~Structured(){
-
+	for(auto& i : memberNameMap){
+		delete i.second;
+	}
 }
 
 StructuredMember* Structured::addMember(DwarfParser *parser, 

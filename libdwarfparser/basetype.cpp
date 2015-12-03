@@ -6,6 +6,8 @@
 
 #include "instance.h"
 
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+
 BaseType::BaseTypeNameMap BaseType::baseTypeNameMap;
 
 BaseType::BaseType(DwarfParser *parser, 

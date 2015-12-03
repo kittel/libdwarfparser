@@ -18,6 +18,8 @@
 
 #include <typeinfo>
 
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+
 uint32_t DwarfParser::nextFileID = 0;
 
 DwarfParser::DwarfParser(int fd) :
