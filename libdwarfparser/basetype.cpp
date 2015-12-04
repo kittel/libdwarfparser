@@ -3,10 +3,10 @@
 #include <cassert>
 #include <libdwarf/libdwarf.h>
 
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-
 #include "instance.h"
 #include "symbolmanager.h"
+
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
 
 BaseType::BaseType(SymbolManager *manager,
                    DwarfParser *parser,
@@ -19,9 +19,6 @@ BaseType::BaseType(SymbolManager *manager,
 		this->encoding = parser->getDieAttributeNumber(object,
 		                                               DW_AT_encoding);
 	}
-	if (this->name.size() != 0) {
-		baseTypeNameMap.insert(std::pair<std::string, BaseType*>(this->name, this));
-	}
 
 	this->manager->addBaseType(this);
 }
@@ -33,7 +30,7 @@ uint64_t BaseType::getEncoding() {
 }
 
 Instance BaseType::getInstance(uint64_t va) {
-	Instance instance = Instance{this->manager, this, va};
+	Instance instance = Instance{this, va};
 	return instance;
 }
 

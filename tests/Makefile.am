@@ -13,13 +13,19 @@ tests_SOURCES = test.cpp \
 tests_CXXFLAGS = $(AM_CXXFLAGS) \
                  $(GLIB_CFLAGS)
 
-tests_LDFLAGS = -lvmiwrapper \
-                -ldwarfparser -ldwarf -lelf \
+tests_LDFLAGS = -L$(top_builddir)/libvmiwrapper \
+                -lvmiwrapper \
+                -L$(top_builddir)/libdwarfparser \
+                -ldwarfparser \
+                -ldwarf -lelf \
                 -lCppUTest -lCppUTestExt
 
 dwarfsymbols_SOURCES = dwarfsymbols.cpp
 dwarfsymbols_CXXFLAGS = $(AM_CXXFLAGS) \
                         $(GLIB_CFLAGS)
-dwarfsymbols_LDFLAGS = -lvmiwrapper \
-                       -ldwarfparser -ldwarf -lelf \
+dwarfsymbols_LDFLAGS = -L$(top_builddir)/libvmiwrapper \
+                       -lvmiwrapper \
+                       -L$(top_builddir)/libdwarfparser \
+                       -ldwarfparser \
+                       -ldwarf -lelf \
                        -lCppUTest -lCppUTestExt

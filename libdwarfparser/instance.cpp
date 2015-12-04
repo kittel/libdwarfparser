@@ -11,27 +11,25 @@
 #include "structuredmember.h"
 #include "symbolmanager.h"
 
-Instance::Instance(SymbolManager *mgr,
-                   BaseType *type,
+Instance::Instance(BaseType *type,
                    uint64_t va,
-                   Instance *parent)
+                   const Instance *parent)
 	:
 	parent{parent},
 	type{type},
-	address{va},
-	manager{mgr} {}
+	address{va} {}
 
 Instance::~Instance() {}
 
-BaseType *Instance::getType() {
+BaseType *Instance::getType() const {
 	return this->type;
 }
 
-uint64_t Instance::getAddress() {
+uint64_t Instance::getAddress() const {
 	return this->address;
 }
 
-uint64_t Instance::getLength() {
+uint64_t Instance::getLength() const {
 	Array *array = dynamic_cast<Array *>(this->type);
 	if (!array) {
 		return 1;
@@ -41,13 +39,13 @@ uint64_t Instance::getLength() {
 	}
 }
 
-bool Instance::isNULL() {
+bool Instance::isNULL() const {
 	return (this->address == 0);
 }
 
 Instance Instance::changeBaseType(const std::string &newType,
-                                  const std::string &fieldname) {
-	BaseType *structModule = this->manager->findBaseTypeByName(newType);
+                                  const std::string &fieldname) const {
+	BaseType *structModule = this->type->manager->findBaseTypeByName(newType);
 	assert(structModule);
 	uint64_t newAddress = this->address;
 	BaseType *newBT     = this->type;
@@ -60,12 +58,12 @@ Instance Instance::changeBaseType(const std::string &newType,
 		newAddress -= sm->getMemberLocation();
 	}
 	newBT = structModule;
-	return Instance(this->manager, newBT, newAddress, this);
+	return Instance(newBT, newAddress, this);
 }
 
 Instance Instance::memberByName(const std::string &name,
                                 bool ptr,
-                                bool expectZeroPtr) {
+                                bool expectZeroPtr) const {
 	uint64_t newAddress;
 	assert(address);
 	BaseType *bt = this->type;
@@ -93,10 +91,10 @@ Instance Instance::memberByName(const std::string &name,
 			}
 		}
 	}
-	return Instance(this->manager, bt, newAddress, this);
+	return Instance(bt, newAddress, this);
 }
 
-Instance Instance::memberByOffset(uint64_t offset, bool ptr) {
+Instance Instance::memberByOffset(uint64_t offset, bool ptr) const {
 	uint64_t newAddress;
 	if (offset > this->type->getByteSize()) {
 		assert(false);
@@ -116,10 +114,10 @@ Instance Instance::memberByOffset(uint64_t offset, bool ptr) {
 			newAddress = vmi->read64FromVA(newAddress);
 		}
 	}
-	return Instance(this->manager, bt, newAddress, this);
+	return Instance(bt, newAddress, this);
 }
 
-std::string Instance::memberName(uint64_t offset) {
+std::string Instance::memberName(uint64_t offset) const {
 	assert(address);
 	BaseType *bt = this->type;
 	while (dynamic_cast<RefBaseType *>(bt)) {
@@ -130,11 +128,11 @@ std::string Instance::memberName(uint64_t offset) {
 	return structured->memberNameByOffset(offset);
 }
 
-uint32_t Instance::size() {
+uint32_t Instance::size() const {
 	return this->type->getByteSize();
 }
 
-Instance Instance::arrayElem(uint64_t element) {
+Instance Instance::arrayElem(uint64_t element) const {
 	if (element >= this->getLength() && 0 != this->getLength()) {
 		// TODO throw exception
 		std::cout << "Array only got length of " << this->getLength()
@@ -149,8 +147,7 @@ Instance Instance::arrayElem(uint64_t element) {
 		          << std::dec << " has no ByteSize" << std::endl;
 	}
 	assert(childType->getByteSize());
-	return Instance(this->manager,
-	                childType,
+	return Instance(childType,
 	                this->address + (element * childType->getByteSize()),
 	                this);
 }
@@ -161,7 +158,7 @@ uint32_t Instance::memberOffset(const std::string &name) const {
 	return structured->memberOffset(name);
 }
 
-Instance Instance::dereference() {
+Instance Instance::dereference() const {
 	uint64_t newAddress = this->address;
 	VMIInstance *vmi    = VMIInstance::getInstance(); // TODO deglob
 	RefBaseType *ptr_type;
@@ -170,10 +167,10 @@ Instance Instance::dereference() {
 		bt         = ptr_type->getBaseType();
 		newAddress = vmi->read64FromVA(newAddress);
 	}
-	return Instance(this->manager, bt, newAddress, this);
+	return Instance(bt, newAddress, this);
 }
 
-bool Instance::operator==(const Instance &instance) const {
+bool Instance::operator ==(const Instance &instance) const {
 	if (this->type != instance.type)
 		return false;
 	if (this->address != instance.address)
@@ -182,7 +179,7 @@ bool Instance::operator==(const Instance &instance) const {
 	return true;
 }
 
-bool Instance::operator!=(const Instance &instance) const {
+bool Instance::operator !=(const Instance &instance) const {
 	return !(*this == instance);
 }
 

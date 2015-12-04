@@ -24,9 +24,10 @@ public:
 	SymbolManager();
 	virtual ~SymbolManager();
 
+	// disallow copies and moves.
 	SymbolManager(SymbolManager &&other) = delete;
-	SymbolManager(const SymbolManager &other) = delete;
 	SymbolManager &operator =(SymbolManager &&other) = delete;
+	SymbolManager(const SymbolManager &other) = delete;
 	SymbolManager &operator =(const SymbolManager &other) = delete;
 
 	/**
@@ -96,6 +97,8 @@ public:
 	Variable *findVariableByID(uint64_t id);
 	Variable *findVariableByName(const std::string &name);
 
+	void replaceBy(const SymbolManager &other);
+
 protected:
 	/**
 	 * The last id issued.
@@ -116,10 +119,9 @@ protected:
 	typedef std::vector<Array *> ArrayVector;
 	typedef std::map<std::string, Variable *> VariableNameMap;
 
-	std::mutex mapMutex;
-
 	IDRevMap                 idRevMap;
 	IDMap                    idMap;
+	std::mutex               mapMutex;
 
 	SymbolNameMap            symbolNameMap;
 	std::mutex               symbolNameMapMutex;

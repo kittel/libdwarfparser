@@ -10,6 +10,8 @@
 #include "function.h"
 #include "variable.h"
 
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+
 SymbolManager::SymbolManager()
 	:
 	currentID{0} {}
@@ -106,7 +108,7 @@ void SymbolManager::addSymbol(Symbol *sym) {
 		this->symbolNameMapMutex.unlock();
 	}
 
-	this->symbolIDMap[sym->id] = sym;
+	this->symbolIDMap[sym->getID()] = sym;
 }
 
 void SymbolManager::addBaseType(BaseType *bt) {
@@ -251,7 +253,7 @@ void SymbolManager::cleanFunctions() {
 	while (item != funcList.end()) {
 		if (*oldPtr == *(*item)) {
 			delPtr = *item;
-			this->addAlternativeID(oldPtr->id, delPtr->id);
+			this->addAlternativeID(oldPtr->getID(), delPtr->getID());
 			item = funcList.erase(item);
 			delete delPtr;
 		} else {
@@ -345,7 +347,7 @@ void SymbolManager::cleanArrays() {
 
 	while (item != this->arrayVector.end()) {
 		if (*oldPtr == *(*item)) {
-			this->addAlternativeID(oldPtr->id, (*item)->id);
+			this->addAlternativeID(oldPtr->getID(), (*item)->getID());
 			delPtr = *item;
 			item = this->arrayVector.erase(item);
 			delete delPtr;
@@ -376,4 +378,20 @@ Variable *SymbolManager::findVariableByID(uint64_t id) {
 
 Variable *SymbolManager::findVariableByName(const std::string &name) {
 	return this->variableNameMap.find(name)->second;
+}
+
+void SymbolManager::replaceBy(const SymbolManager &other) {
+	this->idRevMap = other.idRevMap;
+	this->idMap = other.idMap;
+	this->symbolNameMap = other.symbolNameMap;
+	this->symbolIDMap = other.symbolIDMap;
+	this->symbolIDAliasMap = other.symbolIDAliasMap;
+	this->symbolIDAliasReverseList = other.symbolIDAliasReverseList;
+	this->baseTypeNameMap = other.baseTypeNameMap;
+	this->functionNameMap = other.functionNameMap;
+	this->funcList = other.funcList;
+	this->refBaseTypeNameMap = other.refBaseTypeNameMap;
+	this->arrayVector = other.arrayVector;
+	this->arrayTypeMap = other.arrayTypeMap;
+	this->variableNameMap = other.variableNameMap;
 }

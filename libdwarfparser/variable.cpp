@@ -46,8 +46,7 @@ void Variable::setLocation(uint64_t location) {
 
 Instance Variable::getInstance() {
 	assert(this->location);
-	Instance instance = Instance(this->Symbol::manager,
-	                             this->getBaseType(),
+	Instance instance = Instance(this->getBaseType(),
 	                             this->location);
 	return instance;
 }

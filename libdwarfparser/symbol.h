@@ -30,14 +30,14 @@ public:
 	virtual void print();
 
 	const std::string name;
-	uint64_t id;
+
+	SymbolManager *const manager;
 
 	static void deleteAllSymbols();
 
 protected:
 	uint32_t byteSize;
-
-	SymbolManager *const manager;
+	uint64_t id;
 };
 
 #endif  /* _SYMBOL_H_ */
