@@ -24,9 +24,9 @@ AC_TYPE_UINT64_T
 
 AC_CHECK_HEADERS([string])
 
-PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.16])                                   
-AC_SUBST([GLIB_CFLAGS])                                                         
-AC_SUBST([GLIB_LIBS])                                                           
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.16])
+AC_SUBST([GLIB_CFLAGS])
+AC_SUBST([GLIB_LIBS])
 
 dnl check libelf library 
 AC_CHECK_HEADER([libelf.h],[ac_cv_has_libelf=1],[ac_cv_has_libelf=0]) 

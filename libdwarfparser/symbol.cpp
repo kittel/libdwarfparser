@@ -180,3 +180,6 @@ std::string Symbol::getName(){
 	return this->name;
 }
 
+void Symbol::deleteAllSymbols(){
+}
+

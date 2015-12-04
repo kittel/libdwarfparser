@@ -15,9 +15,9 @@ Structured::Structured(DwarfParser *parser,
 }
 
 Structured::~Structured(){
-	for(auto& i : memberNameMap){
-		delete i.second;
-	}
+	//for(auto& i : memberNameMap){
+	//	delete i.second;
+	//}
 }
 
 StructuredMember* Structured::addMember(DwarfParser *parser, 

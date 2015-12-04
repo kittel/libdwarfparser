@@ -1,5 +1,6 @@
 #include "CppUTest/TestHarness.h"
 #include "libdwarfparser/libdwarfparser.h"
+#include "libdwarfparser/symbol.h"
 
 #include <iostream>
 
@@ -20,6 +21,7 @@ TEST_GROUP(DwarfTests)
 	{
 		//delete className;
 		printf("Teardown\n");
+		Symbol::deleteAllSymbols();
 	}
 };
 

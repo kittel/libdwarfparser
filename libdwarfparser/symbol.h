@@ -65,6 +65,8 @@ public:
 	static uint64_t numberOfSymbols();
 	static std::set<uint64_t> getAliases(uint64_t id);
 
+	static void deleteAllSymbols();
+
 protected:
 	uint64_t id;
 	uint32_t byteSize;
@@ -83,6 +85,7 @@ protected:
 	static std::mutex               symbolIDAliasMapMutex;
 	static SymbolIDAliasReverseList symbolIDAliasReverseList;
 	static std::mutex               symbolIDAliasReverseListMutex;
+
 
 };
 

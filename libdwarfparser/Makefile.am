@@ -63,4 +63,5 @@ libdwarfparser_la_SOURCES =	basetype.cpp \
 
 libdwarfparser_la_CPPFLAGS = -I $(top_builddir)/../libdwarf/ \
 							 -ggdb \
-							$(GLIB_CFLAGS) 
+							 $(GLIB_CFLAGS) \
+							 -lCppUTest -lCppUTestExt
