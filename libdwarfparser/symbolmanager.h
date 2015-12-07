@@ -47,22 +47,21 @@ public:
 	void removeSymbol(Symbol *sym);
 	void removeSymbol(uint64_t id);
 
-	/** return the symbol associated with the name */
-	Symbol *findSymbolByName(const std::string &name);
-
 	/**
+	 * Searching for a Symbol by Name is flawed by design.
 	 * return the symbol by name and cast it to T.
 	 */
 	template <class T>
 	inline T *findSymbolByName(const std::string &name) {
-		auto bt = this->symbolNameMap.find(name);
-		for (auto &i : this->symbolNameMap) {
-			T *t = dynamic_cast<T *>(i.second);
-			if (t) {
-				return t;
-			}
+		T* t;
+		this->symbolNameMapMutex.lock();
+		auto range = this->symbolNameMap.equal_range(name);
+		for (auto it = range.first; it != range.second ; it++) {
+			T *t = dynamic_cast<T *>(it->second);
+			if (t) break;
 		}
-		return nullptr;
+		this->symbolNameMapMutex.unlock();
+		return t;
 	}
 
 	Symbol *findSymbolByID(uint64_t id);
@@ -96,8 +95,7 @@ public:
 
 	Variable *findVariableByID(uint64_t id);
 	Variable *findVariableByName(const std::string &name);
-
-	void replaceBy(const SymbolManager &other);
+	std::vector<std::string> getVarNames();
 
 protected:
 	/**

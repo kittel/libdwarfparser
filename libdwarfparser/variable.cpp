@@ -15,10 +15,9 @@ Variable::Variable(SymbolManager *mgr,
                    const Dwarf_Die &object,
                    const std::string &name)
 	:
-	Symbol(mgr, parser, object, name),
-	ReferencingType(mgr, parser, object) {
-
-	this->location = 0;
+	Symbol{mgr, parser, object, name},
+	ReferencingType{mgr, parser, object},
+	location{0} {
 
 	this->Symbol::manager->addVariable(this);
 	if (parser->dieHasAttr(object, DW_AT_location)) {

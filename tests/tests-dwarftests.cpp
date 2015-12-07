@@ -18,6 +18,7 @@ TEST_GROUP(DwarfTests)
 		} catch(DwarfException &e) {
 			FAIL("Could not load dwarf test unit");
 		}
+		printf("Setup done\n");
 	}
 
 	void teardown() {

@@ -10,13 +10,16 @@
 #include "function.h"
 #include "variable.h"
 
+#include "helpers.h"
+
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 
 SymbolManager::SymbolManager()
 	:
 	currentID{0} {}
 
-SymbolManager::~SymbolManager() {}
+SymbolManager::~SymbolManager() {
+}
 
 std::pair<uint64_t, uint32_t> SymbolManager::getRevID(uint64_t id) {
 	return this->idRevMap[id];
@@ -45,13 +48,6 @@ uint64_t SymbolManager::getID(uint64_t dwarfID, uint32_t fileID) {
 
 std::set<uint64_t> SymbolManager::getAliases(uint64_t id) {
 	return this->symbolIDAliasReverseList[id];
-}
-
-Symbol *SymbolManager::findSymbolByName(const std::string &name) {
-	this->symbolNameMapMutex.lock();
-	auto ret = this->symbolNameMap.find(name)->second;
-	this->symbolNameMapMutex.unlock();
-	return ret;
 }
 
 Symbol *SymbolManager::findSymbolByID(uint64_t id) {
@@ -221,7 +217,7 @@ Function *SymbolManager::findFunctionByID(uint64_t id) {
 }
 
 Function *SymbolManager::findFunctionByName(const std::string &name) {
-	return this->functionNameMap.find(name)->second;
+	return returnPtrInMap(this->functionNameMap, name);
 }
 
 void SymbolManager::cleanFunctions() {
@@ -377,21 +373,13 @@ Variable *SymbolManager::findVariableByID(uint64_t id) {
 }
 
 Variable *SymbolManager::findVariableByName(const std::string &name) {
-	return this->variableNameMap.find(name)->second;
+	return returnPtrInMap(this->variableNameMap, name);
 }
 
-void SymbolManager::replaceBy(const SymbolManager &other) {
-	this->idRevMap = other.idRevMap;
-	this->idMap = other.idMap;
-	this->symbolNameMap = other.symbolNameMap;
-	this->symbolIDMap = other.symbolIDMap;
-	this->symbolIDAliasMap = other.symbolIDAliasMap;
-	this->symbolIDAliasReverseList = other.symbolIDAliasReverseList;
-	this->baseTypeNameMap = other.baseTypeNameMap;
-	this->functionNameMap = other.functionNameMap;
-	this->funcList = other.funcList;
-	this->refBaseTypeNameMap = other.refBaseTypeNameMap;
-	this->arrayVector = other.arrayVector;
-	this->arrayTypeMap = other.arrayTypeMap;
-	this->variableNameMap = other.variableNameMap;
+std::vector<std::string> SymbolManager::getVarNames() {
+	std::vector<std::string> ret;
+	for (auto& it : this->variableNameMap) {
+		ret.push_back(it.first);
+	}
+	return ret;
 }
