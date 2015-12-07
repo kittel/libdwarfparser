@@ -19,6 +19,9 @@ SymbolManager::SymbolManager()
 	currentID{0} {}
 
 SymbolManager::~SymbolManager() {
+	for (auto& it : symbolIDMap ) {
+		delete (it.second);
+	}
 }
 
 std::pair<uint64_t, uint32_t> SymbolManager::getRevID(uint64_t id) {
@@ -89,6 +92,7 @@ Symbol *SymbolManager::findSymbolByID(uint64_t id) {
 			return symbol->second;
 		}
 	}
+	std::cout << "Revlist size: " << revList.size() << std::endl;
 	assert(false);
 }
 

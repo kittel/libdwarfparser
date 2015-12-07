@@ -33,8 +33,6 @@ public:
 
 	SymbolManager *const manager;
 
-	static void deleteAllSymbols();
-
 protected:
 	uint32_t byteSize;
 	uint64_t id;

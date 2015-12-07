@@ -11,32 +11,17 @@ TEST_GROUP(DwarfTests)
 	SymbolManager mgr;
 
 	void setup() {
-		printf("Setup\n");
 		//printf("Using %s as file\n", argv[1]);
 		try {
 			DwarfParser::parseDwarfFromFilename("./tests/dwarftestunit", &mgr);
 		} catch(DwarfException &e) {
 			FAIL("Could not load dwarf test unit");
 		}
-		printf("Setup done\n");
 	}
 
 	void teardown() {
-		printf("Teardown\n");
-		Symbol::deleteAllSymbols();
 	}
 };
-
-TEST(DwarfTests, Create)
-{
-	//CHECK(0 != className);
-	CHECK(true);
-	CHECK_EQUAL(1,1);
-	LONGS_EQUAL(1,1);
-	DOUBLES_EQUAL(1.000, 1.001, .01);
-	STRCMP_EQUAL("hello", "hello");
-	FAIL("The prior tests pass, but this one doesn't");
-}
 
 TEST(DwarfTests, checkFindBaseTypeByName) {
 	BaseType* bt;
