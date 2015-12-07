@@ -3,13 +3,15 @@
 
 #include "refbasetype.h"
 
-class Pointer: public RefBaseType {
+class Pointer : public RefBaseType {
 public:
-	Pointer(DwarfParser *parser, const Dwarf_Die &object, std::string name);
+	Pointer(SymbolManager *mgr,
+	        DwarfParser *parser,
+	        const Dwarf_Die &object,
+	        const std::string &name);
 	virtual ~Pointer();
 
 	void print();
 };
 
-#endif  /* _POINTER_H_ */
-
+#endif /* _POINTER_H_ */

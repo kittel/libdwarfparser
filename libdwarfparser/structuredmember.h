@@ -6,10 +6,12 @@
 
 #include "structured.h"
 
-class StructuredMember: public Symbol, public ReferencingType {
+class StructuredMember : public Symbol, public ReferencingType {
 public:
-	StructuredMember(DwarfParser *parser, const Dwarf_Die &object, 
-			const std::string &name, Structured *parent);
+	StructuredMember(SymbolManager *mgr, DwarfParser *parser,
+	                 const Dwarf_Die &object,
+	                 const std::string &name,
+	                 Structured *parent);
 	virtual ~StructuredMember();
 
 	uint32_t getByteSize();
@@ -17,14 +19,12 @@ public:
 	uint32_t getBitOffset();
 	uint32_t getMemberLocation();
 
-
 protected:
 	uint32_t bitSize;
 	uint32_t bitOffset;
 	uint32_t memberLocation;
 
-	Structured* parent;
+	Structured *parent;
 };
 
-#endif  /* _STRUCTUREDMEMBER_H_ */
-
+#endif /* _STRUCTUREDMEMBER_H_ */

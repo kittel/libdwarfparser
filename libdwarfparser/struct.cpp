@@ -1,12 +1,10 @@
 #include "struct.h"
 
-Struct::Struct(DwarfParser *parser, 
-		const Dwarf_Die &object, 
-		const std::string &name):
-	Structured(parser, object, name){
+Struct::Struct(SymbolManager *mgr,
+               DwarfParser *parser,
+               const Dwarf_Die &object,
+               const std::string &name)
+	:
+	Structured(mgr, parser, object, name) {}
 
-}
-
-Struct::~Struct(){
-
-}
+Struct::~Struct() {}

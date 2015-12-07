@@ -6,89 +6,85 @@
 
 #include <CppUTest/MemoryLeakDetectorNewMacros.h>
 
-Structured::Structured(DwarfParser *parser, 
-		const Dwarf_Die &object, 
-		const std::string &name):
-	BaseType(parser, object, name),
-	memberNameMap(), memberMutex(){
+Structured::Structured(SymbolManager *mgr,
+                       DwarfParser *parser,
+                       const Dwarf_Die &object,
+                       const std::string &name)
+	:
+	BaseType(mgr, parser, object, name) {}
 
-}
+Structured::~Structured() {}
 
-Structured::~Structured(){
-	//for(auto& i : memberNameMap){
-	//	delete i.second;
-	//}
-}
-
-StructuredMember* Structured::addMember(DwarfParser *parser, 
-		const Dwarf_Die &object, const std::string &memberName){
-	StructuredMember* member;
-	memberMutex.lock();
-	auto memberIter = memberNameMap.find(memberName);
-	if ( memberNameMap.find(memberName) != memberNameMap.end()){
+StructuredMember *Structured::addMember(SymbolManager *mgr,
+                                        DwarfParser *parser,
+                                        const Dwarf_Die &object,
+                                        const std::string &memberName) {
+	StructuredMember *member;
+	this->memberMutex.lock();
+	auto memberIter = this->memberNameMap.find(memberName);
+	if (this->memberNameMap.find(memberName) != this->memberNameMap.end()) {
 		member = memberIter->second;
-	}else{
-		member = new StructuredMember(parser, object, memberName, this);
-		memberNameMap[memberName] = member;
+	} else {
+		member = new StructuredMember(mgr, parser, object, memberName, this);
+		this->memberNameMap[memberName] = member;
 	}
-	memberMutex.unlock();
+	this->memberMutex.unlock();
 	return member;
 }
 
-StructuredMember* Structured::memberByName(const std::string &name){
-	return memberNameMap[name];
+StructuredMember *Structured::memberByName(const std::string &name) {
+	return this->memberNameMap[name];
 }
 
-void Structured::listMembers(){
+void Structured::listMembers() {
 	std::cout << "Members of " << this->name << ": " << std::endl;
-	for(auto& i : memberNameMap){
+	for (auto &i : this->memberNameMap) {
 		std::cout << i.second->getName() << std::endl;
 	}
 }
 
-StructuredMember *Structured::memberByOffset(uint32_t offset){
-	StructuredMember * result = NULL;
-	for (auto& i : memberNameMap){
-		if ( i.second->getMemberLocation() == offset)
+StructuredMember *Structured::memberByOffset(uint32_t offset) {
+	StructuredMember *result = nullptr;
+	for (auto &i : this->memberNameMap) {
+		if (i.second->getMemberLocation() == offset)
 			return i.second;
-		if ( i.second->getMemberLocation() < offset &&
-			(!result || 
-			 i.second->getMemberLocation() > result->getMemberLocation())){
+		if (i.second->getMemberLocation() < offset &&
+		    (!result ||
+		     i.second->getMemberLocation() > result->getMemberLocation())) {
 			result = i.second;
 		}
 	}
 	return result;
 }
 
-std::string Structured::memberNameByOffset(uint32_t offset){
-	for(auto& i : memberNameMap){
-		if(i.second->getMemberLocation() == offset){
+std::string Structured::memberNameByOffset(uint32_t offset) {
+	for (auto &i : this->memberNameMap) {
+		if (i.second->getMemberLocation() == offset) {
 			return i.first;
 		}
 	}
 	return "";
 }
 
-uint32_t Structured::memberOffset(const std::string &member) const{
-	for(auto& i : memberNameMap){
-		if(i.second->getName() == member){
-			return i.second->getMemberLocation();   
+uint32_t Structured::memberOffset(const std::string &member) const {
+	for (auto &i : this->memberNameMap) {
+		if (i.second->getName() == member) {
+			return i.second->getMemberLocation();
 		}
 	}
 	return -1;
 }
 
-void Structured::print(){
+void Structured::print() {
 	std::map<uint32_t, std::string> localMemberMap;
-	for(auto& i : memberNameMap){
+	for (auto &i : this->memberNameMap) {
 		localMemberMap[i.second->getMemberLocation()] = i.first;
 	}
 
-	BaseType::print();
+	BaseType::print(); // < TODO
 	std::cout << "\t Members:      " << std::endl;
-	for(auto& i : localMemberMap){
-		std::cout << "\t\t 0x" << 
-			std::hex << i.first << std::dec <<
-			"\t" << i.second << std::endl;
+	for (auto &i : localMemberMap) {
+		std::cout << "\t\t 0x" << std::hex << i.first << std::dec << "\t"
+		          << i.second << std::endl;
 	}
 }

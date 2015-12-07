@@ -3,14 +3,15 @@
 
 #include "refbasetype.h"
 
-class ConstType: public RefBaseType {
+class ConstType : public RefBaseType {
 public:
-	ConstType(DwarfParser *parser, const Dwarf_Die &object, 
-			const std::string &name);
+	ConstType(SymbolManager *mgr,
+	          DwarfParser *parser,
+	          const Dwarf_Die &object,
+	          const std::string &name);
 	virtual ~ConstType();
 
 	void print();
 };
 
-#endif  /* _CONSTTYPE_H_ */
-
+#endif /* _CONSTTYPE_H_ */

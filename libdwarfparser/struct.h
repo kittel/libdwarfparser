@@ -3,11 +3,13 @@
 
 #include "structured.h"
 
-class Struct: public Structured {
+class Struct : public Structured {
 public:
-	Struct(DwarfParser *parser, const Dwarf_Die &object, const std::string &name);
+	Struct(SymbolManager *mgr,
+	       DwarfParser *parser,
+	       const Dwarf_Die &object,
+	       const std::string &name);
 	virtual ~Struct();
 };
 
-#endif  /* _STRUCT_H_ */
-
+#endif /* _STRUCT_H_ */

@@ -3,13 +3,13 @@
 
 #include "refbasetype.h"
 
-class FuncPointer: public RefBaseType {
+class FuncPointer : public RefBaseType {
 public:
-	FuncPointer(DwarfParser *parser, 
-			const Dwarf_Die &object, 
-			const std::string &name);
+	FuncPointer(SymbolManager *mgr,
+	            DwarfParser *parser,
+	            const Dwarf_Die &object,
+	            const std::string &name);
 	virtual ~FuncPointer();
 };
 
-#endif  /* _FUNCPOINTER_H_ */
-
+#endif /* _FUNCPOINTER_H_ */

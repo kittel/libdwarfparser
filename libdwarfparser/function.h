@@ -6,45 +6,32 @@
 #include <vector>
 
 class Function : public BaseType {
-	public:
-		Function(DwarfParser *parser, 
-				const Dwarf_Die &object, 
-				const std::string &name);
-		virtual ~Function();
+public:
+	Function(SymbolManager *mgr,
+	         DwarfParser *parser,
+	         const Dwarf_Die &object,
+	         const std::string &name);
+	virtual ~Function();
 
-		void addParam(DwarfParser *parser, const Dwarf_Die &object);
+	void addParam(DwarfParser *parser,
+	              const Dwarf_Die &object);
 
-		bool operator< (const Function& func) const;
-		bool operator==(const Function& func) const;
-		static void cleanFunctions();
-		void update(DwarfParser *parser, const Dwarf_Die &object);
-		void print();
+	bool operator <(const Function &func) const;
+	bool operator ==(const Function &func) const;
+	void update(DwarfParser *parser, const Dwarf_Die &object);
+	void print();
 
-		static Function* findFunctionByID(uint64_t id);
-		static Function* findFunctionByName(std::string name);
+	uint64_t getAddress();
 
-		uint64_t getAddress();
+	void updateTypes();
 
-	protected:
-		uint64_t rettype;
+protected:
+	uint64_t rettype;
+	uint64_t address;
 
-		uint64_t address;
-
-		typedef std::vector<uint64_t> ParamList;
-		ParamList paramList;
-		bool paramsFinal;
-
-		void updateTypes();
-		
-		typedef std::map<std::string, Function*> FunctionNameMap;
-		static std::mutex functionNameMapMutex;
-		static FunctionNameMap functionNameMap;
-
-		typedef std::vector<Function*> FuncList;
-		static std::mutex funcListMutex;
-		static FuncList funcList;
-		
+	typedef std::vector<uint64_t> ParamList;
+	ParamList paramList;
+	bool paramsFinal;
 };
 
-#endif  /* _FUNCTION_H_ */
-
+#endif /* _FUNCTION_H_ */

@@ -3,36 +3,34 @@
 #include <iostream>
 #include <cassert>
 
-
-void checkEnum(void){
-	BaseType* bt;
-	bt = BaseType::findBaseTypeByName("testenum");
+void checkEnum(SymbolManager *mgr) {
+	BaseType *bt = mgr->findBaseTypeByName("testenum");
 	assert(bt);
 	assert(bt->getName() == std::string("testenum"));
 
-	Enum *enumPtr = dynamic_cast<Enum*>(bt);
+	Enum *enumPtr = dynamic_cast<Enum *>(bt);
 	assert(enumPtr);
 	assert(enumPtr->enumValue(std::string("testenumzero")) == 0);
 	assert(enumPtr->enumName(0) == std::string("testenumzero"));
 }
 
-void checkStruct(void){
+void checkStruct(SymbolManager *mgr) {
 	BaseType *bt;
-	bt = BaseType::findBaseTypeByName("teststruct1");
+	bt = mgr->findBaseTypeByName("teststruct1");
 	assert(bt);
 	assert(bt->getName() == std::string("teststruct1"));
 	assert(bt->getByteSize() == 16);
 
 	Struct *structPtr;
-	structPtr = dynamic_cast<Struct*>(bt);
+	structPtr = dynamic_cast<Struct *>(bt);
 	assert(structPtr);
-	StructuredMember* sm;
+	StructuredMember *sm;
 	sm = structPtr->memberByName("testmember1");
 	assert(sm);
 
-	bt = BaseType::findBaseTypeByName("teststruct2");
+	bt = mgr->findBaseTypeByName("teststruct2");
 	assert(bt);
-	structPtr = dynamic_cast<Struct*>(bt);
+	structPtr = dynamic_cast<Struct *>(bt);
 	assert(structPtr);
 	sm = structPtr->memberByName("testmember3");
 	assert(sm);
@@ -40,23 +38,24 @@ void checkStruct(void){
 	assert(sm->getBitSize() == 1);
 	assert(sm->getBitOffset() == 23);
 	assert(sm->getMemberLocation() == 8);
-
 }
-	
-int main(int argc, char **argv){
-    if(argc < 2) {
+
+int main(int argc, char **argv) {
+	SymbolManager mgr;
+
+	if (argc < 2) {
 		printf("Expecting filename as argument\n");
 		return 0;
-    } else {
-        //printf("Using %s as file\n", argv[1]);
-		try{
-			DwarfParser::parseDwarfFromFilename(std::string(argv[1]));
-		}catch(DwarfException &e){
+	} else {
+		// printf("Using %s as file\n", argv[1]);
+		try {
+			DwarfParser::parseDwarfFromFilename(std::string(argv[1]), &mgr);
+		} catch (DwarfException &e) {
 			std::cout << e.what() << std::endl;
 		}
-    }
-	checkEnum();
-	checkStruct();
+	}
+	checkEnum(&mgr);
+	checkStruct(&mgr);
 
-    return 0;
+	return 0;
 }

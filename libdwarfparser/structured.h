@@ -3,21 +3,23 @@
 
 #include "basetype.h"
 
-#include <map>
+#include <unordered_map>
 
 class StructuredMember;
 
-class Structured: public BaseType {
+class Structured : public BaseType {
 public:
-	Structured(DwarfParser *parser, 
-			const Dwarf_Die &object, 
-			const std::string &name);
+	Structured(SymbolManager *mgr,
+	           DwarfParser *parser,
+	           const Dwarf_Die &object,
+	           const std::string &name);
 	virtual ~Structured();
 
-	virtual StructuredMember *addMember(DwarfParser *parser, 
-			const Dwarf_Die &object, 
-			const std::string &memberName);
-	StructuredMember* memberByName(const std::string &name);
+	virtual StructuredMember *addMember(SymbolManager *mgr,
+	                                    DwarfParser *parser,
+	                                    const Dwarf_Die &object,
+	                                    const std::string &memberName);
+	StructuredMember *memberByName(const std::string &name);
 
 	void listMembers();
 	StructuredMember *memberByOffset(uint32_t offset);
@@ -27,11 +29,9 @@ public:
 	void print();
 
 private:
-	
-	typedef std::map<std::string, StructuredMember*> MemberNameMap;
+	typedef std::unordered_map<std::string, StructuredMember *> MemberNameMap;
 	MemberNameMap memberNameMap;
 	std::mutex memberMutex;
 };
 
-#endif  /* _STRUCTURED_H_ */
-
+#endif /* _STRUCTURED_H_ */

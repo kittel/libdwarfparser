@@ -3,12 +3,13 @@
 
 #include "structured.h"
 
-class Union: public Structured {
+class Union : public Structured {
 public:
-	Union(DwarfParser *parser, 
-			const Dwarf_Die &object, 
-			const std::string &name);
+	Union(SymbolManager *mgr,
+	      DwarfParser *parser,
+	      const Dwarf_Die &object,
+	      const std::string &name);
 	virtual ~Union();
 };
 
-#endif  /* _UNION_H_ */
+#endif /* _UNION_H_ */
