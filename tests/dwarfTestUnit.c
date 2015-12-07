@@ -3,7 +3,6 @@
 
 #include "helpers.h"
 
-
 struct teststruct1{
 	uint8_t testmember1;
 	uint64_t testmember2;

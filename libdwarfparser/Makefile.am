@@ -1,7 +1,6 @@
 # @configure_input@
 AM_CXXFLAGS = -ggdb -pg -Wall -Wextra -Werror -fpic -std=c++1y \
 			  -I $(top_builddir)/ -I $(top_builddir)/common -O3
-#			  -I $(top_builddir)/ -I $(top_builddir)/common -O3 \
 #			  -include CppUTest/MemoryLeakDetectorNewMacros.h
 
 
@@ -61,7 +60,6 @@ libdwarfparser_la_SOURCES =	basetype.cpp \
 #							helpers.h \
 #							instance.h
 
-libdwarfparser_la_CPPFLAGS = -I $(top_builddir)/../libdwarf/ \
-							 -ggdb \
+libdwarfparser_la_CPPFLAGS = -ggdb \
 							 $(GLIB_CFLAGS) \
 							 -lCppUTest -lCppUTestExt

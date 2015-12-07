@@ -12,6 +12,8 @@
 #include <fstream>
 #include <algorithm>
 
+#include <CppUTest/MemoryLeakDetectorNewMacros.h>
+
 #include "vmiexception.h"
 
 #include "helpers.h"
@@ -252,7 +254,7 @@ std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid){
 
 	assert(str);
 	std::string result = std::string(str);
-	delete str;
+	free(str);
 	return result;
 }
 

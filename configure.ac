@@ -2,6 +2,8 @@ AC_INIT([libdwarfparser], [0.1], [thomas@kittel.it])
 AC_PREREQ([2.65])
 
 AC_CONFIG_MACRO_DIR([m4])
+# use the C++ compiler for the following checks
+AC_LANG([C++])
 
 AM_INIT_AUTOMAKE([-Wall])
 AM_PROG_AR
@@ -34,28 +36,23 @@ if [[ x"${ac_cv_has_libelf}" != x1 ]]
 then 
   AC_MSG_FAILURE([please install libelf development package]) 
 fi 
-AC_CHECK_LIB([elf],[elf_begin],[ac_cv_has_libelf=1],[ac_cv_has_libelf=0]) 
-if [[ x"${ac_cv_has_libelf}" != x1 ]] 
-then 
-  AC_MSG_FAILURE([please install libelf development package]) 
-fi 
- 
-#dnl checl libdwarf library 
-#saved_LIBS="${LIBS}" 
-#LIBS="-lelf" 
-#AC_CHECK_HEADER([libdwarf/libdwarf.h],[ac_cv_has_libdwarf=1],[ac_cv_has_libdwarf=0]) 
-#if [[ x"${ac_cv_has_libdwarf}" != x1 ]] 
-#then 
-#  AC_MSG_FAILURE([please install libdwarf development package]) 
-#fi 
-#AC_CHECK_LIB([dwarf],[dwarf_init],[ac_cv_has_libdwarf=1],[ac_cv_has_libdwarf=0]) 
-#if [[ x"${ac_cv_has_libdwarf}" != x1 ]] 
-#then 
-#  AC_MSG_FAILURE([please install libdwarf development package]) 
-#fi 
-                                                                                
-AC_CHECK_LIB(vmi, vmi_init, [], [echo "Error! You need to have libvmi around."; exit 1])
-AC_CHECK_HEADERS([libvmi/libvmi.h])
+AC_CHECK_LIB([vmi], [vmi_init], [], 
+			 [AC_MSG_ERROR(["Error! You need to have libvmi around."])]
+)
+AC_CHECK_LIB([elf], [elf_begin], [], 
+			 [AC_MSG_ERROR(["Error! You need to have libelf around."])]
+)
+AC_CHECK_HEADERS([libvmi/libvmi.h], [], 
+				 [AC_MSG_ERROR(["Error! You need to have libvmi headers around."])]
+)
+AC_CHECK_LIB([dwarf], [dwarf_init], [], 
+			 [AC_MSG_ERROR(["Error! You need to have libdwarf around."])], 
+			 ["-lelf"]
+)
+AC_CHECK_HEADERS([libdwarf/libdwarf.h], [], 
+				 [AC_MSG_ERROR(["Error! You need to have libdwarf headers around."])]
+)
+
 AC_CHECK_HEADERS([CppUTest/MemoryLeakDetectorMallocMacros.h])
 AC_CHECK_HEADERS([CppUTest/TestHarness.h])
 
