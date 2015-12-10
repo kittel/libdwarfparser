@@ -67,13 +67,14 @@ Symbol *SymbolManager::findSymbolByID(uint64_t id) {
 	this->symbolIDAliasMapMutex.unlock();
 
 	if (symbolIDAlias != this->symbolIDAliasMap.end()) {
-		id = symbolIDAlias->second;
+		uint64_t new_id = symbolIDAlias->second;
 
 		this->symbolIDMapMutex.lock();
-		symbol = this->symbolIDMap.find(id);
+		symbol = this->symbolIDMap.find(new_id);
 		this->symbolIDMapMutex.unlock();
 
 		if (symbol != this->symbolIDMap.end()) {
+			assert(new_id == symbol->second->getID());
 			return symbol->second;
 		}
 	}
@@ -89,10 +90,10 @@ Symbol *SymbolManager::findSymbolByID(uint64_t id) {
 		this->symbolIDMapMutex.unlock();
 
 		if (symbol != this->symbolIDMap.end()) {
+			assert(id == symbol->second->getID());
 			return symbol->second;
 		}
 	}
-	std::cout << "Revlist size: " << revList.size() << std::endl;
 	assert(false);
 }
 

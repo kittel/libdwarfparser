@@ -5,6 +5,8 @@
 #include "dwarfparser.h"
 #include "symbolmanager.h"
 
+#include "helpers.h"
+
 
 RefBaseType::RefBaseType(SymbolManager *mgr,
                          DwarfParser *parser,

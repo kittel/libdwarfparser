@@ -26,8 +26,8 @@ public:
 	uint64_t getID();
 	const std::string &getName();
 
-	void addAlternativeDwarfID(uint64_t id, uint32_t fileID);
-	virtual void print();
+	void addAlternativeDwarfID(uint64_t dwarfid, uint32_t fileID);
+	virtual void print() const;
 
 	const std::string name;
 

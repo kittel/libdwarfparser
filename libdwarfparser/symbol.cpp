@@ -24,9 +24,9 @@ Symbol::Symbol(SymbolManager *manager,
 Symbol::~Symbol() {}
 
 
-void Symbol::addAlternativeDwarfID(uint64_t id, uint32_t fileID) {
-	uint64_t internalID = this->manager->getID(id, fileID);
-	this->manager->addAlternativeID(id, internalID);
+void Symbol::addAlternativeDwarfID(uint64_t dwarfid, uint32_t fileID) {
+	uint64_t internalID = this->manager->getID(dwarfid, fileID);
+	this->manager->addAlternativeID(this->id, internalID);
 }
 
 void Symbol::print() const {
