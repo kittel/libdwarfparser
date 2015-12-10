@@ -26,7 +26,7 @@ public:
 	std::string memberNameByOffset(uint32_t offset);
 	uint32_t memberOffset(const std::string &member) const;
 
-	void print();
+	virtual void print() const;
 
 private:
 	typedef std::unordered_map<std::string, StructuredMember *> MemberNameMap;

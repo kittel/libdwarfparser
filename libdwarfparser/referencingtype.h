@@ -18,6 +18,8 @@ public:
 
 	BaseType *getBaseType();
 
+	virtual void print() const;
+
 protected:
 	uint64_t type;
 	BaseType *base;

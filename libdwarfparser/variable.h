@@ -20,6 +20,8 @@ public:
 
 	Instance getInstance();
 
+	virtual void print() const;
+
 private:
 	uint64_t location;
 };

@@ -21,7 +21,7 @@ public:
 	bool operator ==(const Array &array) const;
 
 	void updateTypes();
-	void print();
+	virtual void print() const;
 
 protected:
 	uint64_t length;

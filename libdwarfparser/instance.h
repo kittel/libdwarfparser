@@ -43,7 +43,7 @@ public:
 	bool operator ==(const Instance &instance) const;
 	bool operator !=(const Instance &instance) const;
 
-	void print();
+	virtual void print() const;
 
 private:
 	const Instance *parent;

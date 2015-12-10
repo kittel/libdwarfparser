@@ -183,7 +183,7 @@ bool Instance::operator !=(const Instance &instance) const {
 	return !(*this == instance);
 }
 
-void Instance::print() {
+void Instance::print() const {
 	std::cout << "Instance @       " << std::hex << this->address << std::dec
 	          << std::endl;
 	this->getType()->print();

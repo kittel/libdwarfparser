@@ -29,7 +29,7 @@ void Symbol::addAlternativeDwarfID(uint64_t id, uint32_t fileID) {
 	this->manager->addAlternativeID(id, internalID);
 }
 
-void Symbol::print() {
+void Symbol::print() const {
 	auto dwarfID = this->manager->getRevID(this->id);
 	std::cout << "Symbolname:      " << this->name << std::endl;
 	std::cout << "\t ID:           " << std::hex << this->id << std::dec

@@ -12,7 +12,7 @@ Pointer::Pointer(SymbolManager *mgr,
 
 Pointer::~Pointer() {}
 
-void Pointer::print() {
+void Pointer::print() const {
 	RefBaseType::print();
 	std::cout << "\t Pointer Size  " << this->byteSize << std::endl;
 }

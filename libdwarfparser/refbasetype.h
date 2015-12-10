@@ -18,7 +18,7 @@ public:
 
 	uint64_t getType();
 
-	void print();
+	virtual void print() const;
 
 protected:
 	uint64_t type;

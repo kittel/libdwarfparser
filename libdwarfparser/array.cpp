@@ -73,7 +73,7 @@ void Array::updateTypes() {
 	}
 }
 
-void Array::print() {
+void Array::print() const {
 	Pointer::print();
 	std::cout << "\t Array Type:   " << std::hex << this->type << std::dec
 	          << std::endl;

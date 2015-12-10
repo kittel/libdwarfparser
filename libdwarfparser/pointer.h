@@ -11,7 +11,7 @@ public:
 	        const std::string &name);
 	virtual ~Pointer();
 
-	void print();
+	virtual void print() const;
 };
 
 #endif /* _POINTER_H_ */

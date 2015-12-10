@@ -51,9 +51,10 @@ uint32_t RefBaseType::getByteSize() {
 	return base->getByteSize();
 }
 
-void RefBaseType::print() {
+void RefBaseType::print() const {
 	BaseType::print();
-	std::cout << "\t Ref Type      " << this->type << std::endl;
+	std::cout << "\t Ref Type      " << std::hex
+	          << this->type << std::dec << std::endl;
 }
 
 uint64_t RefBaseType::getType() {

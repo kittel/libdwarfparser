@@ -49,3 +49,11 @@ Instance Variable::getInstance() {
 	                             this->location);
 	return instance;
 }
+
+void Variable::print() const {
+	std::cout << "Variable:" << std::endl;
+	std::cout << "\t Location:     " << std::hex
+	          << "0x" << this->location << std::dec << std::endl;
+	Symbol::print();
+	ReferencingType::print();
+}

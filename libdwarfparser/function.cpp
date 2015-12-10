@@ -104,7 +104,7 @@ void Function::updateTypes() {
 }
 
 
-void Function::print() {
+void Function::print() const {
 	BaseType::print();
 	std::cout << "\t Address:      " << std::hex << this->address << std::dec
 	          << std::endl;

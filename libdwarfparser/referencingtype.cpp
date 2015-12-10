@@ -27,3 +27,8 @@ BaseType *ReferencingType::getBaseType() {
 	assert(this->base);
 	return this->base;
 }
+
+void ReferencingType::print() const {
+	std::cout << "\t ReferenceType:" << this->type << std::endl;
+}
+
