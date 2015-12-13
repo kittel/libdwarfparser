@@ -32,9 +32,6 @@ DwarfParser::Srcfilesdata::~Srcfilesdata() {
 	this->srcfilescount = 0;
 }
 
-
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-
 uint32_t DwarfParser::nextFileID = 0;
 
 

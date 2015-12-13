@@ -6,8 +6,6 @@
 #include "instance.h"
 #include "symbolmanager.h"
 
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-
 BaseType::BaseType(SymbolManager *manager,
                    DwarfParser *parser,
                    const Dwarf_Die &object,

@@ -12,8 +12,6 @@
 
 #include "helpers.h"
 
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-
 SymbolManager::SymbolManager()
 	:
 	currentID{0} {}
@@ -251,18 +249,23 @@ void SymbolManager::cleanFunctions() {
 	Function *delPtr = nullptr;
 	item++;
 
+	FuncList tmp;
+
 	while (item != funcList.end()) {
 		if (*oldPtr == *(*item)) {
 			delPtr = *item;
 			this->addAlternativeID(oldPtr->getID(), delPtr->getID());
-			item = funcList.erase(item);
 			delete delPtr;
 		} else {
+			tmp.push_back(*item);
 			oldPtr = (*item);
-			item++;
 		}
+		item++;
 	}
-	this->funcList.shrink_to_fit();
+
+	tmp.shrink_to_fit();
+	this->funcList.swap(tmp);
+	tmp.clear();
 	// TODO actually we don't need the vector any more at this point
 	this->funcListMutex.unlock();
 }
@@ -346,18 +349,23 @@ void SymbolManager::cleanArrays() {
 	Array *delPtr = nullptr;
 	item++;
 
+	ArrayVector tmp;
+
 	while (item != this->arrayVector.end()) {
 		if (*oldPtr == *(*item)) {
 			this->addAlternativeID(oldPtr->getID(), (*item)->getID());
 			delPtr = *item;
-			item = this->arrayVector.erase(item);
 			delete delPtr;
 		} else {
 			oldPtr = (*item);
-			item++;
+			tmp.push_back(*item);
 		}
+		item++;
 	}
-	this->arrayVector.shrink_to_fit();
+
+	tmp.shrink_to_fit();
+	this->arrayVector.swap(tmp);
+	tmp.clear();
 
 	this->arrayTypeMapMutex.lock();
 	for (auto &item : arrayVector) {

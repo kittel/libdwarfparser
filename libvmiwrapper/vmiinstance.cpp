@@ -12,8 +12,6 @@
 #include <fstream>
 #include <algorithm>
 
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-
 #include "vmiexception.h"
 
 #include "helpers.h"

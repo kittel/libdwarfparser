@@ -4,8 +4,6 @@
 
 #include <iostream>
 
-#include <CppUTest/MemoryLeakDetectorNewMacros.h>
-
 Structured::Structured(SymbolManager *mgr,
                        DwarfParser *parser,
                        const Dwarf_Die &object,
