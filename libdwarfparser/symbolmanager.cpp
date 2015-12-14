@@ -17,7 +17,7 @@ SymbolManager::SymbolManager()
 	currentID{0} {}
 
 SymbolManager::~SymbolManager() {
-	for (auto& it : symbolIDMap ) {
+	for (auto& it : this->symbolIDMap ) {
 		delete (it.second);
 	}
 }
@@ -27,23 +27,18 @@ std::pair<uint64_t, uint32_t> SymbolManager::getRevID(uint64_t id) {
 }
 
 uint64_t SymbolManager::getID(uint64_t dwarfID, uint32_t fileID) {
+	std::lock_guard<std::mutex> lock(this->mapMutex);
 	auto pair = std::make_pair(dwarfID, fileID);
 
-	this->mapMutex.lock();
 	if (this->idMap[pair] == 0) {
-		// return new ID, as this ID was not yet seen.
-		this->currentID += 1;
-		uint64_t newID = this->currentID;
+		uint64_t newID = ++this->currentID;
 
 		this->idMap[pair]     = newID;
 		this->idRevMap[newID] = pair;
 
-		this->mapMutex.unlock();
 		return newID;
-	} else {
-		this->mapMutex.unlock();
-		return this->idMap[pair];
 	}
+	return this->idMap[pair];
 }
 
 
@@ -92,6 +87,9 @@ Symbol *SymbolManager::findSymbolByID(uint64_t id) {
 			return symbol->second;
 		}
 	}
+	std::cout << "Could not find symbol with id: " << id
+	          << " DwarfID: " << std::hex << this->getRevID(id).first
+	          << std::dec << std::endl;
 	assert(false);
 }
 

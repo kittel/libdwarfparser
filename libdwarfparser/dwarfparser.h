@@ -80,8 +80,6 @@ private:
 
 	SymbolManager *manager;
 
-	static uint32_t nextFileID;
-
 	void read_cu_list();
 	void get_die_and_siblings(const Dwarf_Die &in_die,
 	                          Symbol *parent, int in_level,

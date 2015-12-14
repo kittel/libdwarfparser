@@ -32,7 +32,6 @@ DwarfParser::Srcfilesdata::~Srcfilesdata() {
 	this->srcfilescount = 0;
 }
 
-uint32_t DwarfParser::nextFileID = 0;
 
 
 DwarfParser::DwarfParser(int fd, SymbolManager *manager)
@@ -41,13 +40,17 @@ DwarfParser::DwarfParser(int fd, SymbolManager *manager)
 	fd(fd),
 	is_fd_owner(true),
 	res(DW_DLV_ERROR),
-	fileID(++nextFileID),
 	error(),
 	errhand(),
 	errarg(),
 	curCUOffset(0),
 	nextCUOffset(0),
 	manager{manager} {
+
+	static uint32_t nextFileID = 0;
+	static std::mutex nextFileMutex;
+	std::lock_guard<std::mutex> lock(nextFileMutex);
+	this->fileID = ++nextFileID;
 
 	//std::cout << "Loaded parser with id: " << fileID << std::endl;
 	res = dwarf_init(this->fd, DW_DLC_READ, errhand, errarg, &dbg, &error);

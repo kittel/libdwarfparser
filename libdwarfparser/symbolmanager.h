@@ -104,7 +104,7 @@ protected:
 	uint64_t currentID;
 
 	typedef std::map<std::pair<uint64_t, uint32_t>, uint64_t> IDMap;
-	typedef std::map<uint64_t, std::pair<uint64_t, uint32_t>> IDRevMap;
+	typedef std::unordered_map<uint64_t, std::pair<uint64_t, uint32_t>> IDRevMap;
 	typedef std::multimap<std::string, Symbol *> SymbolNameMap;
 	typedef std::unordered_map<uint64_t, Symbol *> SymbolIDMap;
 	typedef std::unordered_map<uint64_t, uint64_t> SymbolIDAliasMap;
