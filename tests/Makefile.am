@@ -18,6 +18,7 @@ tests_LDFLAGS = -L$(top_builddir)/libvmiwrapper \
                 -L$(top_builddir)/libdwarfparser \
                 -ldwarfparser \
                 -ldwarf -lelf \
+                -lvmi \
                 -lCppUTest -lCppUTestExt
 
 dwarfsymbols_SOURCES = dwarfsymbols.cpp
@@ -28,4 +29,5 @@ dwarfsymbols_LDFLAGS = -L$(top_builddir)/libvmiwrapper \
                        -L$(top_builddir)/libdwarfparser \
                        -ldwarfparser \
                        -ldwarf -lelf \
+                       -lvmi \
                        -lCppUTest -lCppUTestExt

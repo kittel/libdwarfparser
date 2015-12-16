@@ -30,6 +30,9 @@ PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.16])
 AC_SUBST([GLIB_CFLAGS])
 AC_SUBST([GLIB_LIBS])
 
+dnl save libs
+OLDLIBS=$LIBS
+
 dnl check libelf library 
 AC_CHECK_HEADER([libelf.h],[ac_cv_has_libelf=1],[ac_cv_has_libelf=0]) 
 if [[ x"${ac_cv_has_libelf}" != x1 ]] 
@@ -55,6 +58,8 @@ AC_CHECK_HEADERS([libdwarf/libdwarf.h], [],
 
 AC_CHECK_HEADERS([CppUTest/MemoryLeakDetectorMallocMacros.h])
 AC_CHECK_HEADERS([CppUTest/TestHarness.h])
+
+LIBS=$OLDLIBS
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libdwarfparser/Makefile])

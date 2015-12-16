@@ -24,9 +24,9 @@ libvmiwrapper_la_SOURCES = libvmiwrapper.cpp \
 libvmiincludedir = $(includedir)/libvmiwrapper
 
 libvmiinclude_HEADERS = libvmiwrapper.h \
-                     vmiinstance.h \
-                     vmiexception.h
+                        vmiinstance.h \
+                        vmiexception.h
 
 libvmiwrapper_la_CPPFLAGS = -ggdb \
                             $(GLIB_CFLAGS) \
-                            -lCppUTest -lCppUTestExt
+                            -lvmi

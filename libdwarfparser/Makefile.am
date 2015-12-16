@@ -60,4 +60,5 @@ libdwarfparser_la_SOURCES = array.cpp \
                             variable.cpp
 
 libdwarfparser_la_CPPFLAGS = -ggdb \
-                             $(GLIB_CFLAGS)
+                             $(GLIB_CFLAGS) \
+                             -lvmi
