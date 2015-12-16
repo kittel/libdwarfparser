@@ -16,6 +16,28 @@ srcdir      = @srcdir@
 
 lib_LTLIBRARIES = libdwarfparser.la
 
+pkginclude_HEADERS = libdwarfparser.h \
+                     array.h \
+                     basetype.h \
+                     consttype.h \
+                     dwarfexception.h \
+                     dwarfparser.h \
+                     enum.h \
+                     funcpointer.h \
+                     function.h \
+                     instance.h \
+                     pointer.h \
+                     refbasetype.h \
+                     referencingtype.h \
+                     struct.h \
+                     structured.h \
+                     structuredmember.h \
+                     symbol.h \
+                     symbolmanager.h \
+                     typedef.h \
+                     union.h \
+                     variable.h
+
 libdwarfparser_la_SOURCES = array.cpp \
                             basetype.cpp \
                             consttype.cpp \

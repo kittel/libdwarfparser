@@ -39,6 +39,9 @@ depcomp
 .project
 .cproject
 
+*.ex
+*.EX
+
 tags
 
 *objdump

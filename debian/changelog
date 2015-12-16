@@ -1,0 +1,5 @@
+libdwarfparser (0.1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Thomas Kittel <thomas@kittel.it>  Wed, 16 Dec 2015 11:49:43 +0100

@@ -1,0 +1,42 @@
+Source: libdwarfparser
+Priority: optional
+Maintainer: Thomas Kittel <thomas@kittel.it>
+Build-Depends: debhelper (>= 9), autotools-dev
+Standards-Version: 3.9.5
+Section: libs
+Homepage: https://git.kittel.it/kittel/libdwarfparser
+Vcs-Git: https://git.kittel.it/kittel/libdwarfparser.git
+Vcs-Browser: https://git.kittel.it/kittel/libdwarfparser
+
+Package: libdwarfparser-dev
+Section: libdevel
+Architecture: any
+Depends: libdwarfparser (= ${binary:Version}), ${misc:Depends}, libdwarf-dev
+Description: Library to parse dwarf information from elf files (Development Files)
+ This library can provide a C++ Class interface to interact with the object
+ hirarchy described in the dwarf symbol information.
+ This package contains the headers.
+
+Package: libdwarfparser
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libdwarf
+Description: Library to parse dwarf information from elf files
+ This library can provide a C++ Class interface to interact with the object
+ hirarchy described in the dwarf symbol information.
+
+Package: libvmiwrapper-dev
+Section: libdevel
+Architecture: any
+Depends: libvmiwrapper (= ${binary:Version}), ${misc:Depends}, libvmi-dev
+Description: C++ library to interact with libVMI (Development Files)
+ LibVMI is a C library to interact with virtual machines.
+ This library is a C++ wrapper for libVMI.
+ This package contains the headers.
+
+Package: libvmiwrapper
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libvmi0
+Description: C++ library to interact with libVMI
+ LibVMI is a C library to interact with virtual machines.
+ This library is a C++ wrapper for libVMI.
+

@@ -1,7 +1,6 @@
 #ifndef LIBDWARFPARSER_H_
 #define LIBDWARFPARSER_H_
 
-
 #include "array.h"
 #include "basetype.h"
 #include "consttype.h"

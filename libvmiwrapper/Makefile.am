@@ -17,14 +17,16 @@ srcdir      = @srcdir@
 
 lib_LTLIBRARIES = libvmiwrapper.la
 
-libvmiwrapper_la_SOURCES =	libvmiwrapper.cpp \
-							vmiinstance.cpp \
-							vmiexception.cpp
+libvmiwrapper_la_SOURCES = libvmiwrapper.cpp \
+                           vmiinstance.cpp \
+                           vmiexception.cpp
 
-#libvmiwrapper_la_HEADERS =	libvmiwrapper.h \
-#							vmiinstance.h \
-#							vmiexception.h
+libvmiincludedir = $(includedir)/libvmiwrapper
+
+libvmiinclude_HEADERS = libvmiwrapper.h \
+                     vmiinstance.h \
+                     vmiexception.h
 
 libvmiwrapper_la_CPPFLAGS = -ggdb \
-							$(GLIB_CFLAGS) \
-							-lCppUTest -lCppUTestExt
+                            $(GLIB_CFLAGS) \
+                            -lCppUTest -lCppUTestExt
