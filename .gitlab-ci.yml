@@ -1,6 +1,7 @@
 stages:
     - build
     - deploy
+    - cleandeploy
 
 build_libs:
     stage: build
@@ -17,6 +18,17 @@ create_deb:
         - export CURDATE=`date +%Y%m%d%H%M%S`
         - "DEBEMAIL='thomas@kittel.it' dch -v 0.1.$CURDATE -D unstable 'New commit'"
         - dpkg-buildpackage -uc -us -tc -rfakeroot
-        - reprepro -b ~gitlab-runner/repo include unstable ../libdwarfparser_0.1.$CURDATE_amd64.changes
+        - reprepro -b ~gitlab-runner/repo include unstable ../libdwarfparser_0.1.{$CURDATE}_amd64.changes
     when: on_success
+
+clean_deb:
+    stage: cleandeploy
+    only:
+        - master
+    script:
+        - rm ../*.deb
+        - rm ../*.changes
+        - rm ../*.dsc
+        - rm ../*.tar.xz
+    when: always
 
