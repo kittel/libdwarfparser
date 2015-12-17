@@ -14,8 +14,9 @@ create_deb:
     only:
         - master
     script:
-        - "DEBEMAIL='thomas@kittel.it' dch -v 0.1.`date +%Y%m%d%H%M%S` -D unstable 'New commit'"
+        - export CURDATE=`date +%Y%m%d%H%M%S`
+        - "DEBEMAIL='thomas@kittel.it' dch -v 0.1.$CURDATE -D unstable 'New commit'"
         - dpkg-buildpackage -uc -us -tc -rfakeroot
-        - reprepro -b ~gitlab-runner/repo include unstable ../libdwarfparser*.changes
+        - reprepro -b ~gitlab-runner/repo include unstable ../libdwarfparser_0.1.$CURDATE_amd64.changes
     when: on_success
 
