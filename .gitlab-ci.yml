@@ -2,9 +2,6 @@ stages:
     - build
     - deploy
 
-cache:
-    untracked: true
-
 build_libs:
     stage: build
     script:
@@ -19,6 +16,6 @@ create_deb:
     script:
         - "DEBEMAIL='thomas@kittel.it' dch -v 0.1.`date +%Y%m%d%H%M%S` -D unstable 'New commit'"
         - dpkg-buildpackage -uc -us -tc -rfakeroot
-        - reprepro -b ~gitlab-runner/repo include unstable ../*.changes
+        - reprepro -b ~gitlab-runner/repo include unstable ../libdwarfparser*.changes
     when: on_success
 
