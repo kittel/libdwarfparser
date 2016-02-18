@@ -16,6 +16,41 @@ class Symbol;
 class RefBaseType;
 class Variable;
 
+
+template <int pos>
+constexpr uint64_t bit() {
+	return 1UL << pos;
+}
+
+/**
+ * available sources for symbols
+ */
+enum class symbol_source : uint64_t {
+	system_map = bit<0>(),
+	modules = bit<1>(),
+	functions = bit<2>(),
+	dwarf_function = bit<3>(),
+	dwarf_variable = bit<4>(),
+	all = 0xffffffffffffffff,
+};
+
+inline constexpr symbol_source operator &(symbol_source __x,
+                                          symbol_source __y) {
+	return static_cast<symbol_source>(static_cast<uint64_t>(__x) &
+	                                  static_cast<uint64_t>(__y));
+}
+
+inline constexpr symbol_source operator |(symbol_source __x,
+                                          symbol_source __y) {
+	return static_cast<symbol_source>(static_cast<uint64_t>(__x) |
+	                                  static_cast<uint64_t>(__y));
+}
+
+inline constexpr symbol_source operator ~(symbol_source __x) {
+	return static_cast<symbol_source>(~static_cast<uint64_t>(__x));
+}
+
+
 /**
  * Manages a symbol namespace.
  */
@@ -97,7 +132,59 @@ public:
 	Variable *findVariableByName(const std::string &name);
 	std::vector<std::string> getVarNames();
 
+	// migrated from kernel.h
+	/** return the address of public system map symbol */
+	uint64_t getSystemMapAddress(const std::string &name, bool priv=false);
+
+	/** add an elf symbol */
+	void addSymbolAddress(const std::string &name, uint64_t address);
+
+	/** try all possible sources for finding the address for a symbol */
+	uint64_t getSymbolAddress(const std::string &name,
+	                          symbol_source src=symbol_source::all);
+
+	/** return the address of a module symbol */
+	uint64_t getModuleSymbolAddress(const std::string &name);
+
+	/** return the symbol name for given address */
+	std::string getModuleSymbolName(uint64_t address);
+
+	/** test if the address is known as symbol. */
+	bool isSymbol(uint64_t address);
+
+	/** test if address is known as function */
+	bool isFunction(uint64_t address);
+
+	/** add a known function address */
+	void addFunctionAddress(const std::string &name, uint64_t address);
+
+	/** return the address of a function with given name */
+	uint64_t getFunctionAddress(const std::string &name);
+
+	/** return the function name of function at address */
+	std::string getFunctionName(uint64_t address);
+
+	/** return the symbol that is the next one previous to address */
+	uint64_t getContainingSymbol(uint64_t address);
+
+	void updateRevMaps();
+	// ------
+
+	/** place a new entry in the sysmap symbol map */
+	void addSysmapSymbol(const std::string &name, uint64_t address, bool priv);
+
+
 protected:
+	typedef std::unordered_map<std::string, uint64_t> SymbolMap;
+	typedef std::map<uint64_t, std::string> SymbolRevMap;
+	SymbolMap sysMapSymbols;            // sysmap symbols
+	SymbolMap sysMapSymbolsPrivate;     // sysmap private symbols
+
+	SymbolMap moduleSymbolMap;  // kernel module symbols
+	SymbolMap functionSymbolMap; // functions
+	SymbolRevMap moduleSymbolRevMap; // addr -> symbol
+	SymbolRevMap functionSymbolRevMap;  // addr -> funcname
+
 	/**
 	 * The last id issued.
 	 */
