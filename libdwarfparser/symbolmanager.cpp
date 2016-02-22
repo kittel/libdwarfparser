@@ -394,3 +394,179 @@ std::vector<std::string> SymbolManager::getVarNames() {
 	}
 	return ret;
 }
+
+#define enum_bit_test(source, input_enum) \
+	static_cast<uint64_t>(src) & static_cast<uint64_t>(input_enum)
+
+uint64_t SymbolManager::getSymbolAddress(const std::string &symbolName,
+                                         symbol_source src) {
+	uint64_t address;
+
+	if (enum_bit_test(src, symbol_source::system_map)) {
+		address = this->getSystemMapAddress(symbolName);
+		if (address != 0) {
+			return address;
+		}
+	}
+
+	if (enum_bit_test(src, symbol_source::modules)) {
+		address = this->getModuleSymbolAddress(symbolName);
+		if (address != 0) {
+			return address;
+		}
+	}
+
+	if (enum_bit_test(src, symbol_source::functions)) {
+		address = this->getFunctionAddress(symbolName);
+		if (address != 0) {
+			return address;
+		}
+	}
+
+	if (enum_bit_test(src, symbol_source::dwarf_function)) {
+		Function *func = this->findFunctionByName(symbolName);
+		if (func) {
+			uint64_t ret = func->getAddress();
+			if (ret) {
+				return ret;
+			}
+		}
+	}
+
+	if (enum_bit_test(src, symbol_source::dwarf_variable)) {
+		Variable *var = this->findVariableByName(symbolName);
+		if (var) {
+			uint64_t ret = var->getLocation();
+			if (ret) {
+				return ret;
+			}
+		}
+	}
+
+	std::cout << COLOR_RED << COLOR_BOLD
+	          << "Could not find address for variable " << symbolName
+	          << COLOR_NORM << COLOR_BOLD_OFF << std::endl;
+	assert(false);
+	return 0;
+}
+
+#undef enum_bit_test
+
+void SymbolManager::updateRevMaps() {
+	this->moduleSymbolRevMap.clear();
+	this->functionSymbolRevMap.clear();
+
+	for (auto &i : this->moduleSymbolMap) {
+		this->moduleSymbolRevMap[i.second] = i.first;
+	}
+	for (auto &i : this->functionSymbolMap) {
+		this->functionSymbolRevMap[i.second] = i.first;
+	}
+}
+
+
+uint64_t SymbolManager::getSystemMapAddress(const std::string &name,
+                                            bool priv) {
+	auto symbol = this->sysMapSymbols.find(name);
+	if (symbol != this->sysMapSymbols.end()) {
+		return symbol->second;
+	}
+
+	if (priv) {
+		symbol = this->sysMapSymbolsPrivate.find(name);
+		if (symbol != this->sysMapSymbolsPrivate.end()) {
+			return symbol->second;
+		}
+	}
+
+	return 0;
+}
+
+void SymbolManager::addSymbolAddress(const std::string &name,
+                                     uint64_t address) {
+	std::string newName = name;
+	while (this->moduleSymbolMap.find(newName) != this->moduleSymbolMap.end()) {
+		newName = newName.append("_");
+	}
+	this->moduleSymbolMap[newName] = address;
+}
+
+uint64_t SymbolManager::getModuleSymbolAddress(const std::string &name) {
+	auto symbol = this->moduleSymbolMap.find(name);
+	if (symbol != this->moduleSymbolMap.end()) {
+		return symbol->second;
+	}
+	std::cout << "Could not find symbol '" << name << "' in symmap." << std::endl;
+	return 0;
+}
+
+std::string SymbolManager::getModuleSymbolName(uint64_t address) {
+	auto symbol = this->moduleSymbolRevMap.find(address);
+	if (symbol != this->moduleSymbolRevMap.end()) {
+		return symbol->second;
+	}
+	std::cout << "Could not find symbol name for '" << address << "'." << std::endl;
+	return "";
+}
+
+bool SymbolManager::isSymbol(uint64_t address) {
+	if (this->moduleSymbolRevMap.find(address) != this->moduleSymbolRevMap.end()) {
+
+		return true;
+	}
+	return false;
+}
+
+uint64_t SymbolManager::getContainingSymbol(uint64_t address) {
+	auto iter = this->moduleSymbolRevMap.upper_bound(address);
+	if (iter != this->moduleSymbolRevMap.end() &&
+	    iter-- != this->moduleSymbolRevMap.begin()) {
+
+		return iter->first;
+	}
+	return 0;
+}
+
+void SymbolManager::addFunctionAddress(const std::string &name,
+                                       uint64_t address) {
+	std::string newName = name;
+	while (this->functionSymbolMap.find(newName) !=
+	       this->functionSymbolMap.end()) {
+
+		newName = newName.append("_");
+	}
+	this->functionSymbolMap[newName] = address;
+}
+
+uint64_t SymbolManager::getFunctionAddress(const std::string &name) {
+	auto function = this->functionSymbolMap.find(name);
+	if (function != this->functionSymbolMap.end()) {
+		return function->second;
+	}
+	return 0;
+}
+
+std::string SymbolManager::getFunctionName(uint64_t address) {
+	auto function = this->functionSymbolRevMap.find(address);
+	if (function != this->functionSymbolRevMap.end()) {
+		return function->second;
+	}
+	return "";
+}
+
+bool SymbolManager::isFunction(uint64_t address) {
+	if (this->functionSymbolRevMap.find(address) !=
+	    this->functionSymbolRevMap.end()) {
+		return true;
+	}
+	return false;
+}
+
+void SymbolManager::addSysmapSymbol(const std::string &name, uint64_t address, bool priv) {
+	if (priv) {
+		this->sysMapSymbols[name] = address;
+	}
+	else {
+		this->sysMapSymbolsPrivate[name] = address;
+	}
+}
