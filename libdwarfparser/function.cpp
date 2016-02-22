@@ -4,6 +4,7 @@
 
 #include "dwarfparser.h"
 #include "symbolmanager.h"
+#include "pointer.h"
 
 Function::Function(SymbolManager *mgr,
                    DwarfParser *parser,
@@ -33,10 +34,11 @@ void Function::addParam(DwarfParser *parser,
 		uint64_t dwarfType = parser->getDieAttributeNumber(object, DW_AT_type);
 		uint32_t fileID    = parser->getFileID();
 		uint64_t paramType = this->manager->getID(dwarfType, fileID);
+		std::string name   = parser->getDieName(object);
 		if (!paramType) {
 			assert(false);
 		}
-		this->paramList.push_back(paramType);
+		this->paramList.push_back(std::pair<std::string, uint64_t>(name,paramType));
 	}
 }
 
@@ -63,8 +65,8 @@ bool Function::operator <(const Function &func) const {
 		return this->paramList.size() < func.paramList.size();
 
 	for (size_t i = 0; i < this->paramList.size(); i++) {
-		if (this->paramList[i] != func.paramList[i])
-			return this->paramList[i] < func.paramList[i];
+		if (this->paramList[i].second != func.paramList[i].second)
+			return this->paramList[i].second < func.paramList[i].second;
 	}
 	if (this->id != func.id)
 		return this->id < func.id;
@@ -81,7 +83,7 @@ bool Function::operator ==(const Function &func) const {
 	}
 
 	for (size_t i = 0; i < this->paramList.size(); i++) {
-		if (this->paramList[i] != func.paramList[i])
+		if (this->paramList[i].second != func.paramList[i].second)
 			return false;
 	}
 	if (this->name != func.name) {
@@ -97,9 +99,9 @@ void Function::updateTypes() {
 		this->rettype = sym->getID();
 	}
 	for (size_t i = 0; i < this->paramList.size(); i++) {
-		sym = this->manager->findSymbolByID(this->paramList[i]);
+		sym = this->manager->findSymbolByID(this->paramList[i].second);
 		assert(sym);
-		this->paramList[i] = sym->getID();
+		this->paramList[i].second = sym->getID();
 	}
 }
 
@@ -109,11 +111,41 @@ void Function::print() const {
 	std::cout << "\t Address:      " << std::hex << this->address << std::dec
 	          << std::endl;
 	for (auto &param : this->paramList) {
-		std::cout << "\t Param:        " << std::hex << param << std::dec
+		std::cout << "\t Param:        " << std::hex << param.second << std::dec
 		          << std::endl;
 	}
 }
 
 uint64_t Function::getAddress() {
 	return this->address;
+}
+
+	
+std::vector<std::pair<std::string,uint64_t>> Function::getParamList() const {
+	return paramList;
+}
+
+std::vector<std::pair<std::string, BaseType*>> Function::getFullParamList() const {
+	std::vector<std::pair<std::string, BaseType*>> parameters;
+	for (auto &param : this->paramList) {
+		std::string name = param.first;
+		BaseType* type	 = this->manager->findBaseTypeByID(param.second);
+		parameters.push_back(std::pair<std::string, BaseType*>(name,type));
+	}
+	return parameters;
+}
+
+BaseType* Function::getParamByName(const std::string& name) const {
+	for (auto &param : this->paramList) {
+		if (param.first == name)
+			return this->manager->findBaseTypeByID(param.second);
+	}
+	return nullptr;
+}
+
+BaseType* Function::getRetType() const {
+	return this->manager->findBaseTypeByID(rettype);
+}
+uint64_t Function::getRetTypeID() const {
+	return rettype;
 }

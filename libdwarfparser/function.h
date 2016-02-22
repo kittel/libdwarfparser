@@ -25,11 +25,18 @@ public:
 
 	void updateTypes();
 
+	std::vector<std::pair<std::string,uint64_t>> getParamList() const;
+	std::vector<std::pair<std::string, BaseType*>> getFullParamList() const;
+	BaseType* getParamByName(const std::string& name) const;
+	uint64_t getRetTypeID() const;
+	BaseType* getRetType() const;
+
 protected:
 	uint64_t rettype;
 	uint64_t address;
 
-	typedef std::vector<uint64_t> ParamList;
+	// Map might also work, however I assume that a list is faster for <10 entries
+	typedef std::vector<std::pair<std::string, uint64_t>> ParamList;
 	ParamList paramList;
 	bool paramsFinal;
 };
