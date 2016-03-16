@@ -54,3 +54,7 @@ void Enum::printEnumMembers(std::ostream &stream) {
 		stream << it.second << ": " << it.first << std::endl;
 	}
 }
+
+void Enum::print() const {
+	BaseType::print();
+}

@@ -11,6 +11,12 @@
 #include "structuredmember.h"
 #include "symbolmanager.h"
 
+Instance::Instance()
+	:
+	parent{nullptr},
+	type{nullptr},
+	address{0} {}
+
 Instance::Instance(BaseType *type,
                    uint64_t va,
                    const Instance *parent)

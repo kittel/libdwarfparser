@@ -8,7 +8,8 @@ class SymbolManager;
 
 class Instance {
 public:
-	Instance(BaseType *type=nullptr,
+	Instance();
+	Instance(BaseType *type,
 	         uint64_t va=0,
 	         const Instance *parent=nullptr);
 	virtual ~Instance();
