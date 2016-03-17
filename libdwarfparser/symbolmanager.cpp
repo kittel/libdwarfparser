@@ -443,10 +443,10 @@ uint64_t SymbolManager::getSymbolAddress(const std::string &symbolName,
 		}
 	}
 
-	std::cout << COLOR_RED << COLOR_BOLD
+	std::cout << std::endl << COLOR_RED << COLOR_BOLD
 	          << "Could not find address for variable " << symbolName
 	          << COLOR_NORM << COLOR_BOLD_OFF << std::endl;
-	assert(false);
+
 	return 0;
 }
 
@@ -496,7 +496,6 @@ uint64_t SymbolManager::getModuleSymbolAddress(const std::string &name) {
 	if (symbol != this->moduleSymbolMap.end()) {
 		return symbol->second;
 	}
-	std::cout << "Could not find symbol '" << name << "' in symmap." << std::endl;
 	return 0;
 }
 
@@ -505,7 +504,6 @@ std::string SymbolManager::getModuleSymbolName(uint64_t address) {
 	if (symbol != this->moduleSymbolRevMap.end()) {
 		return symbol->second;
 	}
-	std::cout << "Could not find symbol name for '" << address << "'." << std::endl;
 	return "";
 }
 
