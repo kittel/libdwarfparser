@@ -15,6 +15,7 @@ public:
 	virtual ~Instance();
 
 	BaseType *getType() const;
+	BaseType *getRealType() const;
 	uint64_t getAddress() const;
 	uint64_t getLength() const;
 	bool isNULL() const;
@@ -55,14 +56,7 @@ private:
 template <typename T>
 inline T Instance::getValue() {
 	assert(address);
-	assert(type);
-	BaseType *bt = this->type;
-	RefBaseType *rbt;
-	while ((rbt = dynamic_cast<RefBaseType *>(bt))) {
-		assert(rbt->getBaseType());
-		bt = rbt->getBaseType();
-	}
-	return bt->getValue<T>(this->address);
+	return this->getRealType()->getValue<T>(this->address);
 }
 
 template <typename T>

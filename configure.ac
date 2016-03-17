@@ -59,10 +59,49 @@ AC_CHECK_HEADERS([libdwarf/libdwarf.h], [],
 AC_CHECK_HEADERS([CppUTest/MemoryLeakDetectorMallocMacros.h])
 AC_CHECK_HEADERS([CppUTest/TestHarness.h])
 
+dnl Check for cython -> required for python bindings
+AC_PATH_PROG([CYTHON], [cython])
+AM_CONDITIONAL([HAVE_CYTHON], [test "$CYTHON"])
+
+dnl Check for python -> required for python bindings
+AM_PATH_PYTHON([2.0], 
+			   [], 
+			   [AC_MSG_WARN([Python not found. Python is required to build presage python binding. Python can be obtained from http://www.python.org])])
+if test "$PYTHON" != :
+then
+    python_include_path=`$PYTHON -c "import distutils.sysconfig; print distutils.sysconfig.get_python_inc();"`
+    AC_CHECK_HEADERS([${python_include_path}/Python.h],
+                     [have_python_header=true],
+                     [AC_MSG_WARN([Python.h header file not found. Python development files are required to build presage python binding. Python can be obtained from http://www.python.org])],
+                     [])
+fi
+AM_CONDITIONAL([HAVE_PYTHON], [test "$PYTHON" != : -a "x$have_python_header" = "xtrue"])
+
+
+AC_ARG_ENABLE([python-binding],
+              AS_HELP_STRING([--disable-python-binding],
+                             [build python binding (default=enabled)]),
+              [ac_enable_python_binding=$enableval],
+              [ac_enable_python_binding=yes])
+if test "x$ac_enable_python_binding" = "xyes"
+then
+    if test ! "$CYTHON" -o ! "$PYTHON" != : -o ! "x$have_python_header" = "xtrue"
+    then
+        AC_MSG_WARN([Python bindings cannot be built. Ensure that Cython and Python packages are available.])
+    fi
+else
+    AC_MSG_NOTICE([Python bindings will not be built.])
+    AC_MSG_NOTICE([Enable Python binding module building with --enable-python-binding])
+fi
+AM_CONDITIONAL([ENABLE_PYTHON_BINDING], [test "x$ac_enable_python_binding" = "xyes"])
+
+
 LIBS=$OLDLIBS
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libdwarfparser/Makefile])
+AC_CONFIG_FILES([libdwarfparser/python/Makefile])
+AC_CONFIG_FILES([libdwarfparser/python/setup.py])
 AC_CONFIG_FILES([libvmiwrapper/Makefile])
 AC_CONFIG_FILES([tests/Makefile])
 

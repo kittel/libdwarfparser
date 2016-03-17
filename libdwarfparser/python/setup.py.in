@@ -1,0 +1,41 @@
+def getenv_list(var_name):
+    from os import getenv
+    var = getenv(var_name)
+    if var:
+        return var.split()
+    else:
+        return []
+
+from distutils.core import setup
+from distutils.extension import Extension
+from Cython.Build import cythonize
+import pkgconfig
+
+glib_pkg = pkgconfig.parse('glib-2.0')
+glib_include = list(glib_pkg['include_dirs'])
+glib_libraries = list(glib_pkg['libraries'])
+
+extensions = [
+    Extension('dwarfparse', ['dwarfparse.pyx'],
+        language='c++',
+        extra_compile_args=['-std=c++14'],
+        #extra_compile_args=getenv_list('CPPFLAGS') + getenv_list('CXXFLAGS'),
+        #extra_link_args=getenv_list('LDFLAGS'))]
+        include_dirs = ['@top_srcdir@', '@top_srcdir@/libdwarfparser'] + glib_include,
+        library_dirs = ['@top_srcdir@/libdwarfparser/.libs', '@top_srcdir@/libvmiwrapper/.libs'],
+        libraries = ['dwarfparser', 'dwarf', 'elf', 'vmiwrapper', 'vmi'] + glib_libraries,
+    )
+]
+
+setup(
+    name='python-@PACKAGE_NAME@',
+    version='@PACKAGE_VERSION@',
+    description='Libdwarfparser Python binding',
+    author='Thomas Kittel',
+    author_email='@PACKAGE_BUGREPORT@',
+    maintainer='Thomas Kittel',
+    maintainer_email='@PACKAGE_BUGREPORT@',
+    #url='https://.../',
+    py_modules=['dwarfparse'],
+    ext_modules = cythonize(extensions),
+)

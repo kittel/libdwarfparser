@@ -31,6 +31,17 @@ BaseType *Instance::getType() const {
 	return this->type;
 }
 
+BaseType *Instance::getRealType() const {
+	assert(this->type);
+	BaseType *bt = this->type;
+	RefBaseType *rbt;
+	while ((rbt = dynamic_cast<RefBaseType *>(bt))) {
+		assert(rbt->getBaseType());
+		bt = rbt->getBaseType();
+	}
+	return bt;
+}
+
 uint64_t Instance::getAddress() const {
 	return this->address;
 }

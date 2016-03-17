@@ -88,7 +88,7 @@ public:
 	 */
 	template <class T>
 	inline T *findSymbolByName(const std::string &name) {
-		T* t;
+		T* t = nullptr;
 		this->symbolNameMapMutex.lock();
 		auto range = this->symbolNameMap.equal_range(name);
 		for (auto it = range.first; it != range.second ; it++) {

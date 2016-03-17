@@ -1,3 +1,5 @@
+SUBDIRS= . python
+
 # @configure_input@
 AM_CXXFLAGS = -ggdb -pg -Wall -Wextra -Werror -fpic -std=c++14 -I $(top_builddir)/ -I $(top_builddir)/common -O3
 
