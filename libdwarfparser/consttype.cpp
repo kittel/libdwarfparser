@@ -9,7 +9,7 @@ ConstType::ConstType(SymbolManager *mgr,
 
 ConstType::~ConstType() {}
 
-void ConstType::print() {
+void ConstType::print() const {
 	RefBaseType::print();
 	std::cout << "\t ConstType:" << std::endl;
 }

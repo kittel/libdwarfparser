@@ -99,9 +99,9 @@ uint64_t SymbolManager::numberOfSymbols() {
 
 
 void SymbolManager::addSymbol(Symbol *sym) {
-	if (sym->name.size() != 0) {
+	if (sym->getName().size() != 0) {
 		this->symbolNameMapMutex.lock();
-		this->symbolNameMap.insert(std::pair<std::string, Symbol *>(sym->name, sym));
+		this->symbolNameMap.insert(std::pair<std::string, Symbol *>(sym->getName(), sym));
 		this->symbolNameMapMutex.unlock();
 	}
 
@@ -109,22 +109,22 @@ void SymbolManager::addSymbol(Symbol *sym) {
 }
 
 void SymbolManager::addBaseType(BaseType *bt) {
-	if (bt->name.size() != 0) {
-		this->baseTypeNameMap.insert(std::make_pair(bt->name, bt));
+	if (bt->getName().size() != 0) {
+		this->baseTypeNameMap.insert(std::make_pair(bt->getName(), bt));
 	}
 }
 
 void SymbolManager::addRefBaseType(RefBaseType *bt) {
-	if (bt->name.compare("") != 0) {
-		this->refBaseTypeNameMap[bt->name] = bt;
+	if (bt->getName().compare("") != 0) {
+		this->refBaseTypeNameMap[bt->getName()] = bt;
 	}
 }
 
 void SymbolManager::addFunction(Function *fun) {
-	if (fun->name.size() != 0 &&
-	    this->functionNameMap.find(fun->name) == this->functionNameMap.end()) {
+	if (fun->getName().size() != 0 &&
+	    this->functionNameMap.find(fun->getName()) == this->functionNameMap.end()) {
 		this->functionNameMapMutex.lock();
-		this->functionNameMap[fun->name] = fun;
+		this->functionNameMap[fun->getName()] = fun;
 		this->functionNameMapMutex.unlock();
 	}
 	this->funcListMutex.lock();
@@ -139,8 +139,8 @@ void SymbolManager::addArray(Array *ar) {
 }
 
 void SymbolManager::addVariable(Variable *var) {
-	if (var->name.size() != 0) {
-		variableNameMap[var->name] = var;
+	if (var->getName().size() != 0) {
+		variableNameMap[var->getName()] = var;
 	}
 }
 

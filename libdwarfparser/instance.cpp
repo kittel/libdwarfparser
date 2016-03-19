@@ -62,7 +62,7 @@ bool Instance::isNULL() const {
 
 Instance Instance::changeBaseType(const std::string &newType,
                                   const std::string &fieldname) const {
-	BaseType *structModule = this->type->manager->findBaseTypeByName(newType);
+	BaseType *structModule = this->type->getManager()->findBaseTypeByName(newType);
 	assert(structModule);
 	uint64_t newAddress = this->address;
 	BaseType *newBT     = this->type;

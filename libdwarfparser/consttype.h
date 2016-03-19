@@ -11,7 +11,7 @@ public:
 	          const std::string &name);
 	virtual ~ConstType();
 
-	void print();
+	void print() const override;
 };
 
 #endif /* _CONSTTYPE_H_ */

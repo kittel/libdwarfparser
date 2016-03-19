@@ -71,9 +71,9 @@ cdef extern from "dwarfparser.h":
 
 cdef extern from "symbol.h":
     cdef cppclass Symbol:
-        uint32_t getByteSize()
-        uint64_t getID()
-        const string &getName()
+        uint32_t getByteSize() const
+        uint64_t getID() const
+        const string &getName() const
         void print() const
 ctypedef Symbol* Symbol_ptr
 

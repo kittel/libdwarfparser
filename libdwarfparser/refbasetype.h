@@ -11,18 +11,29 @@ public:
 	            const std::string &name);
 	virtual ~RefBaseType();
 
-	void resolveBaseType();
+	/* overloaded class functions */
+	virtual uint32_t getByteSize() override;
+	virtual void print() const override;
+
+	/**
+	 * @return Pointer to the referenced BaseType.
+	 */
 	BaseType *getBaseType();
 
-	virtual uint32_t getByteSize();
-
+	/**
+	 * @return ID of the referenced BaseType.
+	 */
 	uint64_t getType();
 
-	virtual void print() const;
 
 protected:
-	uint64_t type;
-	BaseType *base;
+	uint64_t type; ///< ID of the referenced BaseType
+	BaseType *base; ///< Pointer to the referenced BaseType (if already resolved)
+
+	/**
+	 * Internal function to resolve the BaseType that is referenced by this Type
+	 */
+	void resolveBaseType();
 };
 
 #endif /* _REFBASETYPE_H_ */

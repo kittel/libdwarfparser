@@ -12,8 +12,8 @@ Symbol::Symbol(SymbolManager *manager,
                const Dwarf_Die &object,
                const std::string &name)
 	:
-	name{name},
-	manager{manager} {
+	manager{manager},
+	name{name} {
 
 	this->byteSize = parser->getDieByteSize(object);
 	this->id = this->manager->getID(parser->getDieOffset(object),
@@ -41,14 +41,18 @@ void Symbol::print() const {
 	std::cout << "\t Bytesize:     " << this->byteSize << std::endl;
 }
 
+SymbolManager* Symbol::getManager() const {
+	return this->manager;
+}
+
 uint32_t Symbol::getByteSize() {
 	return this->byteSize;
 }
 
-uint64_t Symbol::getID() {
+uint64_t Symbol::getID() const {
 	return this->id;
 }
 
-const std::string &Symbol::getName() {
+const std::string &Symbol::getName() const {
 	return this->name;
 }

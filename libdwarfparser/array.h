@@ -13,20 +13,29 @@ public:
 	      const std::string &name);
 	virtual ~Array();
 
+	virtual uint32_t getByteSize() override;
+	virtual void print() const override;
+	
+	/**
+	 * @return Number of elements in Array
+	 */
 	uint64_t getLength();
-	virtual uint32_t getByteSize();
+	
+	/**
+	 * Update state of Array
+	 */
 	void update(DwarfParser *parser, const Dwarf_Die &object);
 
 	bool operator <(const Array &array) const;
 	bool operator ==(const Array &array) const;
-
 	void updateTypes();
-	virtual void print() const;
+
 
 protected:
 	uint64_t length;
 	uint64_t lengthType;
 	BaseType *lengthTypeBT;
+
 };
 
 #endif /* _ARRAY_H_ */

@@ -25,20 +25,43 @@ public:
 	         const std::string &name);
 	virtual ~BaseType();
 
+	/**
+	 * The encoding of a type is the corresponding base type (char, int, ...) if available.
+	 * @return Encoding of this type.
+	 */
 	uint64_t getEncoding();
 
+	/**
+	 * Return an Instance for this BaseType for easier navigation.
+	 * @param va Address of the BaseType in Memory
+	 * @return Instance for this BaseType
+	 */
 	Instance getInstance(uint64_t va);
 
+	/**
+	 * Get value of this BaseType in memory. This function does an additional
+	 * check for the correct encoding.
+	 * @param va  Address of the BaseType in memory.
+	 * @param pid Process ID to select the corresponding address space. Defaults to 0 (Kernelspace).
+	 * @return Value of BaseType in memory.
+	 */
 	template <typename T>
 	inline T getValue(uint64_t va, uint64_t pid=0);
 
+	/**
+	 * Get value of this BaseType in memory. This function returns the value
+	 * independent of the actual encoding of the BaseType.
+	 * @param va  Address of the BaseType in memory.
+	 * @param pid Process ID to select the corresponding address space. Defaults to 0 (Kernelspace).
+	 * @return Value of BaseType in memory.
+	 */
 	template <typename T>
 	inline T getRawValue(uint64_t va, uint64_t pid=0);
 
 	virtual void print() const;
 
 private:
-	uint64_t encoding;
+	uint64_t encoding; ///< Encoding of this BaseType.
 };
 
 template <>
