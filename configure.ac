@@ -2,8 +2,10 @@ AC_INIT([libdwarfparser], [0.1], [thomas@kittel.it])
 AC_PREREQ([2.65])
 
 AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_HEADERS([config.h])
 # use the C++ compiler for the following checks
 AC_LANG([C++])
+AM_CXXFLAGS="$AM_CXXFLAGS -std=c++14"
 
 AM_INIT_AUTOMAKE([-Wall])
 AM_PROG_AR
@@ -97,6 +99,16 @@ AM_CONDITIONAL([ENABLE_PYTHON_BINDING], [test "x$ac_enable_python_binding" = "xy
 
 
 LIBS=$OLDLIBS
+
+DX_INIT_DOXYGEN([$PACKAGE_NAME],[Doxyfile], [doc])
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(ON)
+DX_PS_FEATURE(OFF)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([libdwarfparser/Makefile])

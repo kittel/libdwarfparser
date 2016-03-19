@@ -18,6 +18,9 @@ autoscan.log
 .deps
 .libs
 
+doc/html
+doc/latex
+
 dwarfsymbols
 test
 tests/dwarftestunit
@@ -32,7 +35,12 @@ install-sh
 libtool
 ltmain.sh
 missing
+stamp-h1
 
+libdwarfparser/python/build/
+libdwarfparser/python/dwarfparse.cpp
+libdwarfparser/python/dwarfparse.so
+libdwarfparser/python/setup.py
 
 depcomp
 
