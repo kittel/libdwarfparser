@@ -23,6 +23,8 @@ from libc.stdint cimport uint16_t
 from libc.stdint cimport uint32_t
 from libc.stdint cimport uint64_t
 
+ctypedef void* ptr_type
+
 cdef extern from "symbolmanager.h":
     cdef cppclass symbol_source:
         pass
@@ -30,9 +32,9 @@ cdef extern from "symbolmanager.h":
     cdef cppclass SymbolManager:
         SymbolManager()
 
-        T findSymbolByName[T](const string &name)
+        ptr_type findSymbolByName[T](const string &name)
         Symbol* findSymbolByID(uint64_t ID)
-        T findBaseTypeByName[T](const string &name)
+        ptr_type findBaseTypeByName[T](const string &name)
         BaseType* findBaseTypeByID(uint64_t ID)
         RefBaseType *findRefBaseTypeByName(const string &name);
         RefBaseType *findRefBaseTypeByID(uint64_t symId);
