@@ -26,9 +26,9 @@ clean_deb:
     only:
         - master
     script:
-        - rm ../*.deb
-        - rm ../*.changes
-        - rm ../*.dsc
-        - rm ../*.tar.xz
+        - rm -f ../*.deb
+        - rm -f ../*.changes
+        - rm -f ../*.dsc
+        - rm -f ../*.tar.xz
     when: always
 
