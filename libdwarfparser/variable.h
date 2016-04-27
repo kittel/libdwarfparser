@@ -19,7 +19,7 @@ public:
 	 */
 	uint64_t getLocation();
 	void update(DwarfParser *parser, const Dwarf_Die &object);
-	
+
 	/**
 	 * @param location New location of Symbol this Variable points to.
 	 * Set a new location for this Variable.
@@ -31,7 +31,7 @@ public:
 	 */
 	Instance getInstance();
 
-	virtual void print() const;
+	void print() const override;
 
 private:
 	uint64_t location; ///< Location of referenced Symbol.

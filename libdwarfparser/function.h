@@ -19,7 +19,7 @@ public:
 	bool operator <(const Function &func) const;
 	bool operator ==(const Function &func) const;
 	void update(DwarfParser *parser, const Dwarf_Die &object);
-	virtual void print() const;
+	void print() const override;
 
 	uint64_t getAddress();
 

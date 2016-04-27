@@ -14,7 +14,7 @@ public:
 	                 Structured *parent);
 	virtual ~StructuredMember();
 
-	uint32_t getByteSize();
+	uint32_t getByteSize() override;
 	uint32_t getBitSize();
 	uint32_t getBitOffset();
 	uint32_t getMemberLocation();

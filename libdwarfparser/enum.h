@@ -20,7 +20,7 @@ public:
 	std::string enumName(uint32_t value);
 	uint32_t enumValue(const std::string &name);
 	void printEnumMembers(std::ostream &stream);
-	virtual void print() const;
+	void print() const override;
 
 private:
 	EnumValues enumValues;
