@@ -11,7 +11,7 @@ public:
 	        const std::string &name);
 	virtual ~Pointer();
 
-	virtual void print() const;
+	void print() const override;
 };
 
 #endif /* _POINTER_H_ */
