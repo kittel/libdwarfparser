@@ -114,10 +114,10 @@ cdef class SymbolManager:
     def isFunction(self, uint64_t address):
         return self.sm_ptr.isFunction(address)
 
-    def getModuleSymbolName(self, uint64_t address):
-        return self.sm_ptr.getModuleSymbolName(address)
-    def getModuleSymbolAddress(self, const string &name):
-        return self.sm_ptr.getModuleSymbolAddress(name)
+    def getElfSymbolName(self, uint64_t address):
+        return self.sm_ptr.getElfSymbolName(address)
+    def getElfSymbolAddress(self, const string &name):
+        return self.sm_ptr.getElfSymbolAddress(name)
     def getFunctionName(self, uint64_t address):
         return self.sm_ptr.getFunctionName(address)
     def getFunctionAddress(self, const string &name):

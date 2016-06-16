@@ -279,9 +279,7 @@ bool VMIInstance::isPageExecutable(page_info_t *page) const {
 void VMIInstance::dumpMemory(uint64_t address,
                              uint64_t len,
                              std::string filename) {
-	vmiMutex.lock();
 	std::vector<uint8_t> dump = this->readVectorFromVA(address, len);
-	vmiMutex.unlock();
 
 	std::ofstream file(filename, std::ios::binary);
 	if (file.is_open()) {
