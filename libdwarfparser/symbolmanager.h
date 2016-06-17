@@ -136,18 +136,24 @@ public:
 	/** return the address of public system map symbol */
 	uint64_t getSystemMapAddress(const std::string &name, bool priv=false);
 
-	/** add an elf symbol */
-	void addSymbolAddress(const std::string &name, uint64_t address);
+	/**
+	 * add an elf symbol.
+	 * if replace is true, previous entries will be overwritten.
+	 * the return value will then tell you if that was the case.
+	 * @returns true if it was already known
+	 */
+	bool addSymbolAddress(const std::string &name, uint64_t address,
+	                      bool replace=false);
 
 	/** try all possible sources for finding the address for a symbol */
 	uint64_t getSymbolAddress(const std::string &name,
 	                          symbol_source src=symbol_source::all);
 
-	/** return the address of a module symbol */
-	uint64_t getModuleSymbolAddress(const std::string &name);
+	/** return the address of a elf symbol */
+	uint64_t getElfSymbolAddress(const std::string &name);
 
 	/** return the symbol name for given address */
-	std::string getModuleSymbolName(uint64_t address);
+	std::string getElfSymbolName(uint64_t address);
 
 	/** test if the address is known as symbol. */
 	bool isSymbol(uint64_t address);
@@ -180,9 +186,9 @@ protected:
 	SymbolMap sysMapSymbols;            // sysmap symbols
 	SymbolMap sysMapSymbolsPrivate;     // sysmap private symbols
 
-	SymbolMap moduleSymbolMap;  // kernel module symbols
+	SymbolMap elfSymbolMap;  // module symbols from elf files
 	SymbolMap functionSymbolMap; // functions
-	SymbolRevMap moduleSymbolRevMap; // addr -> symbol
+	SymbolRevMap elfSymbolRevMap; // addr -> symbol
 	SymbolRevMap functionSymbolRevMap;  // addr -> funcname
 
 	/**

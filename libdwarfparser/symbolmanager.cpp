@@ -410,7 +410,7 @@ uint64_t SymbolManager::getSymbolAddress(const std::string &symbolName,
 	}
 
 	if (enum_bit_test(src, symbol_source::modules)) {
-		address = this->getModuleSymbolAddress(symbolName);
+		address = this->getElfSymbolAddress(symbolName);
 		if (address != 0) {
 			return address;
 		}
@@ -453,11 +453,11 @@ uint64_t SymbolManager::getSymbolAddress(const std::string &symbolName,
 #undef enum_bit_test
 
 void SymbolManager::updateRevMaps() {
-	this->moduleSymbolRevMap.clear();
+	this->elfSymbolRevMap.clear();
 	this->functionSymbolRevMap.clear();
 
-	for (auto &i : this->moduleSymbolMap) {
-		this->moduleSymbolRevMap[i.second] = i.first;
+	for (auto &i : this->elfSymbolMap) {
+		this->elfSymbolRevMap[i.second] = i.first;
 	}
 	for (auto &i : this->functionSymbolMap) {
 		this->functionSymbolRevMap[i.second] = i.first;
@@ -482,33 +482,53 @@ uint64_t SymbolManager::getSystemMapAddress(const std::string &name,
 	return 0;
 }
 
-void SymbolManager::addSymbolAddress(const std::string &name,
-                                     uint64_t address) {
+bool SymbolManager::addSymbolAddress(const std::string &name,
+                                     uint64_t address, bool replace) {
+	bool duplicate = false;
+	auto it = this->elfSymbolMap.find(name);
+
 	std::string newName = name;
-	while (this->moduleSymbolMap.find(newName) != this->moduleSymbolMap.end()) {
-		newName = newName.append("_");
+
+	while (it != this->elfSymbolMap.end()) {
+
+		std::cout << "to add " << newName << " there was "
+		          << it->second << std::endl;
+
+		if (it->second == address) {
+			return false;
+		}
+
+		duplicate = true;
+		if (not replace) {
+			newName = newName.append("_");
+		} else {
+			break;
+		}
+		it = this->elfSymbolMap.find(newName);
 	}
-	this->moduleSymbolMap[newName] = address;
+	this->elfSymbolMap[newName] = address;
+
+	return duplicate;
 }
 
-uint64_t SymbolManager::getModuleSymbolAddress(const std::string &name) {
-	auto symbol = this->moduleSymbolMap.find(name);
-	if (symbol != this->moduleSymbolMap.end()) {
+uint64_t SymbolManager::getElfSymbolAddress(const std::string &name) {
+	auto symbol = this->elfSymbolMap.find(name);
+	if (symbol != this->elfSymbolMap.end()) {
 		return symbol->second;
 	}
 	return 0;
 }
 
-std::string SymbolManager::getModuleSymbolName(uint64_t address) {
-	auto symbol = this->moduleSymbolRevMap.find(address);
-	if (symbol != this->moduleSymbolRevMap.end()) {
+std::string SymbolManager::getElfSymbolName(uint64_t address) {
+	auto symbol = this->elfSymbolRevMap.find(address);
+	if (symbol != this->elfSymbolRevMap.end()) {
 		return symbol->second;
 	}
 	return "";
 }
 
 bool SymbolManager::isSymbol(uint64_t address) {
-	if (this->moduleSymbolRevMap.find(address) != this->moduleSymbolRevMap.end()) {
+	if (this->elfSymbolRevMap.find(address) != this->elfSymbolRevMap.end()) {
 
 		return true;
 	}
@@ -516,9 +536,9 @@ bool SymbolManager::isSymbol(uint64_t address) {
 }
 
 uint64_t SymbolManager::getContainingSymbol(uint64_t address) {
-	auto iter = this->moduleSymbolRevMap.upper_bound(address);
-	if (iter != this->moduleSymbolRevMap.end() &&
-	    iter-- != this->moduleSymbolRevMap.begin()) {
+	auto iter = this->elfSymbolRevMap.upper_bound(address);
+	if (iter != this->elfSymbolRevMap.end() &&
+	    iter-- != this->elfSymbolRevMap.begin()) {
 
 		return iter->first;
 	}

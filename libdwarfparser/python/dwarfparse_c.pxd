@@ -54,8 +54,8 @@ cdef extern from "symbolmanager.h":
         uint64_t getSymbolAddress(const string &name,
                                   symbol_source src);
 
-        uint64_t getModuleSymbolAddress(const string &name);
-        string getModuleSymbolName(uint64_t address);
+        uint64_t getElfSymbolAddress(const string &name);
+        string getElfSymbolName(uint64_t address);
 
         bool isSymbol(uint64_t address);
         bool isFunction(uint64_t address);
