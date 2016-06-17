@@ -19,7 +19,7 @@ Description: Library to parse dwarf information from elf files (Development File
 
 Package: libdwarfparser
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libdwarf
+Depends: ${shlibs:Depends}, ${misc:Depends}, libdwarf1
 Description: Library to parse dwarf information from elf files
  This library can provide a C++ Class interface to interact with the object
  hirarchy described in the dwarf symbol information.

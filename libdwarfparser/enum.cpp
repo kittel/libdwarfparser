@@ -1,8 +1,6 @@
 #include "enum.h"
 
 #include <iostream>
-#include <libdwarf/dwarf.h>
-#include <libdwarf/libdwarf.h>
 #include <string>
 
 #include "dwarfparser.h"
