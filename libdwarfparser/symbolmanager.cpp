@@ -490,10 +490,6 @@ bool SymbolManager::addSymbolAddress(const std::string &name,
 	std::string newName = name;
 
 	while (it != this->elfSymbolMap.end()) {
-
-		std::cout << "to add " << newName << " there was "
-		          << it->second << std::endl;
-
 		if (it->second == address) {
 			return false;
 		}

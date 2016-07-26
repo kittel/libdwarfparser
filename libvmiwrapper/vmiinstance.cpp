@@ -257,11 +257,11 @@ std::vector<uint8_t> VMIInstance::readVectorFromVA(uint64_t va,
 
 std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid) {
 	vmiMutex.lock();
-	char *str = vmi_read_str_va(vmi, va, pid);
+	char *str = vmi_read_str_va(this->vmi, va, pid);
 	vmiMutex.unlock();
 
 	assert(str);
-	std::string result = std::string(str);
+	std::string result = std::string{str};
 	free(str);
 	return result;
 }
