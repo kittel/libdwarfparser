@@ -5,7 +5,6 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 # use the C++ compiler for the following checks
 AC_LANG([C++])
-AM_CXXFLAGS="$AM_CXXFLAGS -std=c++14"
 
 AM_INIT_AUTOMAKE([-Wall])
 AM_PROG_AR
@@ -13,6 +12,8 @@ LT_INIT
 AC_PROG_LIBTOOL
 AC_PROG_CXX
 AC_PROG_INSTALL
+
+AX_CXX_COMPILE_STDCXX_14
 
 
 AC_HEADER_STDC
