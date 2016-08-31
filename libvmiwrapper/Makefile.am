@@ -1,6 +1,5 @@
 # @configure_input@
-AM_CXXFLAGS = -Wall -Wextra -Werror -fpic -std=c++1y \
-			  -I $(top_builddir)/ -I $(top_builddir)/common -O3
+AM_CXXFLAGS = -Wall -Wextra -fpic -I $(top_builddir)/common -O3
 
 
 # Package-specific substitution variables
@@ -28,5 +27,6 @@ libvmiinclude_HEADERS = libvmiwrapper.h \
                         vmiexception.h
 
 libvmiwrapper_la_CPPFLAGS = -ggdb \
-                            $(GLIB_CFLAGS) \
-                            -lvmi
+                            $(GLIB_CFLAGS)
+
+libvmiwrapper_la_LDFLAGS = -lvmi

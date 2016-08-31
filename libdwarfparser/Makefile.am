@@ -1,7 +1,7 @@
 SUBDIRS= . python
 
 # @configure_input@
-AM_CXXFLAGS = -ggdb -pg -Wall -Wextra -Werror -fpic -std=c++14 -I $(top_builddir)/ -I $(top_builddir)/common -O3
+AM_CXXFLAGS = -ggdb -pg -Wall -Wextra -fpic -I $(top_builddir)/common
 
 
 # Package-specific substitution variables
@@ -62,5 +62,6 @@ libdwarfparser_la_SOURCES = array.cpp \
                             variable.cpp
 
 libdwarfparser_la_CPPFLAGS = -ggdb \
-                             $(GLIB_CFLAGS) \
-                             -lvmi
+                             $(GLIB_CFLAGS)
+
+libdwarfparser_la_LDFLAGS= -lvmi

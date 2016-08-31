@@ -210,9 +210,8 @@ inline std::string BaseType::getRawValue(uint64_t va, uint64_t pid) {
 }
 
 template <typename T>
-inline T BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline T BaseType::getRawValue(uint64_t va, uint64_t /*pid*/) {
 	assert(va);
-	VMIInstance *vmi = VMIInstance::getInstance();
 	return 0;
 }
 
