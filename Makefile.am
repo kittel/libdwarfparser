@@ -8,5 +8,5 @@ EXTRA_DIST = Doxyfile
 
 SUBDIRS= \
 		libvmiwrapper \
-		libdwarfparser \
-		tests
+		libdwarfparser
+#		tests
