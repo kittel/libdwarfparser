@@ -26,7 +26,6 @@ test
 tests/dwarftestunit
 tests/tests
 
-m4
 
 aclocal.m4
 ar-lib
