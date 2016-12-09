@@ -443,9 +443,9 @@ uint64_t SymbolManager::getSymbolAddress(const std::string &symbolName,
 		}
 	}
 
-	std::cout << std::endl << COLOR_RED << COLOR_BOLD
-	          << "Could not find address for variable " << symbolName
-	          << COLOR_NORM << COLOR_BOLD_OFF << std::endl;
+	// std::cout << COLOR_RED << COLOR_BOLD
+	//           << "Could not find address for variable " << symbolName
+	//           << COLOR_NORM << COLOR_BOLD_OFF << std::endl;
 
 	return 0;
 }
