@@ -44,6 +44,8 @@ public:
 	                                      uint32_t pid = 0,
 	                                      bool fillunmapped = 0);
 	std::string readStrFromVA(uint64_t va, uint32_t pid = 0);
+	std::vector<uint8_t> readVectorFromPA(uint64_t pa,
+	                                      uint64_t len);
 	void printKernelPages() const;
 
 	bool isPageSuperuser(page_info_t* page) const;

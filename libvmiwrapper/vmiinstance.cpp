@@ -266,6 +266,23 @@ std::string VMIInstance::readStrFromVA(uint64_t va, uint32_t pid) {
 	return result;
 }
 
+std::vector<uint8_t> VMIInstance::readVectorFromPA(uint64_t pa,
+                                                   uint64_t len) {
+	uint8_t *buffer = (uint8_t *)malloc(len);
+	memset(buffer, 0, len);
+	std::vector<uint8_t> result;
+	size_t res  = 0;
+
+	vmiMutex.lock();
+	res = vmi_read_pa(vmi, pa, buffer, len);
+	vmiMutex.unlock();
+
+	result.insert(result.end(), buffer, buffer + res);
+
+	free(buffer);
+	return result;
+}
+
 bool VMIInstance::isPageSuperuser(page_info_t *page) const {
 	bool ret = IA32E_IS_PAGE_SUPERVISOR(page);
 	return ret;
