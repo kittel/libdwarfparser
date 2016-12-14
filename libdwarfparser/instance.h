@@ -37,10 +37,10 @@ public:
 	Instance dereference() const;
 
 	template <typename T>
-	inline T getValue();
+	inline T getValue() const;
 
 	template <typename T>
-	inline T getRawValue(bool dereference=true);
+	inline T getRawValue(bool dereference=true) const;
 
 	bool operator ==(const Instance &instance) const;
 	bool operator !=(const Instance &instance) const;
@@ -55,13 +55,13 @@ private:
 };
 
 template <typename T>
-inline T Instance::getValue() {
+inline T Instance::getValue() const{
 	assert(address);
 	return this->getRealType()->getValue<T>(this->address);
 }
 
 template <typename T>
-inline T Instance::getRawValue(bool dereference) {
+inline T Instance::getRawValue(bool dereference) const {
 	assert(address);
 	assert(type);
 	if (typeid(T) != typeid(std::string) && dereference &&

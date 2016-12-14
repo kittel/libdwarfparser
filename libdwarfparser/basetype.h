@@ -46,7 +46,7 @@ public:
 	 * @return Value of BaseType in memory.
 	 */
 	template <typename T>
-	inline T getValue(uint64_t va, uint64_t pid=0);
+	inline T getValue(uint64_t va, uint64_t pid=0) const;
 
 	/**
 	 * Get value of this BaseType in memory. This function returns the value
@@ -56,7 +56,7 @@ public:
 	 * @return Value of BaseType in memory.
 	 */
 	template <typename T>
-	inline T getRawValue(uint64_t va, uint64_t pid=0);
+	inline T getRawValue(uint64_t va, uint64_t pid=0) const;
 
 	void print() const override;
 
@@ -65,14 +65,14 @@ private:
 };
 
 template <>
-inline std::string BaseType::getValue(uint64_t va, uint64_t pid) {
+inline std::string BaseType::getValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->readStrFromVA(va, pid);
 }
 
 template <typename T>
-inline T BaseType::getValue(uint64_t va, uint64_t pid) {
+inline T BaseType::getValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	if (!encoding) {
 		std::cout << std::hex << this->getID() << std::dec << " "
@@ -90,6 +90,7 @@ inline T BaseType::getValue(uint64_t va, uint64_t pid) {
 		if (typeid(T) == typeid(bool)) {
 			return (T)vmi->read64FromVA(va, pid);
 		} else {
+			std::cout << "Wrong type, type is: " << this->encoding << std::endl;
 			throw DwarfTypeException("Type not bool");
 		}
 	case DW_ATE_complex_float:
@@ -99,30 +100,35 @@ inline T BaseType::getValue(uint64_t va, uint64_t pid) {
 		if (typeid(T) == typeid(float)) {
 			return (T)vmi->read64FromVA(va, pid);
 		} else {
+			std::cout << "Wrong type, type is: " << this->encoding << std::endl;
 			throw DwarfTypeException("Type not float");
 		}
 	case DW_ATE_signed:
 		if (typeid(T) == typeid(int64_t)) {
 			return (T)vmi->read64FromVA(va, pid);
 		} else {
+			std::cout << "Wrong type, type is: " << this->encoding << std::endl;
 			throw DwarfTypeException("Type not int64_t");
 		}
 	case DW_ATE_signed_char:
 		if (typeid(T) == typeid(int8_t)) {
 			return (T)vmi->read8FromVA(va, pid);
 		} else {
+			std::cout << "Wrong type, type is: " << this->encoding << std::endl;
 			throw DwarfTypeException("Type not int8_t");
 		}
 	case DW_ATE_unsigned:
 		if (typeid(T) == typeid(uint64_t)) {
 			return (T)vmi->read64FromVA(va, pid);
 		} else {
+			std::cout << "Wrong type, type is: " << this->encoding << std::endl;
 			throw DwarfTypeException("Type not uint64_t");
 		}
 	case DW_ATE_unsigned_char:
 		if (typeid(T) == typeid(int8_t)) {
 			return (T)vmi->read8FromVA(va, pid);
 		} else {
+			std::cout << "Wrong type, type is: " << this->encoding << std::endl;
 			throw DwarfTypeException("Type not int8_t");
 		}
 	case DW_ATE_imaginary_float:
@@ -147,70 +153,70 @@ inline T BaseType::getValue(uint64_t va, uint64_t pid) {
 }
 
 template <>
-inline int8_t BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline int8_t BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read8FromVA(va, pid);
 }
 
 template <>
-inline uint8_t BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline uint8_t BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read8FromVA(va, pid);
 }
 
 template <>
-inline int16_t BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline int16_t BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read16FromVA(va, pid);
 }
 
 template <>
-inline uint16_t BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline uint16_t BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read16FromVA(va, pid);
 }
 
 template <>
-inline int32_t BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline int32_t BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read32FromVA(va, pid);
 }
 
 template <>
-inline uint32_t BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline uint32_t BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read32FromVA(va, pid);
 }
 
 template <>
-inline int64_t BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline int64_t BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read64FromVA(va, pid);
 }
 
 template <>
-inline uint64_t BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline uint64_t BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->read64FromVA(va, pid);
 }
 
 template <>
-inline std::string BaseType::getRawValue(uint64_t va, uint64_t pid) {
+inline std::string BaseType::getRawValue(uint64_t va, uint64_t pid) const {
 	assert(va);
 	VMIInstance *vmi = VMIInstance::getInstance();
 	return vmi->readStrFromVA(va, pid);
 }
 
 template <typename T>
-inline T BaseType::getRawValue(uint64_t va, uint64_t /*pid*/) {
+inline T BaseType::getRawValue(uint64_t va, uint64_t /*pid*/) const {
 	assert(va);
 	return 0;
 }
