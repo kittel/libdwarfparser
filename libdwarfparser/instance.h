@@ -44,6 +44,7 @@ public:
 
 	bool operator ==(const Instance &instance) const;
 	bool operator !=(const Instance &instance) const;
+	Instance operator[](uint64_t element) const;
 
 	virtual void print() const;
 

@@ -200,6 +200,10 @@ bool Instance::operator !=(const Instance &instance) const {
 	return !(*this == instance);
 }
 
+Instance Instance::operator[](uint64_t element) const {
+	return this->arrayElem(element);
+}
+
 void Instance::print() const {
 	std::cout << "Instance @       " << std::hex << this->address << std::dec
 	          << std::endl;
