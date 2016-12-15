@@ -46,6 +46,10 @@ uint64_t Instance::getAddress() const {
 	return this->address;
 }
 
+void Instance::setAddress(uint64_t address) {
+	this->address = address;
+}
+
 uint64_t Instance::getLength() const {
 	Array *array = dynamic_cast<Array *>(this->type);
 	if (!array) {

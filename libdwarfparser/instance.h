@@ -17,6 +17,7 @@ public:
 	BaseType *getType() const;
 	BaseType *getRealType() const;
 	uint64_t getAddress() const;
+	void     setAddress(uint64_t address);
 	uint64_t getLength() const;
 	bool isNULL() const;
 
