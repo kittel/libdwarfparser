@@ -223,7 +223,7 @@ cdef class BaseType(Symbol):
         #if encoding == DW_ATE_ASCII:
 
         return None
-        
+
 
     def getRawValueInt64_t(self, uint64_t va, uint64_t pid = 0):
         return self.BaseType_ptr.getRawValue[int64_t](va, pid);

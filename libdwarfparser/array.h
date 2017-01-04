@@ -15,12 +15,12 @@ public:
 
 	virtual uint32_t getByteSize() override;
 	virtual void print() const override;
-	
+
 	/**
 	 * @return Number of elements in Array
 	 */
 	uint64_t getLength();
-	
+
 	/**
 	 * Update state of Array
 	 */

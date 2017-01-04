@@ -31,17 +31,17 @@ public:
 	 * Print all members to stdout
 	 */
 	void listMembers();
-	
+
 	/**
 	 * @return Pointer to Member of Structured Type by member offset
 	 */
 	StructuredMember *memberByOffset(uint32_t offset);
-	
+
 	/**
 	 * @return Name of Member of Structured Type by member offset
 	 */
 	std::string memberNameByOffset(uint32_t offset);
-	
+
 	/**
 	 * @return Offset of Member of Structured Type by member name
 	 */

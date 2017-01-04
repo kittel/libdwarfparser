@@ -26,17 +26,17 @@ public:
 	 * @return SymbolManager in charge of the Symbol
 	 */
 	virtual SymbolManager* getManager() const;
-	
+
 	/**
 	 * @return Number of Bytes occupied by the current symbol.
 	 */
 	virtual uint32_t getByteSize();
-	
+
 	/**
 	 * @return Internal ID of the current Symbol. This is NOT the dwarf ID of the symbol.
 	 */
 	uint64_t getID() const;
-	
+
 	/**
 	 * @return Name of the Symbol (BaseType or Variable name)
 	 */
