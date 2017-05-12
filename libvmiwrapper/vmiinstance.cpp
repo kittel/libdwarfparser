@@ -37,18 +37,18 @@
 
 VMIInstance *VMIInstance::instance = NULL;
 
-VMIInstance::VMIInstance(std::string name, uint32_t flags)
+VMIInstance::VMIInstance(std::string name, vmi_mode flags)
 	:
 	vmiMutex(),
 	paused(false) {
 
 	if (!flags) {
-		flags = VMI_AUTO | VMI_INIT_COMPLETE;
+		flags = VMI_XEN;
 	}
 
 	/* initialize the libvmi library */
-	char *name_i = const_cast<char *>(name.c_str());
-	if (vmi_init(&vmi, flags, name_i) == VMI_FAILURE) {
+	//char *name_i = const_cast<char *>(name.c_str());
+	if (vmi_init(&vmi, flags, (void*)name.c_str(),VMI_INIT_DOMAINNAME,NULL,NULL) == VMI_FAILURE) {
 		printf("Failed to init LibVMI library.\n");
 		throw VMIException();
 	}
