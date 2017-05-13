@@ -112,8 +112,8 @@ public:
 
 	template <class T>
 	T *findBaseTypeByName(const std::string &name) {
-		auto bt = this->baseTypeNameMap.find(name);
-		for (auto &i = bt; bt != this->baseTypeNameMap.end(); ++i) {
+		auto range = this->baseTypeNameMap.equal_range(name);
+		for (auto i = range.first; i != range.second; ++i) {
 			T *t = dynamic_cast<T *>(i->second);
 			if (t)
 				return t;
