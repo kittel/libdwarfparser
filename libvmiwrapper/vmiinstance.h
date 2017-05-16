@@ -27,7 +27,7 @@ private:
 	void resumeVM();
 
 public:
-	VMIInstance(std::string name, uint32_t flags = 0);
+	VMIInstance(std::string name, vmi_mode flags = VMI_XEN);
 	virtual ~VMIInstance();
 
 	static VMIInstance *getInstance();
