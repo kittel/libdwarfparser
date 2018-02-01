@@ -37,18 +37,18 @@
 
 VMIInstance *VMIInstance::instance = NULL;
 
-VMIInstance::VMIInstance(std::string name, uint32_t flags)
+VMIInstance::VMIInstance(std::string name, vmi_mode flags)
 	:
 	vmiMutex(),
 	paused(false) {
 
 	if (!flags) {
-		flags = VMI_AUTO | VMI_INIT_COMPLETE;
+		flags = VMI_XEN;
 	}
 
 	/* initialize the libvmi library */
-	char *name_i = const_cast<char *>(name.c_str());
-	if (vmi_init(&vmi, flags, name_i) == VMI_FAILURE) {
+	//char *name_i = const_cast<char *>(name.c_str());
+	if (vmi_init(&vmi, flags, (void*)name.c_str(),VMI_INIT_DOMAINNAME,NULL,NULL) == VMI_FAILURE) {
 		printf("Failed to init LibVMI library.\n");
 		throw VMIException();
 	}
@@ -103,7 +103,8 @@ vmi_instance_t VMIInstance::getLibVMIInstance() {
 }
 
 void VMIInstance::printKernelPages() const {
-	addr_t init_dtb = vmi_pid_to_dtb(vmi, 1);
+	addr_t init_dtb = 0;
+	vmi_pid_to_dtb(vmi, 1,&init_dtb);
 
 	printf("Init dtb is at %p\n", (void *)init_dtb);
 
@@ -154,7 +155,8 @@ PageMap VMIInstance::destroyMap(PageMap map) const {
 
 PageMap VMIInstance::getPages(uint32_t pid, bool executable) {
 	vmiMutex.lock();
-	addr_t init_dtb = vmi_pid_to_dtb(vmi, ((pid == 0) ? 1 : pid));
+	addr_t init_dtb = 0;
+	vmi_pid_to_dtb(vmi, ((pid == 0) ? 1 : pid),&init_dtb);
 	GSList *pages = vmi_get_va_pages(vmi, init_dtb);
 	vmiMutex.unlock();
 	assert(pages);
@@ -181,10 +183,14 @@ PageMap VMIInstance::getPages(uint32_t pid, bool executable) {
 
 uint64_t VMIInstance::translateV2P(uint64_t va, uint32_t pid) {
 	std::lock_guard<std::mutex> lock(vmiMutex);
+	addr_t ret = 0;
 	if (pid) {
-		return vmi_translate_uv2p(vmi, va, pid);
+		vmi_translate_uv2p(vmi, va, pid, &ret);
+		return ret;
 	}
-	return vmi_translate_kv2p(vmi, va);
+	vmi_translate_kv2p(vmi, va, &ret);
+
+	return ret;
 }
 
 uint8_t VMIInstance::read8FromVA(uint64_t va, uint32_t pid) {
@@ -231,11 +237,12 @@ std::vector<uint8_t> VMIInstance::readVectorFromVA(uint64_t va,
 
 	while (size < len) {
 		vmiMutex.lock();
-		res = vmi_read_va(vmi,
+		vmi_read_va(vmi,
 		                  va + size,
 		                  pid,
+		                  std::min(0x1000, (int)(len - size)),
 		                  buffer + size,
-		                  std::min(0x1000, (int)(len - size)));
+		                  &res);
 		vmiMutex.unlock();
 		size += res;
 		if (res == 0) {
@@ -272,9 +279,9 @@ std::vector<uint8_t> VMIInstance::readVectorFromPA(uint64_t pa,
 	memset(buffer, 0, len);
 	std::vector<uint8_t> result;
 	size_t res  = 0;
-
+	size_t size = 0;
 	vmiMutex.lock();
-	res = vmi_read_pa(vmi, pa, buffer, len);
+	vmi_read_pa(vmi, pa,len, buffer, &res);
 	vmiMutex.unlock();
 
 	result.insert(result.end(), buffer, buffer + res);
