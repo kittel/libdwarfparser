@@ -279,7 +279,7 @@ std::vector<uint8_t> VMIInstance::readVectorFromPA(uint64_t pa,
 	memset(buffer, 0, len);
 	std::vector<uint8_t> result;
 	size_t res  = 0;
-	size_t size = 0;
+	//size_t size = 0;
 	vmiMutex.lock();
 	vmi_read_pa(vmi, pa,len, buffer, &res);
 	vmiMutex.unlock();
