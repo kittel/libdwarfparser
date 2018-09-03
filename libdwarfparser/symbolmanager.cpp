@@ -91,6 +91,7 @@ Symbol *SymbolManager::findSymbolByID(uint64_t id) {
 	          << " DwarfID: " << std::hex << this->getRevID(id).first
 	          << std::dec << std::endl;
 	assert(false);
+	return nullptr;
 }
 
 uint64_t SymbolManager::numberOfSymbols() {
